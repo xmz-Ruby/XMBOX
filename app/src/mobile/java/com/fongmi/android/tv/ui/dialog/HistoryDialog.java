@@ -1,15 +1,20 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.view.LayoutInflater;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogHistoryBinding;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.ui.adapter.ConfigAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class HistoryDialog implements ConfigAdapter.OnClickListener {
@@ -45,7 +50,6 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
         binding.recycler.setHasFixedSize(true);
         binding.recycler.setAdapter(adapter.addAll(type));
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 8));
-        binding.recycler.post(() -> binding.recycler.scrollToPosition(0));
     }
 
     private void setDialog() {
@@ -58,6 +62,13 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
     public void onTextClick(Config item) {
         callback.setConfig(item);
         dialog.dismiss();
+    }
+
+    @Override
+    public void onCopyClick(Config item) {
+        ClipboardManager manager = (ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE);
+        manager.setPrimaryClip(ClipData.newPlainText("url", item.getUrl()));
+        Notify.showCenter("复制成功");
     }
 
     @Override

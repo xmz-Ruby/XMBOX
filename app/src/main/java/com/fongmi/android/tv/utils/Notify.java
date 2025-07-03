@@ -4,8 +4,11 @@ import android.Manifest;
 import android.app.Notification;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +28,7 @@ public class Notify {
     public static final int ID = 9527;
     private AlertDialog mDialog;
     private Toast mToast;
+    private Handler mHandler;
 
     private static class Loader {
         static volatile Notify INSTANCE = new Notify();
@@ -57,6 +61,14 @@ public class Notify {
         get().makeText(text);
     }
 
+    public static void showCenter(int resId) {
+        if (resId != 0) showCenter(ResUtil.getString(resId));
+    }
+
+    public static void showCenter(String text) {
+        get().makeTextCenter(text);
+    }
+
     public static void progress(Context context) {
         dismiss();
         get().create(context);
@@ -85,5 +97,24 @@ public class Notify {
         mToast.setView(view);
         mToast.setDuration(Toast.LENGTH_LONG);
         mToast.show();
+    }
+
+    private void makeTextCenter(String message) {
+        if (mToast != null) mToast.cancel();
+        if (mHandler == null) mHandler = new Handler(Looper.getMainLooper());
+        if (TextUtils.isEmpty(message)) return;
+        mToast = new Toast(App.get());
+        TextView view = (TextView) LayoutInflater.from(App.get()).inflate(R.layout.view_toast, null);
+        view.setText(message);
+        mToast.setView(view);
+        mToast.setDuration(Toast.LENGTH_SHORT);
+        mToast.setGravity(Gravity.CENTER, 0, 0);
+        mToast.show();
+        
+        // 1秒后取消Toast
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler.postDelayed(() -> {
+            if (mToast != null) mToast.cancel();
+        }, 1000); // 1000毫秒 = 1秒
     }
 }
