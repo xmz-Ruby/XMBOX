@@ -26,11 +26,6 @@
 - 支持 TV 和手机双平台
 - Material Design 界面设计
 
-## 应用截图
-- 视频列表
-- 播放界面
-- 设置中心
-
 ## 开发说明
 本项目仅用于学习 Android 开发，代码改自 [FongMi/TV](https://github.com/FongMi/TV)。
 
