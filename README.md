@@ -1,5 +1,17 @@
 # XMBOX
 
+各模块说明:
+
+- app - 主要的应用程序代码
+- catvod - 视频点播相关功能
+- forcetech - 强制技术相关功能
+- hook - 钩子功能
+- jianpian - 剪片相关功能
+- quickjs - JavaScript 引擎
+- thunder - 迅雷下载相关功能
+- tvbus - TV 总线功能
+- zlive - 直播相关功能
+
 一个简单的视频播放器应用，支持以下功能：
 
 ## 主要功能
@@ -267,15 +279,3 @@ getProxy(boolean local)
 [直播-線上](other/sample/live/online.json)  
 [直播-本地](other/sample/live/offline.json)
 
-### 飛機群
-
-[討論群組](https://t.me/+qTlg0qAVzP9kMmM1)  
-[發布頻道](https://t.me/fongmi_release)
-
-### 贊助
-
-![photo_2024-01-10_11-39-12](https://github.com/FongMi/TV/assets/3471963/fdc12771-386c-4d5d-9a4d-d0bec0276fa7)
-
-### Star
-
-[![Star History Chart](https://api.star-history.com/svg?repos=FongMi/TV&type=Date)](https://www.star-history.com/#FongMi/TV&Date)
