@@ -22,8 +22,8 @@ android {
         minSdk 21
         //noinspection ExpiredTargetSdkVersion
         targetSdk 28
-        versionCode 302
-        versionName "3.0.2"
+        versionCode 303
+        versionName "3.0.3"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]
@@ -150,4 +150,5 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
     annotationProcessor 'org.greenrobot:eventbus-annotation-processor:3.3.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs_nio:2.1.4'
+    implementation 'io.noties.markwon:core:4.6.2'
 }
