@@ -60,7 +60,8 @@
     </style>
 
     <style name="Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
-        <item name="android:color">#1F1F1F</item>
+        <item name="android:color">@color/primary</item>
+        <item name="android:height">42dp</item>
     </style>
     
     <style name="BottomNavigationView.TextAppearance" parent="TextAppearance.AppCompat">
@@ -69,10 +70,12 @@
     </style>
     
     <style name="BottomNavigation" parent="Widget.Material3.BottomNavigationView">
-        <item name="itemPaddingTop">8dp</item>
-        <item name="itemPaddingBottom">8dp</item>
+        <item name="itemPaddingTop">4dp</item>
+        <item name="itemPaddingBottom">4dp</item>
         <item name="itemTextAppearanceActive">@style/BottomNavigationView.TextAppearance</item>
         <item name="itemTextAppearanceInactive">@style/BottomNavigationView.TextAppearance</item>
+        <item name="itemRippleColor">@android:color/transparent</item>
+        <item name="android:background">@null</item>
     </style>
 
     <!-- M3 Switch Style -->

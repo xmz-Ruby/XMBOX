@@ -267,6 +267,19 @@ public class Config {
         Keep.delete(getId());
     }
 
+    public Config copy() {
+        Config copy = new Config();
+        copy.setType(type);
+        copy.setUrl(url);
+        copy.setJson(json);
+        copy.setName(TextUtils.isEmpty(name) ? url + " 副本" : name + " 副本");
+        copy.setLogo(logo);
+        copy.setHome(home);
+        copy.setParse(parse);
+        copy.setTime(System.currentTimeMillis());
+        return copy;
+    }
+
     @NonNull
     @Override
     public String toString() {

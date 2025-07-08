@@ -73,6 +73,13 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
 
     @Override
     public void onDeleteClick(Config item) {
-        if (adapter.remove(item) == 0) dialog.dismiss();
+        int count = adapter.remove(item);
+        if (count == 0) {
+            dialog.dismiss();
+        } else {
+            // 强制重新测量布局高度
+            binding.recycler.requestLayout();
+            dialog.getWindow().setLayout(dialog.getWindow().getAttributes().width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 }

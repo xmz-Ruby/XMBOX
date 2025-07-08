@@ -14,6 +14,7 @@ import androidx.core.os.HandlerCompat;
 
 import com.fongmi.android.tv.event.EventIndex;
 import com.fongmi.android.tv.ui.activity.CrashActivity;
+import com.fongmi.android.tv.utils.CacheCleaner;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.hook.Hook;
 import com.github.catvod.Init;
@@ -41,6 +42,7 @@ public class App extends Application {
     private final Gson gson;
     private final long time;
     private Hook hook;
+    private final Runnable cleanTask;
 
     public App() {
         instance = this;
@@ -48,6 +50,7 @@ public class App extends Application {
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
         time = System.currentTimeMillis();
         gson = new Gson();
+        cleanTask = this::checkCacheClean;
     }
 
     public static App get() {
@@ -119,6 +122,10 @@ public class App extends Application {
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         EventBus.builder().addIndex(new EventIndex()).installDefaultEventBus();
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
+        
+        // 初始化自动缓存清理
+        initCacheCleaner();
+        
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
@@ -133,6 +140,8 @@ public class App extends Application {
             @Override
             public void onActivityResumed(@NonNull Activity activity) {
                 if (activity != activity()) setActivity(activity);
+                // 应用回到前台时检查缓存
+                checkCacheClean();
             }
 
             @Override
@@ -154,6 +163,20 @@ public class App extends Application {
             public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
             }
         });
+    }
+
+    private void initCacheCleaner() {
+        CacheCleaner cleaner = CacheCleaner.get();
+        cleaner.setCacheThreshold(200 * 1024 * 1024); // 固定使用200MB阈值
+        
+        // 定期检查缓存 (每30分钟)
+        post(cleanTask, 30 * 60 * 1000);
+    }
+    
+    private void checkCacheClean() {
+        CacheCleaner.get().checkAndClean();
+        // 每30分钟定期检查缓存
+        post(cleanTask, 30 * 60 * 1000);
     }
 
     @Override

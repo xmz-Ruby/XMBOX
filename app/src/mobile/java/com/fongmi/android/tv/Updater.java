@@ -16,7 +16,9 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Github;
 import com.github.catvod.utils.Path;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.orhanobut.logger.Logger;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -25,20 +27,25 @@ import java.util.Locale;
 public class Updater implements Download.Callback {
 
     private DialogUpdateBinding binding;
-    private final Download download;
+    private Download download;
     private AlertDialog dialog;
     private boolean dev;
+    private String downloadUrl;
 
     private File getFile() {
         return Path.cache("update.apk");
     }
 
-    private String getJson() {
-        return Github.getJson(dev, BuildConfig.FLAVOR_mode);
+    private String getApkName() {
+        return "mobile-" + BuildConfig.FLAVOR_abi + ".apk";
     }
 
-    private String getApk() {
-        return Github.getApk(dev, BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_abi);
+    private String getJson() {
+        String url = Github.getReleaseApi();
+        boolean usingCnMirror = Github.useCnMirror();
+        Logger.d("Using CN Mirror: " + usingCnMirror);
+        Logger.d("Update check URL: " + url);
+        return url;
     }
 
     public static Updater create() {
@@ -46,7 +53,7 @@ public class Updater implements Download.Callback {
     }
 
     public Updater() {
-        this.download = Download.create(getApk(), getFile(), this);
+        this.download = Download.create("", getFile(), this);
     }
 
     public Updater force() {
@@ -74,18 +81,43 @@ public class Updater implements Download.Callback {
         App.execute(() -> doInBackground(activity));
     }
 
-    private boolean need(int code, String name) {
-        return Setting.getUpdate() && (dev ? !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE : code > BuildConfig.VERSION_CODE);
+    private boolean need(String tagName) {
+        Logger.d("Current version: " + BuildConfig.VERSION_NAME);
+        Logger.d("Latest version: " + tagName);
+        if (tagName.startsWith("v")) tagName = tagName.substring(1);
+        return Setting.getUpdate() && !tagName.equals(BuildConfig.VERSION_NAME);
     }
 
     private void doInBackground(Activity activity) {
         try {
-            JSONObject object = new JSONObject(OkHttp.string(getJson()));
-            String name = object.optString("name");
-            String desc = object.optString("desc");
-            int code = object.optInt("code");
-            if (need(code, name)) App.post(() -> show(activity, name, desc));
+            String jsonUrl = getJson();
+            Logger.d("Fetching update info from: " + jsonUrl);
+            String response = OkHttp.string(jsonUrl);
+            Logger.d("Update check response: " + response);
+            
+            JSONObject release = new JSONObject(response);
+            String tagName = release.getString("tag_name");
+            String body = release.getString("body");
+            JSONArray assets = release.getJSONArray("assets");
+            
+            // Find the correct APK asset
+            String apkName = getApkName();
+            for (int i = 0; i < assets.length(); i++) {
+                JSONObject asset = assets.getJSONObject(i);
+                if (asset.getString("name").equals(apkName)) {
+                    downloadUrl = asset.getString("browser_download_url");
+                    break;
+                }
+            }
+            
+            if (downloadUrl != null && need(tagName)) {
+                download = Download.create(downloadUrl, getFile(), this);
+                App.post(() -> show(activity, tagName, body));
+            } else {
+                Logger.d("No update needed or APK not found");
+            }
         } catch (Exception e) {
+            Logger.e("Update check failed", e);
             e.printStackTrace();
         }
     }
@@ -127,6 +159,7 @@ public class Updater implements Download.Callback {
 
     @Override
     public void error(String msg) {
+        Logger.e("Download error: " + msg);
         Notify.show(msg);
         dismiss();
     }

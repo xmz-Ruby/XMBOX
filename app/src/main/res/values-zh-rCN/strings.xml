@@ -78,6 +78,8 @@
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">缓存</string>
+    <string name="setting_auto_clean">自动清理缓存</string>
+    <string name="setting_cache_threshold">清理阈值</string>
     <string name="setting_backup">备份</string>
     <string name="setting_restore">恢复</string>
     <string name="setting_version">版本</string>
@@ -88,6 +90,8 @@
     <string name="setting_app">应用设置</string>
     <string name="setting_network">网络设置</string>
     <string name="setting_data">数据管理</string>
+    <string name="app_version">v3.0.3</string>
+    <string name="about_github">在GitHub上查看</string>
 
     <!-- Backup & Restore -->
     <string name="restore_select">选择备份</string>
@@ -143,6 +147,7 @@
     <string name="error_cast_file">不支持的文件格式</string>
     <string name="error_device_limit">设备授权数已达上限</string>
     <string name="error_live_empty">该订阅无直播内容</string>
+    <string name="error_no_live">当前源没有直播内容</string>
 
     <!-- Update -->
     <string name="update_version">发现新版本 <xliff:g name="name">%s</xliff:g></string>

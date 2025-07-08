@@ -76,7 +76,9 @@
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
-    <string name="setting_cache">暫存</string>
+    <string name="setting_cache">緩存</string>
+    <string name="setting_auto_clean">自動清理緩存</string>
+    <string name="setting_cache_threshold">清理閾值</string>
     <string name="setting_backup">備份</string>
     <string name="setting_restore">還原</string>
     <string name="setting_version">版本</string>
@@ -87,6 +89,8 @@
     <string name="setting_app">應用設置</string>
     <string name="setting_network">網絡設置</string>
     <string name="setting_data">數據管理</string>
+    <string name="app_version">v3.0.3</string>
+    <string name="about_github">在GitHub上查看</string>
 
     <!-- Backup & Restore -->
     <string name="restore_select">選擇備份</string>
@@ -138,6 +142,10 @@
     <string name="error_play_timeout">連線逾時</string>
     <string name="error_detail">暫無播放資料</string>
     <string name="error_empty">找不到資料</string>
+    <string name="error_cast_file">不支持的檔案格式</string>
+    <string name="error_device_limit">設備授權數已達上限</string>
+    <string name="error_live_empty">該訂閱無直播內容</string>
+    <string name="error_no_live">當前源沒有直播內容</string>
 
     <!-- Update -->
     <string name="update_version">發現新版本 <xliff:g name="name">%s</xliff:g></string>
@@ -203,5 +211,9 @@
         <item>選擇視軌</item>
         <item>選擇字幕</item>
     </string-array>
+
+    <string name="config_set_current">已設為當前點播源</string>
+    
+    <string name="source_hint">點我添加源</string>
 
 </resources>

@@ -3,9 +3,15 @@ package com.fongmi.android.tv.ui.fragment;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +38,7 @@ import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.ui.activity.HomeActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
+import com.fongmi.android.tv.ui.dialog.AboutDialog;
 import com.fongmi.android.tv.ui.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.LiveDialog;
@@ -91,9 +98,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     @Override
     protected void initView() {
-        mBinding.vodUrl.setText(VodConfig.getDesc());
-        mBinding.liveUrl.setText(LiveConfig.getDesc());
-        mBinding.wallUrl.setText(WallConfig.getDesc());
+        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc());
+        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
+        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         
         // 设置开关的颜色为黄色
@@ -145,6 +152,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.player.setOnClickListener(this::onPlayer);
         mBinding.restore.setOnClickListener(this::onRestore);
         mBinding.version.setOnClickListener(this::onVersion);
+        mBinding.about.setOnClickListener(this::onAbout);
         mBinding.vod.setOnLongClickListener(this::onVodEdit);
         mBinding.vodHome.setOnClickListener(this::onVodHome);
         mBinding.live.setOnLongClickListener(this::onLiveEdit);
@@ -162,6 +170,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     @Override
     public void setConfig(Config config) {
+        // 如果URL为空，不进行任何操作
+        if (config.isEmpty()) return;
+        
         if (config.getUrl().startsWith("file") && !PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
         } else {
@@ -204,7 +215,18 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             @Override
             public void error(String msg) {
                 Notify.show(msg);
-                setConfig(type);
+                Notify.dismiss();
+                switch (type) {
+                    case 0:
+                        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc());
+                        break;
+                    case 1:
+                        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
+                        break;
+                    case 2:
+                        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
+                        break;
+                }
             }
         };
     }
@@ -216,21 +238,34 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 Notify.dismiss();
                 RefreshEvent.video();
                 RefreshEvent.config();
-                mBinding.vodUrl.setText(VodConfig.getDesc());
-                mBinding.liveUrl.setText(LiveConfig.getDesc());
-                mBinding.wallUrl.setText(WallConfig.getDesc());
+                setSourceHintText(mBinding.vodUrl, VodConfig.getDesc());
+                setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
+                setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
                 break;
             case 1:
                 setCacheText();
                 Notify.dismiss();
                 RefreshEvent.config();
-                mBinding.liveUrl.setText(LiveConfig.getDesc());
+                setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
                 break;
             case 2:
                 setCacheText();
                 Notify.dismiss();
-                mBinding.wallUrl.setText(WallConfig.getDesc());
+                setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
                 break;
+        }
+    }
+
+    private void setSourceHintText(TextView textView, String desc) {
+        if (TextUtils.isEmpty(desc)) {
+            SpannableString spannable = new SpannableString(getString(R.string.source_hint));
+            spannable.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.white)), 0, spannable.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new RelativeSizeSpan(0.8f), 0, spannable.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            int alpha = (int)(255 * 0.5f);
+            spannable.setSpan(new ForegroundColorSpan(android.graphics.Color.argb(alpha, 255, 255, 255)), 0, spannable.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            textView.setText(spannable);
+        } else {
+            textView.setText(desc);
         }
     }
 
@@ -298,6 +333,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private void onVersion(View view) {
         Updater.create().force().release().start(getActivity());
+    }
+    
+    private void onAbout(View view) {
+        AboutDialog.show(this);
     }
 
     private boolean onVersionDev(View view) {
@@ -415,9 +454,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     public void onHiddenChanged(boolean hidden) {
         if (hidden) return;
-        mBinding.vodUrl.setText(VodConfig.getDesc());
-        mBinding.liveUrl.setText(LiveConfig.getDesc());
-        mBinding.wallUrl.setText(WallConfig.getDesc());
+        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc());
+        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
+        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
         setCacheText();
     }
 

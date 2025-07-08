@@ -144,8 +144,18 @@ public class ConfigDialog {
     private void onPositive(DialogInterface dialog, int which) {
         String url = binding.url.getText().toString().trim();
         String name = binding.name.getText().toString().trim();
+        
+        // 如果是编辑模式，更新现有配置
         if (edit) Config.find(ori, type).url(url).name(name).update();
-        if (url.isEmpty()) Config.delete(ori, type);
+        
+        // 如果URL为空，删除配置
+        if (url.isEmpty()) {
+            Config.delete(ori, type);
+            dialog.dismiss();
+            return;
+        }
+        
+        // 只有URL不为空时，才设置配置
         callback.setConfig(Config.find(url, type));
         dialog.dismiss();
     }

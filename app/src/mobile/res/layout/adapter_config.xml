@@ -6,17 +6,37 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/text"
-        style="@style/Widget.App.Button.OutlinedButton.SiteDialog"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="14sp"
-        tools:text="https://fongmi.github.io/cat.json" />
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_site_dialog"
+            android:gravity="center"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="14sp"
+            tools:text="https://fongmi.github.io/cat.json" />
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/copy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_setting_copy" />
 
     <ImageView
         android:id="@+id/delete"

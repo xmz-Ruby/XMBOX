@@ -201,6 +201,14 @@ public class Setting {
         Prefers.put("update", update);
     }
 
+    public static boolean getUseCnMirror() {
+        return Prefers.getBoolean("use_cn_mirror", false);
+    }
+
+    public static void putUseCnMirror(boolean useCnMirror) {
+        Prefers.put("use_cn_mirror", useCnMirror);
+    }
+
     public static boolean isCaption() {
         return Prefers.getBoolean("caption");
     }

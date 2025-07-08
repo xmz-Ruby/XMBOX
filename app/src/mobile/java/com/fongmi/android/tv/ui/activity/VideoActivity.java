@@ -4,17 +4,24 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.text.style.ClickableSpan;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,6 +71,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.exo.ExoUtil;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
@@ -98,6 +107,7 @@ import com.github.catvod.utils.Trans;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.permissionx.guolindev.PermissionX;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -148,6 +158,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private Clock mClock;
     private String tag;
     private PiP mPiP;
+    private Handler mHandler;
+    private Runnable mTimeUpdateRunnable;
+    private BroadcastReceiver mBatteryReceiver;
+    private int mBatteryLevel = -1;
 
     public static void push(FragmentActivity activity, String text) {
         if (FileChooser.isValid(activity, Uri.parse(text))) file(activity, FileChooser.getPathFromUri(activity, Uri.parse(text)));
@@ -302,6 +316,64 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         showProgress();
         showDanmaku();
         checkId();
+        mHandler = new Handler(Looper.getMainLooper());
+        initTimeBatteryUpdate();
+    }
+
+    private void initTimeBatteryUpdate() {
+        mBatteryReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
+                    int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                    int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                    if (level != -1 && scale != -1) {
+                        mBatteryLevel = (int) ((level / (float) scale) * 100);
+                        updateTimeBattery();
+                    }
+                }
+            }
+        };
+
+        mTimeUpdateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                updateTimeBattery();
+                mHandler.postDelayed(this, 30000);
+            }
+        };
+    }
+
+    private void updateTimeBattery() {
+        TextView timeBattery = mBinding.getRoot().findViewById(R.id.time_battery);
+        if (timeBattery == null) return;
+        
+        // 只在横屏模式下显示
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            String time = DateFormat.getTimeFormat(this).format(System.currentTimeMillis());
+            String battery = mBatteryLevel >= 0 ? mBatteryLevel + "%" : "";
+            String text = time + (battery.isEmpty() ? "" : " | " + battery);
+            timeBattery.setText(text);
+            timeBattery.setVisibility(View.VISIBLE);
+        } else {
+            timeBattery.setVisibility(View.GONE);
+        }
+    }
+
+    private void startTimeBatteryUpdates() {
+        registerReceiver(mBatteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        updateTimeBattery();
+        mHandler.post(mTimeUpdateRunnable);
+    }
+
+    private void stopTimeBatteryUpdates() {
+        try {
+            if (mBatteryReceiver != null) {
+                unregisterReceiver(mBatteryReceiver);
+            }
+        } catch (Exception e) {
+        }
+        mHandler.removeCallbacks(mTimeUpdateRunnable);
     }
 
     @Override
@@ -960,6 +1032,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        updateTimeBattery();
         setR1Callback();
         checkPlayImg();
     }
@@ -1555,6 +1628,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isAutoRotate() && isPort() && newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && !isRotate()) exitFullscreen();
         if (isAutoRotate() && isPort() && newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) enterFullscreen();
         if (isFullscreen()) Util.hideSystemUI(this);
+        updateTimeBattery();
     }
 
     @Override
@@ -1574,6 +1648,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onResume() {
         super.onResume();
+        startTimeBatteryUpdates();
         if (isRedirect()) onPlay();
         setRedirect(false);
     }
@@ -1581,6 +1656,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onPause() {
         super.onPause();
+        stopTimeBatteryUpdates();
         if (isRedirect()) onPaused();
     }
 
@@ -1608,14 +1684,17 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     protected void onDestroy() {
         super.onDestroy();
         stopSearch();
-        mClock.release();
         mPlayers.release();
+        mClock.release();
         Timer.get().reset();
         RefreshEvent.history();
         PlaybackService.stop();
+        mHandler.removeCallbacksAndMessages(null);
         App.removeCallbacks(mR1, mR2, mR3, mR4);
+        EventBus.getDefault().unregister(this);
         mViewModel.result.removeObserver(mObserveDetail);
         mViewModel.player.removeObserver(mObservePlayer);
         mViewModel.search.removeObserver(mObserveSearch);
+        stopTimeBatteryUpdates();
     }
 }

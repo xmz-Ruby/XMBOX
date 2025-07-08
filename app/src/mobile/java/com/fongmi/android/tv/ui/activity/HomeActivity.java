@@ -179,7 +179,13 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         if (mBinding.navigation.getSelectedItemId() == item.getItemId()) return false;
         if (item.getItemId() == R.id.setting) return mManager.change(1);
         if (item.getItemId() == R.id.vod) return mManager.change(0);
-        if (item.getItemId() == R.id.live) return openLive();
+        if (item.getItemId() == R.id.live) {
+            if (LiveConfig.isEmpty()) {
+                Notify.showCenter(R.string.error_no_live);
+                return false;
+            }
+            return openLive();
+        }
         return false;
     }
 

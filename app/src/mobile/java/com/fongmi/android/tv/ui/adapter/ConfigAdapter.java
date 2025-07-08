@@ -11,6 +11,7 @@ import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.AdapterConfigBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder> {
@@ -26,19 +27,36 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
 
         void onTextClick(Config item);
 
+        void onCopyClick(Config item);
+
         void onDeleteClick(Config item);
     }
 
     public ConfigAdapter addAll(int type) {
-        mItems = Config.getAll(type);
-        mItems.remove(type == 0 ? VodConfig.get().getConfig() : LiveConfig.get().getConfig());
+        mItems = new ArrayList<>();
+        List<Config> configs = Config.getAll(type);
+        Config currentConfig = type == 0 ? VodConfig.get().getConfig() : LiveConfig.get().getConfig();
+        
+        for (Config config : configs) {
+            if (config.equals(currentConfig) || config.isEmpty()) continue;
+            mItems.add(config);
+        }
+        
         return this;
     }
 
+    public void addItem(Config item) {
+        if (item.isEmpty()) return;
+        
+        mItems.add(0, item);
+        notifyItemInserted(0);
+    }
+
     public int remove(Config item) {
+        int position = mItems.indexOf(item);
         item.delete();
         mItems.remove(item);
-        notifyDataSetChanged();
+        notifyItemRemoved(position);
         return getItemCount();
     }
 
@@ -58,6 +76,7 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
         Config item = mItems.get(position);
         holder.binding.text.setText(item.getDesc());
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
+        holder.binding.copy.setOnClickListener(v -> mListener.onCopyClick(item));
         holder.binding.delete.setOnClickListener(v -> mListener.onDeleteClick(item));
     }
 

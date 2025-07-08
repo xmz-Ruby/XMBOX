@@ -82,13 +82,17 @@
     <string name="setting_size">Image size</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
-    <string name="setting_cache">Cache</string>
-    <string name="setting_backup">Backup</string>
-    <string name="setting_restore">Restore</string>
-    <string name="setting_version">Version</string>
+    <string name="setting_cache">缓存</string>
+    <string name="setting_auto_clean">Auto Clean Cache</string>
+    <string name="setting_cache_threshold">Cache Threshold</string>
+    <string name="setting_backup">备份</string>
+    <string name="setting_restore">恢复</string>
+    <string name="setting_version">版本</string>
     <string name="setting_choose">Choose</string>
     <string name="setting_off">Off</string>
     <string name="setting_on">On</string>
+    <string name="app_version">v3.0.3</string>
+    <string name="about_github">View on GitHub</string>
 
     <!-- Backup & Restore -->
     <string name="restore_select">Select backup</string>
@@ -146,6 +150,7 @@
     <string name="error_cast_file">Unsupported file format</string>
     <string name="error_device_limit">Device authorization limit reached</string>
     <string name="error_live_empty">This subscription has no live content</string>
+    <string name="error_no_live">Current source has no live content</string>
     <string name="error_empty">Not found</string>
     <string name="error_detail">No play data</string>
     <string name="error_play_flag">No flag data</string>
@@ -223,5 +228,11 @@
     </string-array>
 
     <string name="config_set_current">已设为当前点播源</string>
+
+    <string name="remember_setting">Remember settings</string>
+    <string name="target_size">Target size</string>
+    <string name="scan_result">Scan result</string>
+    
+    <string name="source_hint">点我添加源</string>
 
 </resources>
