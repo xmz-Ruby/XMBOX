@@ -37,6 +37,7 @@ import com.fongmi.android.tv.impl.ProxyCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.ui.activity.HomeActivity;
+import com.fongmi.android.tv.ui.activity.SettingPlayerActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.AboutDialog;
 import com.fongmi.android.tv.ui.dialog.ConfigDialog;
@@ -98,10 +99,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     @Override
     protected void initView() {
-        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc());
-        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
-        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
-        mBinding.versionText.setText(BuildConfig.VERSION_NAME);
+        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc(), R.string.source_hint_setting);
+        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
+        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
+        mBinding.versionText.setText(getString(R.string.setting_version) + " " + BuildConfig.VERSION_NAME);
         
         // 设置开关的颜色为黄色
         int accentColor = getResources().getColor(R.color.accent);
@@ -170,33 +171,58 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     @Override
     public void setConfig(Config config) {
-        // 如果URL为空，不进行任何操作
-        if (config.isEmpty()) return;
+        // 添加Fragment状态检查，防止在无效状态下执行
+        if (getActivity() == null || !isAdded() || isDetached()) return;
         
-        if (config.getUrl().startsWith("file") && !PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
-        } else {
-            load(config);
+        // 如果URL为空，不进行任何操作
+        if (config == null || config.isEmpty()) return;
+        
+        try {
+            if (config.getUrl().startsWith("file") && !PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> {
+                    if (getActivity() != null && isAdded()) {
+                        load(config);
+                    }
+                });
+            } else {
+                load(config);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     private void load(Config config) {
-        switch (config.getType()) {
-            case 0:
-                Notify.progress(getActivity());
-                VodConfig.load(config, getCallback(0));
-                mBinding.vodUrl.setText(config.getDesc());
-                break;
-            case 1:
-                Notify.progress(getActivity());
-                LiveConfig.load(config, getCallback(1));
-                mBinding.liveUrl.setText(config.getDesc());
-                break;
-            case 2:
-                Notify.progress(getActivity());
-                WallConfig.load(config, getCallback(2));
-                mBinding.wallUrl.setText(config.getDesc());
-                break;
+        // 再次检查Fragment状态，防止在异步回调中执行
+        if (getActivity() == null || !isAdded() || isDetached()) return;
+        
+        try {
+            switch (config.getType()) {
+                case 0:
+                    Notify.progress(getActivity());
+                    VodConfig.load(config, getCallback(0));
+                    if (mBinding != null && mBinding.vodUrl != null) {
+                        mBinding.vodUrl.setText(config.getDesc());
+                    }
+                    break;
+                case 1:
+                    Notify.progress(getActivity());
+                    LiveConfig.load(config, getCallback(1));
+                    if (mBinding != null && mBinding.liveUrl != null) {
+                        mBinding.liveUrl.setText(config.getDesc());
+                    }
+                    break;
+                case 2:
+                    Notify.progress(getActivity());
+                    WallConfig.load(config, getCallback(2));
+                    if (mBinding != null && mBinding.wallUrl != null) {
+                        mBinding.wallUrl.setText(config.getDesc());
+                    }
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Notify.dismiss();
         }
     }
 
@@ -204,27 +230,33 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         return new Callback() {
             @Override
             public void success(String result) {
+                // 检查Fragment是否还在活动状态
+                if (getActivity() == null || !isAdded()) return;
                 Notify.show(result);
             }
 
             @Override
             public void success() {
+                // 检查Fragment是否还在活动状态
+                if (getActivity() == null || !isAdded()) return;
                 setConfig(type);
             }
 
             @Override
             public void error(String msg) {
+                // 检查Fragment是否还在活动状态
+                if (getActivity() == null || !isAdded()) return;
                 Notify.show(msg);
                 Notify.dismiss();
                 switch (type) {
                     case 0:
-                        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc());
+                        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc(), R.string.source_hint_setting);
                         break;
                     case 1:
-                        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
+                        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
                         break;
                     case 2:
-                        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
+                        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
                         break;
                 }
             }
@@ -238,27 +270,27 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 Notify.dismiss();
                 RefreshEvent.video();
                 RefreshEvent.config();
-                setSourceHintText(mBinding.vodUrl, VodConfig.getDesc());
-                setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
-                setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
+                setSourceHintText(mBinding.vodUrl, VodConfig.getDesc(), R.string.source_hint_setting);
+                setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
+                setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
                 break;
             case 1:
                 setCacheText();
                 Notify.dismiss();
                 RefreshEvent.config();
-                setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
+                setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
                 break;
             case 2:
                 setCacheText();
                 Notify.dismiss();
-                setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
+                setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
                 break;
         }
     }
 
-    private void setSourceHintText(TextView textView, String desc) {
+    private void setSourceHintText(TextView textView, String desc, int hintStringRes) {
         if (TextUtils.isEmpty(desc)) {
-            SpannableString spannable = new SpannableString(getString(R.string.source_hint));
+            SpannableString spannable = new SpannableString(getString(hintStringRes));
             spannable.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.white)), 0, spannable.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannable.setSpan(new RelativeSizeSpan(0.8f), 0, spannable.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             int alpha = (int)(255 * 0.5f);
@@ -328,7 +360,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void onPlayer(View view) {
-        getRoot().change(2);
+        SettingPlayerActivity.start(requireActivity());
     }
 
     private void onVersion(View view) {
@@ -454,9 +486,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     public void onHiddenChanged(boolean hidden) {
         if (hidden) return;
-        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc());
-        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc());
-        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc());
+        setSourceHintText(mBinding.vodUrl, VodConfig.getDesc(), R.string.source_hint_setting);
+        setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
+        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
         setCacheText();
     }
 

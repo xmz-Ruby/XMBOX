@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -27,9 +28,19 @@ public class UaDialog {
         return new UaDialog(fragment);
     }
 
+    public static UaDialog create(Activity activity) {
+        return new UaDialog(activity);
+    }
+
     public UaDialog(Fragment fragment) {
         this.callback = (UaCallback) fragment;
         this.binding = DialogUaBinding.inflate(LayoutInflater.from(fragment.getContext()));
+        this.append = true;
+    }
+
+    public UaDialog(Activity activity) {
+        this.callback = (UaCallback) activity;
+        this.binding = DialogUaBinding.inflate(LayoutInflater.from(activity));
         this.append = true;
     }
 

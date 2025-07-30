@@ -37,6 +37,7 @@ public class VodConfig {
     private Parse parse;
     private String wall;
     private Site home;
+    private volatile boolean isLoading = false; // 添加加载状态标记
 
     private static class Loader {
         static volatile VodConfig INSTANCE = new VodConfig();
@@ -67,7 +68,35 @@ public class VodConfig {
     }
 
     public static void load(Config config, Callback callback) {
-        get().clear().config(config).load(callback);
+        // 参数检查
+        if (config == null || callback == null) {
+            if (callback != null) {
+                App.post(() -> callback.error("配置参数无效"));
+            }
+            return;
+        }
+        
+        // 添加加载状态检查，防止并发加载
+        VodConfig instance = get();
+        synchronized (instance) {
+            if (instance.isLoading) {
+                // 如果正在加载，取消之前的加载
+                try {
+                    OkHttp.cancel("vod");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            instance.isLoading = true;
+        }
+        
+        try {
+            instance.clear().config(config).load(callback);
+        } catch (Exception e) {
+            instance.isLoading = false;
+            e.printStackTrace();
+            App.post(() -> callback.error("配置加载失败: " + e.getMessage()));
+        }
     }
 
     public VodConfig init() {
@@ -114,15 +143,23 @@ public class VodConfig {
             OkHttp.cancel("vod");
             checkJson(Json.parse(Decoder.getJson(UrlUtil.convert(config.getUrl()), "vod")).getAsJsonObject(), callback);
         } catch (Throwable e) {
-            if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
-            else loadCache(callback, e);
+            if (TextUtils.isEmpty(config.getUrl())) {
+                isLoading = false;
+                App.post(() -> callback.error(""));
+            } else {
+                loadCache(callback, e);
+            }
             e.printStackTrace();
         }
     }
 
     private void loadCache(Callback callback, Throwable e) {
-        if (!TextUtils.isEmpty(config.getJson())) checkJson(Json.parse(config.getJson()).getAsJsonObject(), callback);
-        else App.post(() -> callback.error(Notify.getError(R.string.error_config_get, e)));
+        if (!TextUtils.isEmpty(config.getJson())) {
+            checkJson(Json.parse(config.getJson()).getAsJsonObject(), callback);
+        } else {
+            isLoading = false;
+            App.post(() -> callback.error(Notify.getError(R.string.error_config_get, e)));
+        }
     }
 
     private void checkJson(JsonObject object, Callback callback) {
@@ -152,11 +189,21 @@ public class VodConfig {
             if (loadLive && object.has("lives")) initLive(object);
             String notice = Json.safeString(object, "notice");
             config.logo(Json.safeString(object, "logo"));
-            App.post(() -> callback.success(notice));
             config.json(object.toString()).update();
-            App.post(callback::success);
+            
+            // 重置加载状态
+            isLoading = false;
+            
+            // 只调用一次success回调，优先显示通知消息
+            if (!TextUtils.isEmpty(notice)) {
+                App.post(() -> callback.success(notice));
+            } else {
+                App.post(callback::success);
+            }
         } catch (Throwable e) {
             e.printStackTrace();
+            // 重置加载状态
+            isLoading = false;
             App.post(() -> callback.error(Notify.getError(R.string.error_config_parse, e)));
         }
     }
@@ -318,10 +365,32 @@ public class VodConfig {
     }
 
     public void setHome(Site home) {
+        if (home == null) {
+            // 如果传入null，使用默认站点或创建空站点
+            home = sites.isEmpty() ? new Site() : sites.get(0);
+        }
         this.home = home;
         this.home.setActivated(true);
-        config.home(home.getKey()).save();
-        for (Site item : getSites()) item.setActivated(home);
+        
+        // 安全地保存配置，防止空指针异常
+        try {
+            if (home.getKey() != null && config != null) {
+                config.home(home.getKey()).save();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        // 安全地更新所有站点的激活状态
+        try {
+            for (Site item : getSites()) {
+                if (item != null) {
+                    item.setActivated(home);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setWall(String wall) {

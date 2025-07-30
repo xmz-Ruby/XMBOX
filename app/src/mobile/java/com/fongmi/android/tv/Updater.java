@@ -85,7 +85,36 @@ public class Updater implements Download.Callback {
         Logger.d("Current version: " + BuildConfig.VERSION_NAME);
         Logger.d("Latest version: " + tagName);
         if (tagName.startsWith("v")) tagName = tagName.substring(1);
-        return Setting.getUpdate() && !tagName.equals(BuildConfig.VERSION_NAME);
+        
+        // 版本比较逻辑
+        try {
+            String[] currentParts = BuildConfig.VERSION_NAME.split("\\.");
+            String[] remoteParts = tagName.split("\\.");
+            
+            // 比较主版本号
+            for (int i = 0; i < Math.min(currentParts.length, remoteParts.length); i++) {
+                int current = Integer.parseInt(currentParts[i]);
+                int remote = Integer.parseInt(remoteParts[i]);
+                
+                if (remote > current) {
+                    return Setting.getUpdate(); // 远程版本高于当前版本，需要更新
+                } else if (remote < current) {
+                    return false; // 远程版本低于当前版本，不需要更新
+                }
+                // 如果相等，继续比较下一级版本号
+            }
+            
+            // 如果前面的版本号都相等，但远程版本有更多的版本号，视为更新
+            if (remoteParts.length > currentParts.length) {
+                return Setting.getUpdate();
+            }
+            
+            return false; // 版本相同或远程版本较低，不需要更新
+        } catch (NumberFormatException e) {
+            // 如果版本号解析失败，退回到简单字符串比较
+            Logger.e("Version parsing failed", e);
+            return Setting.getUpdate() && !tagName.equals(BuildConfig.VERSION_NAME);
+        }
     }
 
     private void doInBackground(Activity activity) {

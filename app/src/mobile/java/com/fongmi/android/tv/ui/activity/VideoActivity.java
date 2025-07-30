@@ -513,7 +513,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.swipeLayout.setRefreshing(false);
         if (result.getList().isEmpty()) setEmpty(result.hasMsg());
         else setDetail(result.getList().get(0));
-        Notify.show(result.getMsg());
+        // 只在有错误或重要消息时显示提示
+        if (result.hasMsg() && result.getList().isEmpty()) {
+            Notify.show(result.getMsg());
+        }
     }
 
     private void setEmpty(boolean finish) {

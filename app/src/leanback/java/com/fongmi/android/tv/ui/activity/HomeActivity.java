@@ -47,6 +47,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.custom.CustomTitleView;
+import com.fongmi.android.tv.ui.dialog.LastWatchToast;
 import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.presenter.FuncPresenter;
 import com.fongmi.android.tv.ui.presenter.HeaderPresenter;
@@ -252,6 +253,16 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if ((items.isEmpty() && exist) || (renew && exist)) mAdapter.removeItems(historyIndex, 1);
         if ((!items.isEmpty() && !exist) || (renew && exist)) mAdapter.add(historyIndex, new ListRow(mHistoryAdapter));
         mHistoryAdapter.setItems(items, null);
+        
+        // 显示上次播放弹窗
+        checkLastWatchDialog(items);
+    }
+    
+    private void checkLastWatchDialog(List<History> items) {
+        if (!items.isEmpty() && App.isAppJustLaunched()) {
+            App.setAppLaunched();
+            LastWatchToast.create(this, items.get(0)).show();
+        }
     }
 
     private void setHistoryDelete(boolean delete) {

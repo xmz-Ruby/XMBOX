@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 
@@ -22,9 +23,18 @@ public class BufferDialog {
         return new BufferDialog(fragment);
     }
 
+    public static BufferDialog create(Activity activity) {
+        return new BufferDialog(activity);
+    }
+
     public BufferDialog(Fragment fragment) {
         this.callback = (BufferCallback) fragment;
         this.binding = DialogBufferBinding.inflate(LayoutInflater.from(fragment.getContext()));
+    }
+
+    public BufferDialog(Activity activity) {
+        this.callback = (BufferCallback) activity;
+        this.binding = DialogBufferBinding.inflate(LayoutInflater.from(activity));
     }
 
     public void show() {

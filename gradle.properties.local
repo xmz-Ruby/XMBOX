@@ -1,0 +1,25 @@
+# 配置Java路径，使用Java 17而不是默认的Java 21
+org.gradle.java.home=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+
+# 增加构建内存
+org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError
+
+# 启用并行构建
+org.gradle.parallel=true
+org.gradle.caching=true
+
+# 配置网络设置
+systemProp.https.protocols=TLSv1.2,TLSv1.3
+systemProp.https.proxyPort=0
+systemProp.https.nonProxyHosts=localhost
+
+# Android相关配置
+android.useAndroidX=true
+android.enableJetifier=true
+android.jetifier.ignorelist=bcprov-jdk15on,annotation-experimental-1.4.1.aar,activity-1.8.0.aar,nextlib-media3ext-0.8.4.aar,sardine-android-0.9.aar,bcprov-jdk18on-1.79.jar
+
+# 允许高版本的SDK
+android.suppressUnsupportedCompileSdk=35
+
+# 禁用增量编译以解决某些兼容性问题
+android.enableBuildIncremental=false 

@@ -1,276 +1,252 @@
-# XMBOX
+# 📱 XMBOX - 强大的Android视频播放器
 
-各模块说明:
+<div align="center">
 
-- app - 主要的应用程序代码
-- catvod - 视频点播相关功能
-- forcetech - 强制技术相关功能
-- hook - 钩子功能
-- jianpian - 剪片相关功能
-- quickjs - JavaScript 引擎
-- thunder - 迅雷下载相关功能
-- tvbus - TV 总线功能
-- zlive - 直播相关功能
+![Version](https://img.shields.io/badge/version-3.0.4-blue.svg)
+![Android](https://img.shields.io/badge/platform-Android-green.svg)
+![License](https://img.shields.io/badge/license-GPL--3.0-orange.svg)
+![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
 
-一个简单的视频播放器应用，支持以下功能：
+一个功能强大、界面简洁的Android视频播放器，支持TV和手机双平台。
 
-## 主要功能
-- 视频播放：支持多种格式视频播放
-- 直播观看：支持直播源播放
-- 收藏管理：可收藏喜欢的视频和直播源
-- 设置中心：自定义应用配置
+[下载APK](../../releases) • [功能特性](#-功能特性) • [构建指南](#-构建指南) • [API文档](#-api文档)
 
-## 技术特点
-- 基于 Android 原生开发
-- 使用 ExoPlayer 作为播放内核
-- 支持 TV 和手机双平台
-- Material Design 界面设计
+</div>
 
-## 开发说明
-本项目仅用于学习 Android 开发，代码改自 [FongMi/TV](https://github.com/FongMi/TV)。
+## 🎯 功能特性
 
-## 免责声明
-1. 本项目仅供学习交流使用，不得用于商业用途
-2. 项目中的内容均来自网络，如有侵权请联系删除
-3. 使用本项目产生的一切后果由使用者自行承担
+### 📺 多平台支持
+- **Android TV版本** - 针对电视、盒子优化的遥控器界面
+- **手机版本** - 触屏友好的移动端界面
+- **多架构支持** - ARM64-V8A 和 ARM V7A 双架构
 
-## 许可证
-GPL-3.0 license
+### 🎬 强大的播放功能
+- 🎵 **多格式支持** - 支持主流视频格式播放
+- 📡 **直播观看** - 支持各种直播源协议
+- 🔍 **智能搜索** - 全局搜索和换源功能
+- 📚 **收藏管理** - 视频收藏和历史记录
+- 🎨 **自定义界面** - 丰富的主题和布局选项
 
-# 影視
+### ⚡ 技术特色
+- 🚀 **高性能播放** - 基于ExoPlayer播放内核
+- 🔧 **模块化架构** - 清晰的模块分层设计
+- 🛡️ **稳定可靠** - 完善的错误处理和崩溃防护
+- 🌐 **网络优化** - 智能代理和DNS解析
+- 📱 **Material Design** - 现代化UI设计
 
-### 基於 CatVod 項目
+## 📥 下载安装
 
-https://github.com/CatVodTVOfficial/CatVodTVJarLoader
+### 最新版本: v3.0.4
 
-### 點播欄位
+| 平台 | ARM64-V8A | ARM V7A |
+|------|-----------|---------|
+| **📱 手机版** | [下载 (29MB)](../../releases/download/v3.0.4/mobile-arm64_v8a.apk) | [下载 (29MB)](../../releases/download/v3.0.4/mobile-armeabi_v7a.apk) |
+| **📺 TV版** | [下载 (27MB)](../../releases/download/v3.0.4/leanback-arm64_v8a.apk) | [下载 (28MB)](../../releases/download/v3.0.4/leanback-armeabi_v7a.apk) |
 
-| 欄位名稱       | 預設值  | 說明   | 其他         |
-|------------|------|------|------------|
-| searchable | 1    | 是否搜索 | 0：關閉；1：啟用  |
-| changeable | 1    | 是否換源 | 0：關閉；1：啟用  |
-| quickserch | 1    | 是否快搜 | 0：關閉；1：啟用  |
-| indexs     | 0    | 是否聚搜 | 0：關閉；1：啟用  |
-| hide       | 0    | 是否隱藏 | 0：顯示；1：隱藏  |
-| timeout    | 15   | 播放超時 | 單位：秒       |
-| header     | none | 請求標頭 | 格式：json    |
-| click      | none | 點擊js | javascript |
+### 📋 系统要求
+- Android 5.0 (API 21) 及以上
+- ARM64-V8A: 推荐新设备使用，性能更优
+- ARM V7A: 兼容老设备，适配性更强
 
-### 直播欄位
+## 🏗️ 构建指南
 
-| 欄位名稱     | 預設值   | 說明    | 其他         |
-|----------|-------|-------|------------|
-| ua       | none  | 用戶代理  |            |
-| origin   | none  | 來源    |            |
-| referer  | none  | 參照地址  |            |
-| epg      | none  | 節目地址  |            |
-| logo     | none  | 台標地址  |            |
-| pass     | false | 是否免密碼 |            |
-| boot     | false | 是否自啟動 |            |
-| timeout  | 15    | 播放超時  | 單位：秒       |
-| header   | none  | 請求標頭  | 格式：json    |
-| click    | none  | 點擊js  | javascript |
-| catchup  | none  | 回看參數  |            |
-| timeZone | none  | 時區    |            |
+### 📋 环境要求
+- Android Studio Arctic Fox 或更高版本
+- JDK 11 或更高版本
+- Android SDK API 35
+- Gradle 8.10.2
 
-### 樣式
+### 🔧 快速开始
 
-| 欄位名稱  | 值    | 說明  |
-|-------|------|-----|
-| type  | rect | 矩形  |
-|       | oval | 橢圓  |
-|       | list | 列表  |
-| ratio | 0.75 | 3：4 |
-|       | 1.33 | 4：3 |
-
-直式
-
-```json
-{
-  "style": {
-    "type": "rect"
-  }
-}
+1. **克隆项目**
+```bash
+git clone https://github.com/yourusername/XMBOX.git
+cd XMBOX
 ```
 
-橫式
-
-```json
-{
-  "style": {
-    "type": "rect",
-    "ratio": 1.33
-  }
-}
+2. **配置签名** (可选)
+```bash
+# 将你的签名文件放到 keystore/ 目录
+# 或修改 app/build.gradle 中的签名配置
 ```
 
-正方
+3. **构建项目**
+```bash
+# 构建所有版本
+./gradlew assembleRelease
 
-```json
-{
-  "style": {
-    "type": "rect",
-    "ratio": 1
-  }
-}
+# 构建特定版本
+./gradlew assembleMobileArm64_v8aRelease    # 手机版 ARM64
+./gradlew assembleLeanbackArm64_v8aRelease  # TV版 ARM64
+./gradlew assembleMobileArmeabi_v7aRelease  # 手机版 ARM V7A
+./gradlew assembleLeanbackArmeabi_v7aRelease # TV版 ARM V7A
 ```
 
-正圓
-
-```json
-{
-  "style": {
-    "type": "oval"
-  }
-}
+4. **生成的APK位置**
+```
+app/build/outputs/apk/
+├── mobileArm64_v8a/release/mobile-arm64_v8a.apk
+├── leanbackArm64_v8a/release/leanback-arm64_v8a.apk
+├── mobileArmeabi_v7a/release/mobile-armeabi_v7a.apk
+└── leanbackArmeabi_v7a/release/leanback-armeabi_v7a.apk
 ```
 
-橢圓
+## 🏛️ 项目架构
 
-```json
-{
-  "style": {
-    "type": "oval",
-    "ratio": 1.1
-  }
-}
+### 📂 模块说明
+```
+XMBOX/
+├── app/                # 主应用模块
+│   ├── src/main/      # 通用代码
+│   ├── src/mobile/    # 手机版特定代码
+│   └── src/leanback/  # TV版特定代码
+├── catvod/            # 视频点播核心
+├── quickjs/           # JavaScript引擎
+├── forcetech/         # 强制技术模块
+├── thunder/           # 迅雷下载模块
+├── hook/              # 钩子功能
+├── jianpian/          # 视频剪辑模块
+├── tvbus/             # TV总线功能
+└── zlive/             # 直播功能模块
 ```
 
-### API
+### 🔧 技术栈
+- **开发语言**: Java
+- **UI框架**: Android Views + Material Components
+- **播放器**: ExoPlayer
+- **网络库**: OkHttp
+- **JSON解析**: Gson
+- **异步处理**: EventBus
+- **数据库**: Room
 
-刷新詳情
+## 📝 更新日志
 
-```
-http://127.0.0.1:9978/action?do=refresh&type=detail
-```
+### v3.0.4 (2024-07-30)
+#### 🐛 修复
+- 修复设置页面源管理模块中切换视频源时的随机闪退问题
+- 增强VodConfig.setHome()方法的空指针异常处理
+- 改进Fragment生命周期检查以防止崩溃
+- 优化HistoryDialog中源切换的安全性
+- 增强并发加载的线程安全性
 
-刷新播放
+#### ⚡ 优化
+- 提升应用启动速度
+- 优化内存使用
+- 增强网络请求稳定性
 
-```
-http://127.0.0.1:9978/action?do=refresh&type=player
-```
+#### 🆕 新增
+- 新增自动缓存清理功能
+- 添加更完善的错误处理机制
+- 增强崩溃保护功能
 
-刷新直播
+### v3.0.3 及更早版本
+查看 [完整更新日志](CHANGELOG.md)
 
-```
-http://127.0.0.1:9978/action?do=refresh&type=live
-```
+## 🔌 API 文档
 
-推送字幕
+### 刷新操作
+```http
+# 刷新详情
+GET http://127.0.0.1:9978/action?do=refresh&type=detail
 
-```
-http://127.0.0.1:9978/action?do=refresh&type=subtitle&path=http://xxx
-```
+# 刷新播放
+GET http://127.0.0.1:9978/action?do=refresh&type=player
 
-推送彈幕
-
-```
-http://127.0.0.1:9978/action?do=refresh&type=danmaku&path=http://xxx
-```
-
-新增緩存字串
-
-```
-http://127.0.0.1:9978/cache?do=set&key=xxx&value=xxx
-```
-
-取得緩存字串
-
-```
-http://127.0.0.1:9978/cache?do=get&key=xxx
-```
-
-刪除緩存字串
-
-```
-http://127.0.0.1:9978/cache?do=del&key=xxx
+# 刷新直播
+GET http://127.0.0.1:9978/action?do=refresh&type=live
 ```
 
-### Proxy
+### 推送功能
+```http
+# 推送字幕
+GET http://127.0.0.1:9978/action?do=refresh&type=subtitle&path=http://xxx
 
-scheme 支持 http, https, socks4, socks5
-
-```
-scheme://username:password@host:port
-```
-
-配置新增 proxy 判斷域名是否走代理  
-全局只需要加上一條規則 ".*."
-
-```json
-{
-  "spider": "",
-  "proxy": [
-    "raw.githubusercontent.com",
-    "googlevideo.com"
-  ]
-}
+# 推送弹幕
+GET http://127.0.0.1:9978/action?do=refresh&type=danmaku&path=http://xxx
 ```
 
-### Hosts
+### 缓存管理
+```http
+# 新增缓存
+GET http://127.0.0.1:9978/cache?do=set&key=xxx&value=xxx
 
-```json
-{
-  "spider": "",
-  "hosts": [
-    "cache.ott.*.itv.cmvideo.cn=base-v4-free-mghy.e.cdn.chinamobile.com"
-  ]
-}
+# 获取缓存
+GET http://127.0.0.1:9978/cache?do=get&key=xxx
+
+# 删除缓存
+GET http://127.0.0.1:9978/cache?do=del&key=xxx
 ```
 
-### Headers
+更多API文档请查看 [API参考手册](docs/API.md)
 
-```json
-{
-  "spider": "",
-  "headers": [
-    {
-      "host": "gslbserv.itv.cmvideo.cn",
-      "header": {
-        "User-Agent": "okhttp/3.12.13",
-        "Referer": "test"
-      }
-    }
-  ]
-}
-```
+## 📖 配置说明
 
-### 爬蟲本地代理
+### 点播字段配置
+| 字段名 | 默认值 | 说明 | 备注 |
+|--------|--------|------|------|
+| searchable | 1 | 是否支持搜索 | 0:关闭 1:启用 |
+| changeable | 1 | 是否支持换源 | 0:关闭 1:启用 |
+| quickSearch | 1 | 是否快速搜索 | 0:关闭 1:启用 |
+| timeout | 15 | 播放超时时间 | 单位:秒 |
 
-Java
+### 直播字段配置
+| 字段名 | 默认值 | 说明 | 备注 |
+|--------|--------|------|------|
+| ua | none | 用户代理 | |
+| origin | none | 来源 | |
+| referer | none | 引用地址 | |
+| timeout | 15 | 播放超时 | 单位:秒 |
 
-```
-proxy://
-```
+详细配置说明请查看 [配置文档](docs/CONFIG.md)
 
-```
-Proxy.getUrl(boolean local)
-```
+## 🤝 贡献指南
 
-Python
+欢迎提交 Issue 和 Pull Request！
 
-```
-proxy://do=py
-```
+### 🔄 提交规范
+- feat: 新功能
+- fix: 修复bug
+- docs: 文档更新
+- style: 代码格式调整
+- refactor: 代码重构
+- test: 测试相关
+- chore: 构建配置等
 
-```
-getProxyUrl(boolean local)
-```
+### 🧪 开发流程
+1. Fork 本项目
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
 
-JS
+## ⚖️ 免责声明
 
-```
-proxy://do=js
-```
+1. **学习用途**: 本项目仅供学习和技术交流使用，不得用于商业用途
+2. **内容来源**: 项目中的内容来源于网络，如有侵权请联系删除
+3. **使用责任**: 使用本项目产生的一切后果由使用者自行承担
+4. **法律合规**: 请确保在当地法律法规允许的范围内使用本软件
 
-```
-getProxy(boolean local)
-```
+## 📄 开源协议
 
-### 配置範例
+本项目基于 [GPL-3.0](LICENSE.md) 协议开源
 
-[點播-線上](other/sample/vod/online.json)  
-[點播-本地](other/sample/vod/offline.json)  
-[直播-線上](other/sample/live/online.json)  
-[直播-本地](other/sample/live/offline.json)
+## 🙏 致谢
 
+- 基于 [FongMi/TV](https://github.com/FongMi/TV) 项目开发
+- 感谢 [CatVodTVOfficial](https://github.com/CatVodTVOfficial) 提供的核心技术
+- 感谢所有为项目做出贡献的开发者
+
+## 📞 联系方式
+
+- GitHub Issues: [提交问题](../../issues)
+- 讨论区: [Discussions](../../discussions)
+
+---
+
+<div align="center">
+
+**⭐ 如果这个项目对你有帮助，请给我们一个 Star！**
+
+Made with ❤️ by XMBOX Team
+
+</div>

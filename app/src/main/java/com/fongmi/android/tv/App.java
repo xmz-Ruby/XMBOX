@@ -43,6 +43,7 @@ public class App extends Application {
     private final long time;
     private Hook hook;
     private final Runnable cleanTask;
+    private boolean appJustLaunched;
 
     public App() {
         instance = this;
@@ -51,6 +52,7 @@ public class App extends Application {
         time = System.currentTimeMillis();
         gson = new Gson();
         cleanTask = this::checkCacheClean;
+        appJustLaunched = true;
     }
 
     public static App get() {
@@ -67,6 +69,14 @@ public class App extends Application {
 
     public static Activity activity() {
         return get().activity;
+    }
+    
+    public static boolean isAppJustLaunched() {
+        return get().appJustLaunched;
+    }
+    
+    public static void setAppLaunched() {
+        get().appJustLaunched = false;
     }
 
     public static void execute(Runnable runnable) {

@@ -171,6 +171,7 @@
     <string name="none">无</string>
     <string name="times">倍</string>
     <string name="lines">行</string>
+    <string name="last_watch">上次播放</string>
 
     <string-array name="select_decode">
         <item>软解</item>
@@ -213,5 +214,11 @@
         <item>选择视轨</item>
         <item>选择字幕</item>
     </string-array>
+
+    <string name="source_hint">您还没有添加视频源\n点击下方按钮添加</string>
+    <string name="add_source">添加源</string>
+    <string name="source_hint_setting">添加视频源</string>
+    <string name="source_hint_live">添加直播源</string>
+    <string name="source_hint_wall">添加壁纸源</string>
 
 </resources>

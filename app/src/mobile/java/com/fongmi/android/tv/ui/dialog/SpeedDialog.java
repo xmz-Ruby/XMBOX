@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 
@@ -22,9 +23,18 @@ public class SpeedDialog {
         return new SpeedDialog(fragment);
     }
 
+    public static SpeedDialog create(Activity activity) {
+        return new SpeedDialog(activity);
+    }
+
     public SpeedDialog(Fragment fragment) {
         this.callback = (SpeedCallback) fragment;
         this.binding = DialogSpeedBinding.inflate(LayoutInflater.from(fragment.getContext()));
+    }
+
+    public SpeedDialog(Activity activity) {
+        this.callback = (SpeedCallback) activity;
+        this.binding = DialogSpeedBinding.inflate(LayoutInflater.from(activity));
     }
 
     public void show() {

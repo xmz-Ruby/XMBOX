@@ -90,13 +90,20 @@ public class Notify {
 
     private void makeText(String message) {
         if (mToast != null) mToast.cancel();
+        if (mHandler == null) mHandler = new Handler(Looper.getMainLooper());
         if (TextUtils.isEmpty(message)) return;
         mToast = new Toast(App.get());
         TextView view = (TextView) LayoutInflater.from(App.get()).inflate(R.layout.view_toast, null);
         view.setText(message);
         mToast.setView(view);
-        mToast.setDuration(Toast.LENGTH_LONG);
+        mToast.setDuration(Toast.LENGTH_SHORT);
         mToast.show();
+        
+        // 1秒后取消Toast
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler.postDelayed(() -> {
+            if (mToast != null) mToast.cancel();
+        }, 1000); // 1000毫秒 = 1秒
     }
 
     private void makeTextCenter(String message) {

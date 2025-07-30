@@ -427,7 +427,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setDetail(Result result) {
         if (result.getList().isEmpty()) setEmpty(result.hasMsg());
         else setDetail(result.getList().get(0));
-        Notify.show(result.getMsg());
+        // 只在有错误或重要消息时显示提示
+        if (result.hasMsg() && result.getList().isEmpty()) {
+            Notify.show(result.getMsg());
+        }
     }
 
     private void setEmpty(boolean finish) {
@@ -1224,7 +1227,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void nextSite() {
         if (mQuickAdapter.size() == 0) return;
         Vod item = (Vod) mQuickAdapter.get(0);
-        Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
+        // 只在真正需要切换时显示提示（即当前站点已经失败的情况下）
+        if (mBroken.contains(getId())) {
+            Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
+        }
         mQuickAdapter.removeItems(0, 1);
         mBroken.add(getId());
         setInitAuto(false);

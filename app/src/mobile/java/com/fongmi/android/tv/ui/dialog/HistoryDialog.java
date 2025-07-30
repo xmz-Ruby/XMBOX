@@ -60,8 +60,35 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
 
     @Override
     public void onTextClick(Config item) {
-        callback.setConfig(item);
+        // 防止重复点击和空值
+        if (!dialog.isShowing() || item == null) return;
+        
+        // 检查callback是否有效
+        if (callback == null) {
+            dialog.dismiss();
+            return;
+        }
+        
+        // 先关闭对话框，避免时序冲突
         dialog.dismiss();
+        
+        // 延迟执行配置设置，确保对话框完全关闭
+        App.post(() -> {
+            try {
+                // 双重检查callback和item是否仍然有效
+                if (callback != null && item != null && !item.isEmpty()) {
+                    callback.setConfig(item);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                // 如果出现异常，显示错误提示
+                try {
+                    Notify.show("配置切换失败: " + e.getMessage());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }, 150); // 增加延迟到150毫秒
     }
 
     @Override

@@ -93,10 +93,11 @@
                 <LinearLayout
                     android:id="@+id/vod"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
@@ -151,10 +152,11 @@
                 <LinearLayout
                     android:id="@+id/live"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
@@ -209,10 +211,11 @@
                 <LinearLayout
                     android:id="@+id/wall"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="56dp"
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
@@ -269,35 +272,43 @@
                 android:textSize="14sp"
                 android:alpha="0.7" />
 
+            <!-- 将三个设置项放在一个共同的背景容器中 -->
             <LinearLayout
-                android:id="@+id/player"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                android:orientation="vertical">
                 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_control_setting"
-                    android:tint="@color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- 播放器设置 -->
+                <LinearLayout
+                    android:id="@+id/player"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/setting_player"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    android:orientation="horizontal"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="12dp">
+                    
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_setting_player"
+                        android:tint="@color/white" />
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/setting_player"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-                            <LinearLayout
+                </LinearLayout>
+                
+                <!-- 无痕模式 -->
+                <LinearLayout
                     android:id="@+id/incognito"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/shape_item"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:paddingTop="16dp"
@@ -318,46 +329,48 @@
                         android:textColor="@color/white"
                         android:textSize="16sp" />
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/incognitoSwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/M3SwitchStyle" />
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/incognitoSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/M3SwitchStyle" />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/size"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                </LinearLayout>
                 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_setting_size"
-                    android:tint="@color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/setting_size"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/sizeText"
+                <!-- 图片尺寸 -->
+                <LinearLayout
+                    android:id="@+id/size"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="Medium" />
+                    android:orientation="horizontal"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="16dp">
+                    
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_setting_size"
+                        android:tint="@color/white" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/setting_size"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/sizeText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="Medium" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <!-- 网络设置分组 -->
@@ -372,105 +385,117 @@
                 android:textSize="14sp"
                 android:alpha="0.7" />
 
+            <!-- 将三个网络设置项放在一个共同的背景容器中 -->
             <LinearLayout
-                android:id="@+id/doh"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape_item"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_setting_doh"
-                    android:tint="@color/white" />
+                android:orientation="vertical">
                 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/setting_doh"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/dohText"
+                <!-- DoH设置 -->
+                <LinearLayout
+                    android:id="@+id/doh"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="Google" />
+                    android:orientation="horizontal"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
 
-            </LinearLayout>
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_setting_doh"
+                        android:tint="@color/white" />
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/setting_doh"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-            <LinearLayout
-                android:id="@+id/proxy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/dohText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="Google" />
+
+                </LinearLayout>
                 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_fab_link"
-                    android:tint="@color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/setting_proxy"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/proxyText"
+                <!-- 代理设置 -->
+                <LinearLayout
+                    android:id="@+id/proxy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="http" />
+                    android:orientation="horizontal"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
+                    
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_fab_link"
+                        android:tint="@color/white" />
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/setting_proxy"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-            <LinearLayout
-                android:id="@+id/cache"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/proxyText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="http" />
+
+                </LinearLayout>
                 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_folder"
-                    android:tint="@color/white" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/setting_cache"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/cacheText"
+                <!-- 缓存设置 -->
+                <LinearLayout
+                    android:id="@+id/cache"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="1.0 MB" />
+                    android:orientation="horizontal"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
+                    
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_folder"
+                        android:tint="@color/white" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/setting_cache"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/cacheText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="1.0 MB" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <!-- 备份与恢复分组 -->
@@ -511,7 +536,6 @@
                         android:id="@+id/backup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?android:attr/selectableItemBackground"
                         android:paddingTop="16dp"
                         android:paddingBottom="16dp"
                         android:text="@string/setting_backup"
@@ -530,7 +554,6 @@
                         android:id="@+id/restore"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?android:attr/selectableItemBackground"
                         android:gravity="end"
                         android:paddingTop="16dp"
                         android:paddingEnd="16dp"
@@ -545,7 +568,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal">
                 
                 <LinearLayout
@@ -565,21 +588,13 @@
                         android:tint="@color/white" />
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:text="@string/setting_version"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <TextView
                         android:id="@+id/versionText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="end"
+                        android:text="@string/setting_version"
                         android:textColor="@color/white"
                         android:textSize="16sp"
-                        tools:text="1.2.1" />
+                        tools:text="版本 3.0.3" />
 
                 </LinearLayout>
                 

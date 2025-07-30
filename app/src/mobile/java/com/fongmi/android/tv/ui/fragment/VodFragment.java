@@ -26,6 +26,8 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Class;
+import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
@@ -35,6 +37,7 @@ import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.StateEvent;
 import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -44,11 +47,14 @@ import com.fongmi.android.tv.ui.activity.KeepActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
+import com.fongmi.android.tv.ui.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.dialog.FilterDialog;
+import com.fongmi.android.tv.ui.dialog.LastWatchToast;
 import com.fongmi.android.tv.ui.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
@@ -68,7 +74,7 @@ import okhttp3.Call;
 import okhttp3.Headers;
 import okhttp3.Response;
 
-public class VodFragment extends BaseFragment implements SiteCallback, FilterCallback, TypeAdapter.OnClickListener {
+public class VodFragment extends BaseFragment implements SiteCallback, FilterCallback, TypeAdapter.OnClickListener, ConfigCallback {
 
     private FragmentVodBinding mBinding;
     private SiteViewModel mViewModel;
@@ -99,10 +105,37 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         EventBus.getDefault().register(this);
         setRecyclerView();
         setViewModel();
-        showProgress();
+        initStartupState(); // 根据是否已有配置来设置初始状态
         setLogo();
         initHot();
         getHot();
+        // 检查是否需要显示上次播放弹窗
+        checkLastWatchDialog();
+    }
+    
+    // 初始化启动状态：区分已有配置和无配置的情况
+    private void initStartupState() {
+        // 检查是否已经有保存的配置，添加空值检查
+        boolean hasExistingConfig = false;
+        try {
+            Config config = VodConfig.get().getConfig();
+            hasExistingConfig = config != null && 
+                               config.getUrl() != null && 
+                               !config.getUrl().isEmpty();
+        } catch (Exception e) {
+            // 如果获取配置时出错，认为没有配置
+            hasExistingConfig = false;
+        }
+        
+        if (hasExistingConfig) {
+            // 已有配置：显示加载状态，确保不显示添加源提示
+            showProgress();
+            mBinding.emptySourceHint.setVisibility(View.GONE);
+        } else {
+            // 无配置：立即显示空源提示，不显示加载状态
+            hideProgress();
+            checkEmptySource();
+        }
     }
 
     @Override
@@ -125,6 +158,23 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
                 setFabVisible(position);
             }
         });
+    }
+
+    // 添加检查上次播放历史并显示弹窗的方法
+    private void checkLastWatchDialog() {
+        if (App.isAppJustLaunched()) {
+            List<History> histories = History.get();
+            if (!histories.isEmpty()) {
+                App.setAppLaunched();
+                App.post(() -> {
+                    if (getActivity() != null) {
+                        LastWatchToast.create(getActivity(), histories.get(0)).show();
+                    }
+                }, 1000);
+            } else {
+                App.setAppLaunched();
+            }
+        }
     }
 
     private void setRecyclerView() {
@@ -173,10 +223,148 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         setFabVisible(0);
         hideProgress();
         checkRetry();
+        checkEmptySource(); // 添加检查是否显示空源提示
+    }
+
+    // 修改checkEmptySource方法，增强鲁棒性
+    private void checkEmptySource() {
+        // 检查是否有基础配置文件，添加空值检查
+        boolean hasBaseConfig = false;
+        try {
+            Config config = VodConfig.get().getConfig();
+            hasBaseConfig = config != null && 
+                           config.getUrl() != null && 
+                           !config.getUrl().isEmpty();
+        } catch (Exception e) {
+            hasBaseConfig = false;
+        }
+        
+        // 检查是否有有效的站点配置
+        boolean hasValidSites = false;
+        boolean hasValidHome = false;
+        try {
+            hasValidSites = VodConfig.get().getSites().size() > 0;
+            Site site = getSite();
+            hasValidHome = site != null && site.getKey() != null && !site.getKey().isEmpty();
+        } catch (Exception e) {
+            hasValidSites = false;
+            hasValidHome = false;
+        }
+        
+        // 只有在完全没有配置文件或配置文件无效时才显示空源提示
+        boolean isEmpty = !hasBaseConfig || (!hasValidSites || !hasValidHome);
+        
+        if (mBinding.emptySourceHint != null) {
+            mBinding.emptySourceHint.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+            if (isEmpty) {
+                // 设置整个布局的点击事件
+                mBinding.emptySourceHint.setOnClickListener(this::onAddSource);
+                // 设置按钮的点击事件
+                if (mBinding.addSourceBtn != null) {
+                    mBinding.addSourceBtn.setOnClickListener(this::onAddSource);
+                }
+                // 空源状态下隐藏所有悬浮按钮
+                hideFabButtons();
+            }
+        }
+    }
+    
+    // 添加源按钮点击事件处理
+    private void onAddSource(View view) {
+        ConfigDialog.create(this).type(0).show();
+    }
+    
+    // 实现ConfigCallback接口
+    @Override
+    public void setConfig(Config config) {
+        if (config == null || config.isEmpty()) return;
+        
+        // 检查Fragment是否还在活动状态，增强检查
+        if (!isValidFragmentState()) return;
+        
+        // 安全地隐藏空源提示
+        try {
+            if (mBinding != null && mBinding.emptySourceHint != null) {
+                mBinding.emptySourceHint.setVisibility(View.GONE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        Notify.progress(getActivity());
+        VodConfig.load(config, new Callback() {
+            @Override
+            public void success() {
+                // 双重检查Fragment是否还在活动状态
+                if (!isValidFragmentState()) return;
+                
+                try {
+                    Notify.dismiss();
+                    RefreshEvent.config();
+                    RefreshEvent.video();
+                    homeContent();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            @Override
+            public void error(String msg) {
+                // 双重检查Fragment是否还在活动状态
+                if (!isValidFragmentState()) return;
+                
+                try {
+                    Notify.dismiss();
+                    Notify.show(msg);
+                    // 加载失败时重新显示空源提示
+                    checkEmptySource();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    
+    // 添加Fragment状态检查方法
+    private boolean isValidFragmentState() {
+        return getActivity() != null && 
+               !getActivity().isFinishing() && 
+               !getActivity().isDestroyed() && 
+               isAdded() && 
+               !isDetached() && 
+               !isRemoving() &&
+               getView() != null &&
+               mBinding != null;
     }
 
     private void setFabVisible(int position) {
-        if (mAdapter.getItemCount() == 0) {
+        // 检查是否为空源状态 - 使用与checkEmptySource相同的逻辑，添加空值检查
+        boolean hasBaseConfig = false;
+        boolean hasValidSites = false;
+        boolean hasValidHome = false;
+        
+        try {
+            Config config = VodConfig.get().getConfig();
+            hasBaseConfig = config != null && 
+                           config.getUrl() != null && 
+                           !config.getUrl().isEmpty();
+            
+            hasValidSites = VodConfig.get().getSites().size() > 0;
+            
+            Site site = getSite();
+            hasValidHome = site != null && site.getKey() != null && !site.getKey().isEmpty();
+        } catch (Exception e) {
+            hasBaseConfig = false;
+            hasValidSites = false;
+            hasValidHome = false;
+        }
+        
+        boolean isEmpty = !hasBaseConfig || (!hasValidSites || !hasValidHome);
+        
+        if (isEmpty) {
+            // 空源状态下隐藏所有悬浮按钮
+            hideFabButtons();
+        } else if (mAdapter.getItemCount() == 0) {
             mBinding.top.setVisibility(View.INVISIBLE);
             mBinding.link.setVisibility(View.VISIBLE);
             mBinding.filter.setVisibility(View.GONE);
@@ -189,6 +377,13 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
             mBinding.filter.setVisibility(View.GONE);
             mBinding.link.show();
         }
+    }
+    
+    // 隐藏所有悬浮按钮的方法
+    private void hideFabButtons() {
+        mBinding.top.setVisibility(View.GONE);
+        mBinding.link.setVisibility(View.GONE);
+        mBinding.filter.setVisibility(View.GONE);
     }
 
     private void checkRetry() {
@@ -247,6 +442,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private void homeContent() {
         showProgress();
         setFabVisible(0);
+        // 安全地隐藏空源提示
+        try {
+            if (mBinding != null && mBinding.emptySourceHint != null) {
+                mBinding.emptySourceHint.setVisibility(View.GONE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mAdapter.clear();
         mViewModel.homeContent();
         mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
@@ -296,6 +499,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         switch (event.getType()) {
             case EMPTY:
                 hideProgress();
+                checkEmptySource(); // 添加检查是否显示空源提示
                 break;
             case PROGRESS:
                 showProgress();
