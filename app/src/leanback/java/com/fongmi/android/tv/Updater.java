@@ -14,6 +14,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Github;
+import com.github.catvod.utils.Logger;
 import com.github.catvod.utils.Path;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -97,7 +98,13 @@ public class Updater implements Download.Callback {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (need(code, name)) App.post(() -> show(activity, name, desc));
+            if (need(code, name)) {
+                App.post(() -> show(activity, name, desc));
+            } else {
+                // 不需要更新，提示已是最新版
+                App.post(() -> Notify.show("已是最新版本 " + name));
+                Logger.d("Already latest version: " + name);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             // 添加用户友好的错误提示

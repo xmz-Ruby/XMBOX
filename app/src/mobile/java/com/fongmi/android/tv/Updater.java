@@ -154,8 +154,14 @@ public class Updater implements Download.Callback {
             if (downloadUrl != null && need(tagName)) {
                 download = Download.create(downloadUrl, getFile(), this);
                 App.post(() -> show(activity, tagName, body));
+            } else if (downloadUrl != null) {
+                // 找到APK但不需要更新，提示已是最新版
+                App.post(() -> Notify.show("已是最新版本 " + tagName));
+                Logger.d("Already latest version: " + tagName);
             } else {
-                Logger.d("No update needed or APK not found");
+                // 未找到对应的APK文件
+                App.post(() -> Notify.show("检查更新完成，未找到适合此设备的安装包"));
+                Logger.d("APK not found for this device");
             }
         } catch (Exception e) {
             Logger.e("Update check failed", e);
