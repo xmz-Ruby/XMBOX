@@ -7,6 +7,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.FileUtil;
@@ -124,6 +125,17 @@ public class Updater implements Download.Callback {
             String response = OkHttp.string(jsonUrl);
             Logger.d("Update check response: " + response);
             
+            // 检查响应是否包含错误信息
+            if (response.contains("rate limit exceeded")) {
+                App.post(() -> Notify.show("检查更新失败：API请求过于频繁，请稍后重试"));
+                return;
+            }
+            
+            if (response.contains("Not Found Project") || response.contains("Not Found")) {
+                App.post(() -> Notify.show("检查更新失败：更新服务暂时不可用"));
+                return;
+            }
+            
             JSONObject release = new JSONObject(response);
             String tagName = release.getString("tag_name");
             String body = release.getString("body");
@@ -148,6 +160,18 @@ public class Updater implements Download.Callback {
         } catch (Exception e) {
             Logger.e("Update check failed", e);
             e.printStackTrace();
+            // 添加用户友好的错误提示
+            App.post(() -> {
+                String errorMsg = "检查更新失败";
+                if (e.getMessage() != null && e.getMessage().contains("rate limit")) {
+                    errorMsg = "检查更新失败：请求过于频繁，请稍后重试";
+                } else if (e.getMessage() != null && e.getMessage().contains("Not Found")) {
+                    errorMsg = "检查更新失败：更新服务暂时不可用";
+                } else {
+                    errorMsg = "检查更新失败，请稍后重试";
+                }
+                Notify.show(errorMsg);
+            });
         }
     }
 

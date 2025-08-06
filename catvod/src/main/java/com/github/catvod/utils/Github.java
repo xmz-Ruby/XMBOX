@@ -17,9 +17,9 @@ public class Github {
     public static final String URL = "https://raw.githubusercontent.com/Tosencen/XMBOX/main";
     public static final String API_URL = "https://api.github.com/repos/Tosencen/XMBOX/releases/latest";
     
-    // 国内镜像地址 - 使用Gitee作为示例，实际应替换为您的镜像地址
-    public static final String CN_URL = "https://gitee.com/tosencen/XMBOX/raw/main";
-    public static final String CN_API_URL = "https://gitee.com/api/v5/repos/tosencen/XMBOX/releases/latest";
+    // 国内镜像地址 - 使用Gitee作为镜像
+    public static final String CN_URL = "https://gitee.com/ochenoktochen/XMBOX/raw/main";
+    public static final String CN_API_URL = "https://gitee.com/api/v5/repos/ochenoktochen/XMBOX/releases/latest";
     
     // 存储测速结果
     private static Boolean useCnMirror = null;
