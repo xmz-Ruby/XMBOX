@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@color/black_90"
     android:padding="16dp">
 
     <ImageView
@@ -23,7 +24,7 @@
         android:maxLines="3"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
-        android:textColor="@color/grey_700"
+        android:textColor="@color/white"
         android:textSize="18sp"
         tools:text="@string/push_info" />
 
@@ -41,11 +42,13 @@
         android:layout_alignStart="@+id/info"
         android:layout_marginBottom="10dp"
         android:hint="@string/dialog_config_hint"
+        android:textColorHint="@color/white_50"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="text"
         android:nextFocusDown="@id/positive"
         android:singleLine="true"
+        android:textColor="@color/white"
         android:textSize="18sp" />
 
     <LinearLayout
@@ -68,7 +71,7 @@
             android:gravity="center"
             android:singleLine="true"
             android:text="@string/setting_choose"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp" />
 
         <TextView
@@ -83,7 +86,7 @@
             android:gravity="center"
             android:singleLine="true"
             android:text="@string/dialog_positive"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp" />
 
         <TextView
@@ -97,7 +100,7 @@
             android:gravity="center"
             android:singleLine="true"
             android:text="@string/dialog_negative"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp" />
 
     </LinearLayout>

@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
@@ -484,7 +485,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setText(TextView view, int resId, String text) {
         view.setText(getSpan(resId, text), TextView.BufferType.SPANNABLE);
         view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
-        view.setLinkTextColor(MDColor.YELLOW_500);
+        view.setLinkTextColor(ContextCompat.getColor(view.getContext(), R.color.primary));
         CustomMovement.bind(view);
         view.setTag(text);
     }

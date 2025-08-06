@@ -26,7 +26,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:nextFocusLeft="@id/change"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             tools:text="首頁" />
 
@@ -39,7 +39,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:text="@string/play"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp" />
 
         <TextView
@@ -51,7 +51,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:text="@string/play_exo"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp" />
 
         <TextView
@@ -62,7 +62,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             tools:text="硬解" />
 
@@ -74,7 +74,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             android:visibility="gone"
             tools:text="1.00"
@@ -88,7 +88,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             tools:text="預設" />
 
@@ -100,7 +100,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             android:visibility="gone"
             tools:text="來源 1"
@@ -116,7 +116,7 @@
             android:focusableInTouchMode="true"
             android:tag="3"
             android:text="@string/play_track_text"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -131,7 +131,7 @@
             android:focusableInTouchMode="true"
             android:tag="1"
             android:text="@string/play_track_audio"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -146,7 +146,7 @@
             android:focusableInTouchMode="true"
             android:tag="2"
             android:text="@string/play_track_video"
-            android:textColor="@color/white"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />

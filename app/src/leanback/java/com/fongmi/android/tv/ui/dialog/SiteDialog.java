@@ -55,6 +55,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         setType(type);
         initView();
         initEvent();
+        setDialog();
     }
 
     private boolean list() {
@@ -94,7 +95,13 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         if (decoration != null) binding.recycler.removeItemDecoration(decoration);
         binding.recycler.addItemDecoration(decoration = new SpaceItemDecoration(getCount(), 16));
         binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), getCount()));
-        if (!binding.mode.hasFocus()) binding.recycler.post(() -> binding.recycler.scrollToPosition(VodConfig.getHomeIndex()));
+        if (!binding.mode.hasFocus()) {
+            binding.recycler.post(() -> {
+                binding.recycler.scrollToPosition(VodConfig.getHomeIndex());
+                // 清除焦点，避免滚动后自动获得焦点显示黄色背景
+                binding.recycler.post(() -> binding.recycler.clearFocus());
+            });
+        }
     }
 
     private void setDialog() {

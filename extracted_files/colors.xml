@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 主题颜色 -->
-    <color name="primary">#FF0057B8</color>
-    <color name="primaryDark">#FF003C7E</color>
-    <color name="accent">#FF0057B8</color>
+    <color name="primary">#FFEB3B</color>
+    <color name="primaryDark">#FDD835</color>
+    <color name="accent">#FFEB3B</color>
     
     <!-- 基本颜色 -->
     <color name="white">#FFFFFFFF</color>

@@ -5,7 +5,9 @@ import android.view.LayoutInflater;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogDescBinding;
 import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.github.bassaer.library.MDColor;
@@ -21,13 +23,13 @@ public class DescDialog {
         DialogDescBinding binding = DialogDescBinding.inflate(LayoutInflater.from(activity));
         AlertDialog dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         dialog.getWindow().setDimAmount(0);
-        initView(binding.text, desc);
+        initView(binding.text, desc, activity);
         dialog.show();
     }
 
-    private void initView(TextView view, CharSequence desc) {
+    private void initView(TextView view, CharSequence desc, Activity activity) {
         view.setText(desc, TextView.BufferType.SPANNABLE);
-        view.setLinkTextColor(MDColor.BLUE_500);
+        view.setLinkTextColor(ContextCompat.getColor(activity, R.color.primary));
         CustomMovement.bind(view);
     }
 }

@@ -34,7 +34,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusLeft="@id/video"
                 android:nextFocusDown="@id/timeBar"
-                android:textColor="@color/white"
+                android:textColor="@color/button_text"
                 android:textSize="14sp"
                 tools:text="刷新" />
 
@@ -48,7 +48,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
                 android:text="@string/play_exo"
-                android:textColor="@color/white"
+                android:textColor="@color/button_text"
                 android:textSize="14sp" />
 
             <TextView
@@ -60,7 +60,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
-                android:textColor="@color/white"
+                android:textColor="@color/button_text"
                 android:textSize="14sp"
                 tools:text="硬解" />
 
@@ -73,7 +73,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
-                android:textColor="@color/white"
+                android:textColor="@color/button_text"
                 android:textSize="14sp"
                 tools:text="1.00" />
 
@@ -86,7 +86,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
-                android:textColor="@color/white"
+                android:textColor="@color/button_text"
                 android:textSize="14sp"
                 tools:text="預設" />
 
@@ -101,7 +101,7 @@
                 android:nextFocusDown="@id/timeBar"
                 android:tag="3"
                 android:text="@string/play_track_text"
-                android:textColor="@color/white"
+                android:textColor="@color/button_text"
                 android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
@@ -117,7 +117,7 @@
                 android:nextFocusDown="@id/timeBar"
                 android:tag="1"
                 android:text="@string/play_track_audio"
-                android:textColor="@color/white"
+                android:textColor="@color/button_text"
                 android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
@@ -134,7 +134,7 @@
                 android:nextFocusDown="@id/timeBar"
                 android:tag="2"
                 android:text="@string/play_track_video"
-                android:textColor="@color/white"
+                android:textColor="@color/button_text"
                 android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />

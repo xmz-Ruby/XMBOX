@@ -39,7 +39,7 @@ public class AboutDialog extends BaseDialog {
     private void openGitHub() {
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://github.com/Tosencen/XMBOX/releases/tag/v3.0.3"));
+            intent.setData(Uri.parse("https://github.com/Tosencen/XMBOX/releases/latest"));
             startActivity(intent);
         } catch (Exception e) {
             e.printStackTrace();

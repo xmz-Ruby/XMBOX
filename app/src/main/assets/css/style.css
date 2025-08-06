@@ -5469,7 +5469,7 @@ body[data-weui-theme="dark"] .weui-picker__mask {
 }
 
 .weui-primary-loading_brand {
-  color: #07c160;
+  color: #FFEB3B;
   color: var(--weui-BRAND);
 }
 
