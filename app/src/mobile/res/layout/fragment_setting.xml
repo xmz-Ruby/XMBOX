@@ -78,7 +78,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="(长按输入框可改源名)"
+                    android:text="(单击视频输入框可加源)"
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     android:alpha="0.5" />
@@ -129,7 +129,8 @@
                     android:background="@drawable/shape_item"
                     android:padding="16dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_setting_home" />
+                    android:src="@drawable/potted_plant_24px"
+                    android:tint="@color/white" />
 
                 <ImageView
                     android:id="@+id/vodHistory"
@@ -138,7 +139,8 @@
                     android:background="@drawable/shape_item"
                     android:padding="16dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_setting_history" />
+                    android:src="@drawable/ic_m3_list_alt"
+                    android:tint="@color/white" />
 
             </LinearLayout>
 
@@ -188,7 +190,8 @@
                     android:background="@drawable/shape_item"
                     android:padding="16dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_setting_home" />
+                    android:src="@drawable/potted_plant_24px"
+                    android:tint="@color/white" />
 
                 <ImageView
                     android:id="@+id/liveHistory"
@@ -197,7 +200,8 @@
                     android:background="@drawable/shape_item"
                     android:padding="16dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_setting_history" />
+                    android:src="@drawable/ic_m3_list_alt"
+                    android:tint="@color/white" />
 
             </LinearLayout>
 
@@ -292,7 +296,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_setting_player"
+                        android:src="@drawable/hive_24px"
                         android:tint="@color/white" />
 
                     <TextView
@@ -318,7 +322,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_setting_incognito"
+                        android:src="@drawable/domino_mask_24px"
                         android:tint="@color/white" />
 
                     <TextView
@@ -350,7 +354,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_setting_size"
+                        android:src="@drawable/select_all_24px"
                         android:tint="@color/white" />
 
                     <TextView
@@ -405,7 +409,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_setting_doh"
+                        android:src="@drawable/globe_book_24px"
                         android:tint="@color/white" />
                     
                     <TextView
@@ -475,7 +479,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_folder"
+                        android:src="@drawable/owl_24px"
                         android:tint="@color/white" />
 
                     <TextView
@@ -529,7 +533,7 @@
                         android:layout_height="24dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_file"
+                        android:src="@drawable/photo_prints_24px"
                         android:tint="@color/white" />
                         
                     <TextView
@@ -610,7 +614,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_control_info"
+                        android:src="@drawable/egg_24px"
                         android:tint="@color/white" />
 
                     <TextView
