@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.0.4-blue.svg)
+![Version](https://img.shields.io/badge/version-3.0.5-blue.svg)
 ![Android](https://img.shields.io/badge/platform-Android-green.svg)
 ![License](https://img.shields.io/badge/license-GPL--3.0-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
@@ -36,12 +36,12 @@
 
 ## 📥 下载安装
 
-### 最新版本: v3.0.4
+### 最新版本: v3.0.5
 
 | 平台 | ARM64-V8A | ARM V7A |
 |------|-----------|---------|
-| **📱 手机版** | [下载 (29MB)](../../releases/download/v3.0.4/mobile-arm64_v8a.apk) | [下载 (29MB)](../../releases/download/v3.0.4/mobile-armeabi_v7a.apk) |
-| **📺 TV版** | [下载 (27MB)](../../releases/download/v3.0.4/leanback-arm64_v8a.apk) | [下载 (28MB)](../../releases/download/v3.0.4/leanback-armeabi_v7a.apk) |
+| **📱 手机版** | [下载 (29MB)](../../releases/download/v3.0.5/mobile-arm64_v8a.apk) | [下载 (29MB)](../../releases/download/v3.0.5/mobile-armeabi_v7a.apk) |
+| **📺 TV版** | [下载 (27MB)](../../releases/download/v3.0.5/leanback-arm64_v8a.apk) | [下载 (28MB)](../../releases/download/v3.0.5/leanback-armeabi_v7a.apk) |
 
 ### 📋 系统要求
 - Android 5.0 (API 21) 及以上
@@ -120,6 +120,12 @@ XMBOX/
 - **数据库**: Room
 
 ## 📝 更新日志
+
+### v3.0.5 (2024-08-22)
+#### 🎨 界面优化
+- 优化导航栏历史记录图标，采用 Material Design 3 规范的列表图标
+- 改进设置页面的图标显示效果
+- 优化用户界面视觉体验
 
 ### v3.0.4 (2024-07-30)
 #### 🐛 修复
