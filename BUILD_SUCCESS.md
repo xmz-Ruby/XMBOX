@@ -1,14 +1,14 @@
 # 构建成功说明
 
-## 修复过程
+## 配置过程
 
 1. 添加了必要的native库文件
-   - 从反编译的APK中提取了arm64-v8a架构的库文件
-   - 将这些库文件复制到`app/src/main/jniLibs/arm64-v8a/`目录
+   - 配置了arm64-v8a架构的库文件
+   - 将这些库文件放置在`app/src/main/jniLibs/arm64-v8a/`目录
 
 2. 添加了着色器文件
-   - 从反编译的APK中提取了着色器文件
-   - 将这些文件复制到`app/src/main/assets/shaders/`目录
+   - 配置了必要的着色器文件
+   - 将这些文件放置在`app/src/main/assets/shaders/`目录
 
 3. 修复了EventIndex类
    - 手动创建了`EventIndex`类实现
