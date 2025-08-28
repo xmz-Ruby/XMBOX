@@ -201,6 +201,14 @@ public class Setting {
         Prefers.put("update", update);
     }
 
+    public static boolean getAutoUpdateCheck() {
+        return Prefers.getBoolean("auto_update_check", false);
+    }
+
+    public static void putAutoUpdateCheck(boolean autoUpdateCheck) {
+        Prefers.put("auto_update_check", autoUpdateCheck);
+    }
+
     public static boolean getUseCnMirror() {
         return Prefers.getBoolean("use_cn_mirror", false);
     }

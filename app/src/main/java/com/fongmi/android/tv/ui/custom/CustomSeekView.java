@@ -60,6 +60,14 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     public void setListener(Players player) {
         this.player = player;
     }
+    
+    public void setPosition(long position) {
+        timeBar.setPosition(position);
+    }
+    
+    public void setDuration(long duration) {
+        timeBar.setDuration(duration);
+    }
 
     private void start() {
         removeCallbacks(refresh);
@@ -102,7 +110,7 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         }
     }
 
-    private void setKeyTimeIncrement(long duration) {
+    public void setKeyTimeIncrement(long duration) {
         if (duration > TimeUnit.HOURS.toMillis(3)) {
             timeBar.setKeyTimeIncrement(TimeUnit.MINUTES.toMillis(5));
         } else if (duration > TimeUnit.MINUTES.toMillis(30)) {
@@ -124,8 +132,19 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     }
 
     private void seekToTimeBarPosition(long positionMs) {
+        // 先设置播放位置
         player.seekTo(positionMs);
-        refresh();
+        // 延迟刷新进度条，确保播放器已经处理了跳转操作
+        removeCallbacks(refresh);
+        postDelayed(() -> {
+            refresh();
+            // 确保进度条位置与实际播放位置一致
+            long actualPosition = player.getPosition();
+            if (Math.abs(actualPosition - positionMs) > 100) { // 如果差异超过100ms，再次调整
+                timeBar.setPosition(actualPosition);
+                positionView.setText(player.stringToTime(actualPosition));
+            }
+        }, 50); // 延迟50ms刷新
     }
 
     @Override
@@ -148,6 +167,16 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     @Override
     public void onScrubStop(@NonNull TimeBar timeBar, long position, boolean canceled) {
         scrubbing = false;
-        if (!canceled) seekToTimeBarPosition(position);
+        if (!canceled) {
+            // 先隐藏进度条提示，避免用户看到不一致的状态
+            // 注意：这里不能直接访问mBinding.widget.seek，因为CustomSeekView不包含这个引用
+            // 这个优化将在VideoActivity的onSeekEnd方法中实现
+            // 调整播放位置
+            seekToTimeBarPosition(position);
+            // 确保播放状态正确
+            if (!player.isPlaying()) {
+                player.play();
+            }
+        }
     }
 }

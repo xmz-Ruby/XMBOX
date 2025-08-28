@@ -32,6 +32,7 @@ public class Updater implements Download.Callback {
     private AlertDialog dialog;
     private boolean dev;
     private String downloadUrl;
+    private boolean forceCheck; // 标记是否是用户主动检查更新
 
     private File getFile() {
         return Path.cache("update.apk");
@@ -60,6 +61,7 @@ public class Updater implements Download.Callback {
     public Updater force() {
         Notify.show(R.string.update_check);
         Setting.putUpdate(true);
+        this.forceCheck = true; // 标记为用户主动检查更新
         return this;
     }
 
@@ -160,7 +162,10 @@ public class Updater implements Download.Callback {
                 Logger.d("Already latest version: " + tagName);
             } else {
                 // 未找到对应的APK文件
-                App.post(() -> Notify.show("检查更新完成，未找到适合此设备的安装包"));
+                // 只在用户主动检查更新时显示提示
+                if (forceCheck) {
+                    App.post(() -> Notify.show("检查更新完成，未找到适合此设备的安装包"));
+                }
                 Logger.d("APK not found for this device");
             }
         } catch (Exception e) {

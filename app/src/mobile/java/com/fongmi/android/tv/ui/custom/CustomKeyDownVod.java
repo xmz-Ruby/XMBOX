@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
+import android.content.res.Configuration;
 
 import androidx.annotation.NonNull;
 
@@ -109,6 +110,17 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener im
         if (isEdge(e1) || changeScale || lock || e1.getPointerCount() > 1) return true;
         float deltaX = e2.getX() - e1.getX();
         float deltaY = e1.getY() - e2.getY();
+        
+        // 在横屏模式下，调整触摸事件的处理逻辑
+        if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // 横屏模式下，增加对水平滑动的敏感度
+            if (Math.abs(deltaX) > Math.abs(deltaY) * 0.5f) {
+                if (touch) checkFunc(distanceX, distanceY, e2);
+                if (changeTime) listener.onSeek(time = (long) (deltaX * 50));
+                return true;
+            }
+        }
+        
         if (touch) checkFunc(distanceX, distanceY, e2);
         if (changeTime) listener.onSeek(time = (long) (deltaX * 50));
         if (changeBright) setBright(deltaY);
@@ -145,9 +157,32 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener im
 
     private void checkFunc(float distanceX, float distanceY, MotionEvent e2) {
         int four = ResUtil.getScreenWidth(activity) / 4;
-        if (e2.getX() > four && e2.getX() < four * 3) center = true;
-        else if (Math.abs(distanceX) < Math.abs(distanceY)) checkSide(e2);
-        if (Math.abs(distanceX) >= Math.abs(distanceY)) changeTime = true;
+        
+        // 在横屏模式下，调整中心区域的判断
+        if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // 横屏模式下，扩大中心区域，更容易触发进度条调整
+            int centerStart = ResUtil.getScreenWidth(activity) / 3;
+            int centerEnd = ResUtil.getScreenWidth(activity) * 2 / 3;
+            if (e2.getX() > centerStart && e2.getX() < centerEnd) {
+                center = true;
+            } else if (Math.abs(distanceX) < Math.abs(distanceY)) {
+                checkSide(e2);
+            }
+            // 横屏模式下，降低触发进度条调整的阈值
+            if (Math.abs(distanceX) >= Math.abs(distanceY) * 0.7f) {
+                changeTime = true;
+            }
+        } else {
+            // 竖屏模式保持原有逻辑
+            if (e2.getX() > four && e2.getX() < four * 3) {
+                center = true;
+            } else if (Math.abs(distanceX) < Math.abs(distanceY)) {
+                checkSide(e2);
+            }
+            if (Math.abs(distanceX) >= Math.abs(distanceY)) {
+                changeTime = true;
+            }
+        }
         touch = false;
     }
 

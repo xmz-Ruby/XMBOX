@@ -21,6 +21,7 @@ import com.fongmi.android.tv.api.config.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.impl.ConfigCallback;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -156,7 +157,63 @@ public class ConfigDialog {
         }
         
         // 只有URL不为空时，才设置配置
+        // 保存原始URL，以便在添加失败时恢复
+        String originalUrl = ori;
         callback.setConfig(Config.find(url, type));
+        
+        // 添加一个延迟检查，如果配置没有成功加载，则恢复原始URL
+        new android.os.Handler().postDelayed(() -> {
+            // 检查配置是否成功加载
+            Config currentConfig = getConfig();
+            if (currentConfig == null || !currentConfig.getUrl().equals(url)) {
+                // 配置加载失败，恢复原始URL
+                if (!TextUtils.isEmpty(originalUrl)) {
+                    // 如果有原始URL，恢复原始URL
+                    callback.setConfig(Config.find(originalUrl, type));
+                } else {
+                    // 如果没有原始URL，设置为空
+                    switch (type) {
+                        case 0:
+                            VodConfig.get().clear().config(Config.vod()).load(new Callback() {
+                                @Override
+                                public void success() {}
+                                
+                                @Override
+                                public void success(String result) {}
+                                
+                                @Override
+                                public void error(String msg) {}
+                            });
+                            break;
+                        case 1:
+                            LiveConfig.get().clear().config(Config.live()).load(new Callback() {
+                                @Override
+                                public void success() {}
+                                
+                                @Override
+                                public void success(String result) {}
+                                
+                                @Override
+                                public void error(String msg) {}
+                            });
+                            break;
+                        case 2:
+                            WallConfig.get().clear().config(Config.wall()).load(new Callback() {
+                                @Override
+                                public void success() {}
+                                
+                                @Override
+                                public void success(String result) {}
+                                
+                                @Override
+                                public void error(String msg) {}
+                            });
+                            break;
+                    }
+                }
+            }
+        }, 2000); // 2秒后检查
+        
         dialog.dismiss();
     }
 

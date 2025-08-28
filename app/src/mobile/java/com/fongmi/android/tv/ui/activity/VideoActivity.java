@@ -30,6 +30,7 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -1465,6 +1466,55 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         this.rotate = rotate;
         if (fullscreen && rotate) noPadding(mBinding.control.getRoot());
         if (fullscreen && !rotate) setPadding(mBinding.control.getRoot());
+        // 检测屏幕方向变化并处理
+        onOrientationChanged();
+    }
+    
+    // 添加屏幕方向变化处理方法
+    private void onOrientationChanged() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // 切换到横屏模式
+            onLandscapeMode();
+        } else {
+            // 切换到竖屏模式
+            onPortraitMode();
+        }
+    }
+    
+    private void onLandscapeMode() {
+        // 横屏模式下的特殊处理
+        // 调整进度条的敏感度
+        if (mPlayers != null) {
+            long duration = mPlayers.getDuration();
+            if (duration > TimeUnit.MINUTES.toMillis(30)) {
+                mBinding.control.seek.setKeyTimeIncrement(TimeUnit.MINUTES.toMillis(1));
+            } else if (duration > TimeUnit.MINUTES.toMillis(10)) {
+                mBinding.control.seek.setKeyTimeIncrement(TimeUnit.SECONDS.toMillis(30));
+            } else if (duration > 0) {
+                mBinding.control.seek.setKeyTimeIncrement(TimeUnit.SECONDS.toMillis(15));
+            }
+        }
+        
+        // 确保进度条状态正确
+        if (mPlayers != null) {
+            long position = mPlayers.getPosition();
+            long duration = mPlayers.getDuration();
+            if (position > 0 && duration > 0) {
+                mBinding.control.seek.setPosition(position);
+                mBinding.control.seek.setDuration(duration);
+            }
+        }
+    }
+    
+    private void onPortraitMode() {
+        // 竖屏模式下的处理
+        // 恢复进度条的默认敏感度
+        if (mPlayers != null) {
+            long duration = mPlayers.getDuration();
+            if (duration > 0) {
+                mBinding.control.seek.setKeyTimeIncrement(duration);
+            }
+        }
     }
 
     public boolean isStop() {
@@ -1566,10 +1616,40 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Override
     public void onSeekEnd(long time) {
-        mBinding.widget.seek.setVisibility(View.GONE);
-        mPlayers.seek(time);
-        showProgress();
-        onPlay();
+        handleLandscapeSeek(time);
+    }
+    
+    // 添加新的方法，处理横屏模式下的特殊逻辑
+    private void handleLandscapeSeek(long time) {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // 横屏模式下的特殊处理
+            mBinding.widget.seek.setVisibility(View.GONE);
+            mPlayers.pause();
+            mPlayers.seek(time);
+            showProgress();
+            App.post(() -> {
+                long actualPosition = mPlayers.getPosition();
+                if (Math.abs(actualPosition - time) > 500) {
+                    mPlayers.seek(time);
+                }
+                onPlay();
+                hideProgress();
+            }, 150); // 横屏模式下延迟更长，确保跳转完成
+        } else {
+            // 竖屏模式使用原有逻辑
+            mBinding.widget.seek.setVisibility(View.GONE);
+            mPlayers.pause();
+            mPlayers.seek(time);
+            showProgress();
+            App.post(() -> {
+                long actualPosition = mPlayers.getPosition();
+                if (Math.abs(actualPosition - time) > 500) {
+                    mPlayers.seek(time);
+                }
+                onPlay();
+                hideProgress();
+            }, 100); // 竖屏模式下延迟较短
+        }
     }
 
     @Override

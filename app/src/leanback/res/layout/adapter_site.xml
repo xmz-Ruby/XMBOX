@@ -19,6 +19,7 @@
         android:singleLine="true"
         android:textColor="@color/button_text"
         android:textSize="18sp"
+        android:duplicateParentState="true"
         tools:text="泥巴" />
 
     <com.google.android.material.checkbox.MaterialCheckBox

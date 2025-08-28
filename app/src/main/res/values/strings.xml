@@ -91,7 +91,7 @@
     <string name="setting_choose">Choose</string>
     <string name="setting_off">Off</string>
     <string name="setting_on">On</string>
-    <string name="app_version">v3.0.3</string>
+    <string name="app_version">v3.0.6</string>
     <string name="about_github">View on GitHub</string>
 
     <!-- Backup & Restore -->
@@ -126,7 +126,7 @@
     <string name="dialog_edit">Edit</string>
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
-    <string name="dialog_paste">Paste from clipboard</string>
+    <string name="dialog_paste">Click to paste</string>
     <string name="dialog_config_hint">Please enter the config…</string>
     <string name="dialog_config_name">Please enter the name…</string>
     <string name="dialog_config_url">Please enter the url…</string>
