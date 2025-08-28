@@ -1,4 +1,5 @@
-# 📱 XMBOX - 强大的Android视频播放器
+<h1 align="center"> 📱 XMBOX - 强大的Android视频播放器
+  </h1>
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-3.0.6-blue.svg)
