@@ -42,6 +42,7 @@
 |------|-----------|---------|
 | **📱 手机版** | [下载 (29MB)](../../releases/download/v3.0.6/mobile-arm64_v8a.apk) | [下载 (29MB)](../../releases/download/v3.0.6/mobile-armeabi_v7a.apk) |
 | **📺 TV版** | [下载 (27MB)](../../releases/download/v3.0.6/leanback-arm64_v8a.apk) | [下载 (28MB)](../../releases/download/v3.0.6/leanback-armeabi_v7a.apk) |
+
 TV版基于 [FongMi/TV](https://github.com/FongMi/TV) 原项目就改了些配色，想要嘿稳定的可去原项目体验
 ### 📋 系统要求
 - Android 5.0 (API 21) 及以上
