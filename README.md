@@ -7,10 +7,7 @@
 ![License](https://img.shields.io/badge/license-GPL--3.0-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
 
-一个操作方便、界面简洁的Android视频播放器盒子，支持TV和手机双平台。
-代码改自
-[FongMi/TV](https://github.com/FongMi/TV) 
-仅用于学习练习，请勿用于商业用途
+一个操作方便、界面简洁的Android视频播放器盒子，需自行添源，支持TV和手机双平台。
 
 [下载APK](../../releases) • [功能特性](#-功能特性) • [构建指南](#-构建指南) • [API文档](#-api文档)
 
