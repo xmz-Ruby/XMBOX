@@ -1,4 +1,4 @@
-<h1 align="center"> 📱 XMBOX - 强大的Android视频播放器
+<h1 align="center"> 📱 XMBOX - Android视频播放器盒子
   </h1>
 <div align="center">
 
@@ -7,7 +7,10 @@
 ![License](https://img.shields.io/badge/license-GPL--3.0-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
 
-一个功能强大、界面简洁的Android视频播放器，支持TV和手机双平台。
+一个操作方便、界面简洁的Android视频播放器盒子，支持TV和手机双平台。
+代码改自
+[FongMi/TV](https://github.com/FongMi/TV) 
+仅用于学习练习，请勿用于商业用途
 
 [下载APK](../../releases) • [功能特性](#-功能特性) • [构建指南](#-构建指南) • [API文档](#-api文档)
 
