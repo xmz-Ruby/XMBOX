@@ -1,4 +1,4 @@
-<h1 align="center"> 📱 XMBOX - Android视频播放器盒子
+<h1 align="center"> 📱 XMBOX - Android视频播放器
   </h1>
 <div align="center">
 
@@ -226,7 +226,7 @@ GET http://127.0.0.1:9978/cache?do=del&key=xxx
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 创建 Pull Request
 
-## ⚖️ 许可协议
+### ⚖️ 许可协议
 XMBOX软件许可协议：
 以下是对[GPL-3.0](LICENSE.md)开源协议的补充，如有冲突，以以下协议为准。
 词语约定： 本协议中的“本软件”指“XMBOX软件”，“用户”指签署本协议的使用者，“版权数据”指包括但不限于视频、图像、音频、名字等在内的他人拥有所属版权的数据。
