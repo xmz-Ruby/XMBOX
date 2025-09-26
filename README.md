@@ -1,4 +1,4 @@
-<h1 align="center"> 📱 XMBOX - Android视频播放器
+<h1 align="center"> 📱 XMBOX - Android资源播放器
   </h1>
 <div align="center">
 
