@@ -75,11 +75,6 @@ public class Updater implements Download.Callback {
     }
 
     public void start(Activity activity) {
-        // 检查是否启用启动时自动检查更新
-        if (!Setting.getAutoUpdateCheck()) {
-            Logger.d("Auto update check is disabled");
-            return;
-        }
         App.execute(() -> doInBackground(activity));
     }
 
