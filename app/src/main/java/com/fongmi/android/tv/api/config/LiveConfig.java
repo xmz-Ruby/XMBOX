@@ -40,6 +40,13 @@ public class LiveConfig {
     private boolean sync;
     private Live home;
 
+    private LiveConfig() {
+        // 在构造函数中初始化列表，防止空指针异常
+        this.ads = new ArrayList<>();
+        this.rules = new ArrayList<>();
+        this.lives = new ArrayList<>();
+    }
+
     private static class Loader {
         static volatile LiveConfig INSTANCE = new LiveConfig();
     }
@@ -97,9 +104,9 @@ public class LiveConfig {
 
     public LiveConfig clear() {
         this.home = null;
-        this.ads.clear();
-        this.rules.clear();
-        this.lives.clear();
+        if (this.ads != null) this.ads.clear();
+        if (this.rules != null) this.rules.clear();
+        if (this.lives != null) this.lives.clear();
         return this;
     }
 

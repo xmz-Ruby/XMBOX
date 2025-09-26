@@ -39,6 +39,16 @@ public class VodConfig {
     private Site home;
     private volatile boolean isLoading = false; // 添加加载状态标记
 
+    private VodConfig() {
+        // 在构造函数中初始化列表，防止空指针异常
+        this.ads = new ArrayList<>();
+        this.doh = new ArrayList<>();
+        this.rules = new ArrayList<>();
+        this.sites = new ArrayList<>();
+        this.flags = new ArrayList<>();
+        this.parses = new ArrayList<>();
+    }
+
     private static class Loader {
         static volatile VodConfig INSTANCE = new VodConfig();
     }
@@ -123,12 +133,12 @@ public class VodConfig {
         this.wall = null;
         this.home = null;
         this.parse = null;
-        this.ads.clear();
-        this.doh.clear();
-        this.rules.clear();
-        this.sites.clear();
-        this.flags.clear();
-        this.parses.clear();
+        if (this.ads != null) this.ads.clear();
+        if (this.doh != null) this.doh.clear();
+        if (this.rules != null) this.rules.clear();
+        if (this.sites != null) this.sites.clear();
+        if (this.flags != null) this.flags.clear();
+        if (this.parses != null) this.parses.clear();
         this.loadLive = true;
         BaseLoader.get().clear();
         return this;

@@ -154,5 +154,15 @@
             app:spanCount="2"
             tools:listitem="@layout/adapter_vod_rect" />
 
+        <!-- 搜索结果空状态Lottie动画 -->
+        <include
+            android:id="@+id/emptyLayout"
+            layout="@layout/view_empty_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="-40dp"
+            android:visibility="gone" />
+
     </RelativeLayout>
 </LinearLayout>

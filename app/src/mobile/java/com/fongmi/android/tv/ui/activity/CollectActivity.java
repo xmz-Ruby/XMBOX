@@ -44,6 +44,7 @@ import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.net.OkHttp;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
+import com.airbnb.lottie.LottieAnimationView;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -151,12 +152,14 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
             if (mCollectAdapter.getPosition() == 0) mSearchAdapter.addAll(result.getList());
             mCollectAdapter.add(Collect.create(result.getList()));
             mCollectAdapter.add(result.getList());
+            updateEmptyState();
         });
         mViewModel.result.observe(this, result -> {
             boolean same = !result.getList().isEmpty() && mCollectAdapter.getActivated().getSite().equals(result.getList().get(0).getSite());
             if (same) mCollectAdapter.getActivated().getList().addAll(result.getList());
             if (same) mSearchAdapter.addAll(result.getList());
             mScroller.endLoading(result);
+            updateEmptyState();
         });
     }
 
@@ -187,11 +190,33 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.agent.setVisibility(View.GONE);
         mBinding.view.setVisibility(View.VISIBLE);
         mBinding.result.setVisibility(View.VISIBLE);
+        updateEmptyState(); // 搜索开始时显示空状态
         if (mExecutor != null) mExecutor.shutdownNow();
         mExecutor = new PauseExecutor(20);
         String keyword = mBinding.keyword.getText().toString().trim();
         for (Site site : mSites) mExecutor.execute(() -> search(site, keyword));
         App.post(() -> mRecordAdapter.add(keyword), 250);
+    }
+
+    private void updateEmptyState() {
+        // 只有在结果页面可见且搜索结果为空时才显示空状态动画
+        boolean isResultVisible = isVisible(mBinding.result);
+        boolean isEmpty = mSearchAdapter.getItemCount() == 0;
+        boolean shouldShowEmpty = isResultVisible && isEmpty;
+        
+        mBinding.emptyLayout.getRoot().setVisibility(shouldShowEmpty ? View.VISIBLE : View.GONE);
+        
+        // 控制Lottie动画播放
+        if (shouldShowEmpty) {
+            try {
+                LottieAnimationView lottieView = mBinding.emptyLayout.getRoot().findViewById(R.id.lottieAnimation);
+                if (lottieView != null) {
+                    lottieView.playAnimation();
+                }
+            } catch (Exception e) {
+                // 忽略错误
+            }
+        }
     }
 
     private void search(Site site, String keyword) {
@@ -235,6 +260,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.result.setVisibility(View.GONE);
         mBinding.site.setVisibility(View.VISIBLE);
         mBinding.agent.setVisibility(View.VISIBLE);
+        mBinding.emptyLayout.getRoot().setVisibility(View.GONE); // 隐藏空状态动画
         if (mExecutor != null) mExecutor.shutdownNow();
     }
 

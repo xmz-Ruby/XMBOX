@@ -45,6 +45,7 @@ import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.HistoryActivity;
 import com.fongmi.android.tv.ui.activity.KeepActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
+import com.airbnb.lottie.LottieAnimationView;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.ConfigDialog;
@@ -265,6 +266,15 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
                 }
                 // 空源状态下隐藏所有悬浮按钮
                 hideFabButtons();
+                // 启动Lottie动画
+                try {
+                    LottieAnimationView lottieView = mBinding.emptySourceHint.findViewById(R.id.lottieAnimation);
+                    if (lottieView != null) {
+                        lottieView.playAnimation();
+                    }
+                } catch (Exception e) {
+                    // 忽略错误
+                }
             }
         }
     }

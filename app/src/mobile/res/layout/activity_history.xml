@@ -65,5 +65,15 @@
             android:paddingEnd="8dp"
             android:paddingBottom="8dp" />
 
+        <!-- 空状态Lottie动画 -->
+        <include
+            android:id="@+id/emptyLayout"
+            layout="@layout/view_empty_lottie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="-40dp"
+            android:visibility="gone" />
+
     </FrameLayout>
 </LinearLayout>

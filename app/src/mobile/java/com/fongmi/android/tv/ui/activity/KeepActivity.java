@@ -21,6 +21,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.SyncDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.airbnb.lottie.LottieAnimationView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -63,6 +64,25 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
     private void getKeep() {
         mAdapter.addAll(Keep.getVod());
         mBinding.delete.setVisibility(mAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
+        updateEmptyState();
+    }
+
+    private void updateEmptyState() {
+        boolean isEmpty = mAdapter.getItemCount() == 0;
+        mBinding.emptyLayout.getRoot().setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        mBinding.recycler.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        
+        // 控制Lottie动画播放
+        if (isEmpty) {
+            try {
+                LottieAnimationView lottieView = mBinding.emptyLayout.getRoot().findViewById(R.id.lottieAnimation);
+                if (lottieView != null) {
+                    lottieView.playAnimation();
+                }
+            } catch (Exception e) {
+                // 忽略错误
+            }
+        }
     }
 
     private void onSync(View view) {
@@ -71,7 +91,10 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
 
     private void onDelete(View view) {
         if (mAdapter.isDelete()) {
-            new MaterialAlertDialogBuilder(this).setTitle(R.string.dialog_delete_record).setMessage(R.string.dialog_delete_keep).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> mAdapter.clear()).show();
+            new MaterialAlertDialogBuilder(this).setTitle(R.string.dialog_delete_record).setMessage(R.string.dialog_delete_keep).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> {
+                mAdapter.clear();
+                updateEmptyState();
+            }).show();
         } else if (mAdapter.getItemCount() > 0) {
             mAdapter.setDelete(true);
         } else {
@@ -114,6 +137,7 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
         if (mAdapter.getItemCount() > 0) return;
         mBinding.delete.setVisibility(View.GONE);
         mAdapter.setDelete(false);
+        updateEmptyState();
     }
 
     @Override

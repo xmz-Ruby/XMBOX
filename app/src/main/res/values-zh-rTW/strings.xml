@@ -141,7 +141,7 @@
     <string name="error_play_flag">暫無線路資料</string>
     <string name="error_play_timeout">連線逾時</string>
     <string name="error_detail">暫無播放資料</string>
-    <string name="error_empty">找不到資料</string>
+    <string name="error_empty">這裡撒子內容都沒得～</string>
     <string name="error_cast_file">不支持的檔案格式</string>
     <string name="error_device_limit">設備授權數已達上限</string>
     <string name="error_live_empty">該訂閱無直播內容</string>

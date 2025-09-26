@@ -56,6 +56,7 @@ public class Updater implements Download.Callback {
 
     public Updater() {
         this.download = Download.create("", getFile(), this);
+        this.forceCheck = false; // 默认不是用户主动检查更新
     }
 
     public Updater force() {
@@ -127,14 +128,14 @@ public class Updater implements Download.Callback {
             String response = OkHttp.string(jsonUrl);
             Logger.d("Update check response: " + response);
             
-            // 检查响应是否包含错误信息
+            // 检查响应是否包含错误信息，只有在用户主动检查更新时才显示错误提示
             if (response.contains("rate limit exceeded")) {
-                App.post(() -> Notify.show("检查更新失败：API请求过于频繁，请稍后重试"));
+                showErrorIfForceCheck("检查更新失败：API请求过于频繁，请稍后重试");
                 return;
             }
             
             if (response.contains("Not Found Project") || response.contains("Not Found")) {
-                App.post(() -> Notify.show("检查更新失败：更新服务暂时不可用"));
+                showErrorIfForceCheck("检查更新失败：更新服务暂时不可用");
                 return;
             }
             
@@ -157,8 +158,10 @@ public class Updater implements Download.Callback {
                 download = Download.create(downloadUrl, getFile(), this);
                 App.post(() -> show(activity, tagName, body));
             } else if (downloadUrl != null) {
-                // 找到APK但不需要更新，提示已是最新版
-                App.post(() -> Notify.show("已是最新版本 " + tagName));
+                // 找到APK但不需要更新，只在用户主动检查更新时提示已是最新版
+                if (forceCheck) {
+                    App.post(() -> Notify.show("已是最新版本 " + tagName));
+                }
                 Logger.d("Already latest version: " + tagName);
             } else {
                 // 未找到对应的APK文件
@@ -171,17 +174,19 @@ public class Updater implements Download.Callback {
         } catch (Exception e) {
             Logger.e("Update check failed", e);
             e.printStackTrace();
-            // 添加用户友好的错误提示
+            // 添加用户友好的错误提示，只有在用户主动检查更新时才显示
             App.post(() -> {
-                String errorMsg = "检查更新失败";
-                if (e.getMessage() != null && e.getMessage().contains("rate limit")) {
-                    errorMsg = "检查更新失败：请求过于频繁，请稍后重试";
-                } else if (e.getMessage() != null && e.getMessage().contains("Not Found")) {
-                    errorMsg = "检查更新失败：更新服务暂时不可用";
-                } else {
-                    errorMsg = "检查更新失败，请稍后重试";
+                if (forceCheck) { // 只有在用户主动检查更新时才显示错误提示
+                    String errorMsg = "检查更新失败";
+                    if (e.getMessage() != null && e.getMessage().contains("rate limit")) {
+                        errorMsg = "检查更新失败：API请求过于频繁，请稍后重试"; // 统一错误提示文本
+                    } else if (e.getMessage() != null && e.getMessage().contains("Not Found")) {
+                        errorMsg = "检查更新失败：更新服务暂时不可用";
+                    } else {
+                        errorMsg = "检查更新失败，请稍后重试";
+                    }
+                    Notify.show(errorMsg);
                 }
-                Notify.show(errorMsg);
             });
         }
     }
@@ -213,6 +218,16 @@ public class Updater implements Download.Callback {
         try {
             if (dialog != null) dialog.dismiss();
         } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * 只有在用户主动检查更新时才显示错误提示
+     * @param message 错误提示消息
+     */
+    private void showErrorIfForceCheck(String message) {
+        if (forceCheck) {
+            App.post(() -> Notify.show(message));
         }
     }
 

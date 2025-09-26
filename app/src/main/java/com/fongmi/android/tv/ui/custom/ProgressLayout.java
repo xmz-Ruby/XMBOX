@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 
 import com.fongmi.android.tv.databinding.ViewEmptyBinding;
 import com.fongmi.android.tv.databinding.ViewProgressBinding;
+import com.airbnb.lottie.LottieAnimationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,8 @@ public class ProgressLayout extends RelativeLayout {
     }
 
     private void initView() {
-        mEmptyView = ViewEmptyBinding.inflate(LayoutInflater.from(getContext())).getRoot();
+        // 使用新的Lottie动画空状态布局
+        mEmptyView = LayoutInflater.from(getContext()).inflate(com.fongmi.android.tv.R.layout.view_empty_lottie, null);
         mEmptyView.setTag(TAG_PROGRESS);
         mEmptyView.setVisibility(GONE);
         mProgressView = ViewProgressBinding.inflate(LayoutInflater.from(getContext())).getRoot();
@@ -103,18 +105,43 @@ public class ProgressLayout extends RelativeLayout {
             case CONTENT:
                 mEmptyView.setVisibility(GONE);
                 mProgressView.setVisibility(GONE);
+                pauseLottieAnimation();
                 setContentVisibility(true);
                 break;
             case PROGRESS:
                 mEmptyView.setVisibility(GONE);
                 mProgressView.setVisibility(VISIBLE);
+                pauseLottieAnimation();
                 setContentVisibility(false);
                 break;
             case EMPTY:
                 mEmptyView.setVisibility(VISIBLE);
                 mProgressView.setVisibility(GONE);
+                playLottieAnimation();
                 setContentVisibility(false);
                 break;
+        }
+    }
+
+    private void playLottieAnimation() {
+        try {
+            LottieAnimationView lottieView = mEmptyView.findViewById(com.fongmi.android.tv.R.id.lottieAnimation);
+            if (lottieView != null) {
+                lottieView.playAnimation();
+            }
+        } catch (Exception e) {
+            // 忽略错误，保持兼容性
+        }
+    }
+
+    private void pauseLottieAnimation() {
+        try {
+            LottieAnimationView lottieView = mEmptyView.findViewById(com.fongmi.android.tv.R.id.lottieAnimation);
+            if (lottieView != null) {
+                lottieView.pauseAnimation();
+            }
+        } catch (Exception e) {
+            // 忽略错误，保持兼容性
         }
     }
 

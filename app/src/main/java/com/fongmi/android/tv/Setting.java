@@ -316,4 +316,12 @@ public class Setting {
     public static boolean hasCaption() {
         return new Intent(Settings.ACTION_CAPTIONING_SETTINGS).resolveActivity(App.get().getPackageManager()) != null;
     }
+
+    public static boolean isPrivacyAgreed() {
+        return Prefers.getBoolean("privacy_agreed_v1", false);
+    }
+
+    public static void setPrivacyAgreed(boolean agreed) {
+        Prefers.put("privacy_agreed_v1", agreed);
+    }
 }
