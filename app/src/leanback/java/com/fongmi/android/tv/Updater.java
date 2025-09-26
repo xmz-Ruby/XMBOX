@@ -29,6 +29,7 @@ public class Updater implements Download.Callback {
     private final Download download;
     private AlertDialog dialog;
     private boolean dev;
+    private boolean forceCheck; // 是否为手动检查
 
     private File getFile() {
         return Path.cache("update.apk");
@@ -48,11 +49,13 @@ public class Updater implements Download.Callback {
 
     public Updater() {
         this.download = Download.create(getApk(), getFile(), this);
+        this.forceCheck = false;
     }
 
     public Updater force() {
         Notify.show(R.string.update_check);
         Setting.putUpdate(true);
+        this.forceCheck = true; // 标记为手动检查
         return this;
     }
 
@@ -88,14 +91,18 @@ public class Updater implements Download.Callback {
         try {
             String response = OkHttp.string(getJson());
             
-            // 检查响应是否包含错误信息
+            // 检查响应是否包含错误信息，只在手动检查时提示
             if (response.contains("rate limit exceeded")) {
-                App.post(() -> Notify.show("检查更新失败：API请求过于频繁，请稍后重试"));
+                if (forceCheck) {
+                    App.post(() -> Notify.show("检查更新失败：API请求过于频繁，请稍后重试"));
+                }
                 return;
             }
             
             if (response.contains("Not Found Project") || response.contains("Not Found")) {
-                App.post(() -> Notify.show("检查更新失败：更新服务暂时不可用"));
+                if (forceCheck) {
+                    App.post(() -> Notify.show("检查更新失败：更新服务暂时不可用"));
+                }
                 return;
             }
             
@@ -106,24 +113,28 @@ public class Updater implements Download.Callback {
             if (need(code, name)) {
                 App.post(() -> show(activity, name, desc));
             } else {
-                // 不需要更新，提示已是最新版
-                App.post(() -> Notify.show("已是最新版本 " + name));
+                // 只在手动检查时提示已是最新版
+                if (forceCheck) {
+                    App.post(() -> Notify.show("已是最新版本 " + name));
+                }
                 Logger.d("Already latest version: " + name);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // 添加用户友好的错误提示
-            App.post(() -> {
-                String errorMsg = "检查更新失败";
-                if (e.getMessage() != null && e.getMessage().contains("rate limit")) {
-                    errorMsg = "检查更新失败：请求过于频繁，请稍后重试";
-                } else if (e.getMessage() != null && e.getMessage().contains("Not Found")) {
-                    errorMsg = "检查更新失败：更新服务暂时不可用";
-                } else {
-                    errorMsg = "检查更新失败，请稍后重试";
-                }
-                Notify.show(errorMsg);
-            });
+            // 只在手动检查时提示网络错误
+            if (forceCheck) {
+                App.post(() -> {
+                    String errorMsg = "检查更新失败";
+                    if (e.getMessage() != null && e.getMessage().contains("rate limit")) {
+                        errorMsg = "检查更新失败：请求过于频繁，请稍后重试";
+                    } else if (e.getMessage() != null && e.getMessage().contains("Not Found")) {
+                        errorMsg = "检查更新失败：更新服务暂时不可用";
+                    } else {
+                        errorMsg = "检查更新失败，请稍后重试";
+                    }
+                    Notify.show(errorMsg);
+                });
+            }
         }
     }
 
