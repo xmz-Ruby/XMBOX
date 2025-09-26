@@ -14,12 +14,10 @@ import okhttp3.Response;
 
 public class Github {
 
-    public static final String URL = "https://raw.githubusercontent.com/Tosencen/XMBOX/main";
-    public static final String API_URL = "https://api.github.com/repos/Tosencen/XMBOX/releases/latest";
+    public static final String URL = "https://raw.githubusercontent.com/Tosencen/XMBOX-Release/main";
     
     // 国内镜像地址 - 使用Gitee作为镜像
-    public static final String CN_URL = "https://gitee.com/ochenoktochen/XMBOX/raw/main";
-    public static final String CN_API_URL = "https://gitee.com/api/v5/repos/ochenoktochen/XMBOX/releases/latest";
+    public static final String CN_URL = "https://gitee.com/ochenoktochen/XMBOX-Release/raw/main";
     
     // 存储测速结果
     private static Boolean useCnMirror = null;
@@ -34,9 +32,6 @@ public class Github {
         return CN_URL + "/" + path + "/" + name;
     }
 
-    public static String getReleaseApi() {
-        return useCnMirror() ? CN_API_URL : API_URL;
-    }
 
     public static String getJson(boolean dev, String name) {
         if (useCnMirror()) {

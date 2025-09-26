@@ -202,7 +202,7 @@ public class Setting {
     }
 
     public static boolean getAutoUpdateCheck() {
-        return Prefers.getBoolean("auto_update_check", false);
+        return Prefers.getBoolean("auto_update_check", true); // 默认启用自动更新检查
     }
 
     public static void putAutoUpdateCheck(boolean autoUpdateCheck) {

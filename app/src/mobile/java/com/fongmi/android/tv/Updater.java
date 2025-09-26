@@ -7,7 +7,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.FileUtil;
@@ -15,11 +14,10 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Github;
+import com.github.catvod.utils.Logger;
 import com.github.catvod.utils.Path;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.orhanobut.logger.Logger;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -28,26 +26,20 @@ import java.util.Locale;
 public class Updater implements Download.Callback {
 
     private DialogUpdateBinding binding;
-    private Download download;
+    private final Download download;
     private AlertDialog dialog;
     private boolean dev;
-    private String downloadUrl;
-    private boolean forceCheck; // 标记是否是用户主动检查更新
 
     private File getFile() {
         return Path.cache("update.apk");
     }
 
-    private String getApkName() {
-        return "mobile-" + BuildConfig.FLAVOR_abi + ".apk";
+    private String getJson() {
+        return Github.getJson(dev, BuildConfig.FLAVOR_mode);
     }
 
-    private String getJson() {
-        String url = Github.getReleaseApi();
-        boolean usingCnMirror = Github.useCnMirror();
-        Logger.d("Using CN Mirror: " + usingCnMirror);
-        Logger.d("Update check URL: " + url);
-        return url;
+    private String getApk() {
+        return Github.getApk(dev, BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_abi);
     }
 
     public static Updater create() {
@@ -55,14 +47,12 @@ public class Updater implements Download.Callback {
     }
 
     public Updater() {
-        this.download = Download.create("", getFile(), this);
-        this.forceCheck = false; // 默认不是用户主动检查更新
+        this.download = Download.create(getApk(), getFile(), this);
     }
 
     public Updater force() {
         Notify.show(R.string.update_check);
         Setting.putUpdate(true);
-        this.forceCheck = true; // 标记为用户主动检查更新
         return this;
     }
 
@@ -82,112 +72,46 @@ public class Updater implements Download.Callback {
     }
 
     public void start(Activity activity) {
+        // 检查是否启用启动时自动检查更新
+        if (!Setting.getAutoUpdateCheck()) {
+            Logger.d("Auto update check is disabled");
+            return;
+        }
         App.execute(() -> doInBackground(activity));
     }
 
-    private boolean need(String tagName) {
-        Logger.d("Current version: " + BuildConfig.VERSION_NAME);
-        Logger.d("Latest version: " + tagName);
-        if (tagName.startsWith("v")) tagName = tagName.substring(1);
-        
-        // 版本比较逻辑
-        try {
-            String[] currentParts = BuildConfig.VERSION_NAME.split("\\.");
-            String[] remoteParts = tagName.split("\\.");
-            
-            // 比较主版本号
-            for (int i = 0; i < Math.min(currentParts.length, remoteParts.length); i++) {
-                int current = Integer.parseInt(currentParts[i]);
-                int remote = Integer.parseInt(remoteParts[i]);
-                
-                if (remote > current) {
-                    return Setting.getUpdate(); // 远程版本高于当前版本，需要更新
-                } else if (remote < current) {
-                    return false; // 远程版本低于当前版本，不需要更新
-                }
-                // 如果相等，继续比较下一级版本号
-            }
-            
-            // 如果前面的版本号都相等，但远程版本有更多的版本号，视为更新
-            if (remoteParts.length > currentParts.length) {
-                return Setting.getUpdate();
-            }
-            
-            return false; // 版本相同或远程版本较低，不需要更新
-        } catch (NumberFormatException e) {
-            // 如果版本号解析失败，退回到简单字符串比较
-            Logger.e("Version parsing failed", e);
-            return Setting.getUpdate() && !tagName.equals(BuildConfig.VERSION_NAME);
-        }
+    private boolean need(int code, String name) {
+        return Setting.getUpdate() && (dev ? !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE : code > BuildConfig.VERSION_CODE);
     }
 
     private void doInBackground(Activity activity) {
         try {
-            String jsonUrl = getJson();
-            Logger.d("Fetching update info from: " + jsonUrl);
-            String response = OkHttp.string(jsonUrl);
-            Logger.d("Update check response: " + response);
+            String response = OkHttp.string(getJson());
             
-            // 检查响应是否包含错误信息，只有在用户主动检查更新时才显示错误提示
+            // 检查响应是否包含错误信息
             if (response.contains("rate limit exceeded")) {
-                showErrorIfForceCheck("检查更新失败：API请求过于频繁，请稍后重试");
+                App.post(() -> Notify.show("检查更新失败：API请求过于频繁，请稍后重试"));
                 return;
             }
             
             if (response.contains("Not Found Project") || response.contains("Not Found")) {
-                showErrorIfForceCheck("检查更新失败：更新服务暂时不可用");
+                App.post(() -> Notify.show("检查更新失败：更新服务暂时不可用"));
                 return;
             }
             
-            JSONObject release = new JSONObject(response);
-            String tagName = release.getString("tag_name");
-            String body = release.getString("body");
-            JSONArray assets = release.getJSONArray("assets");
-            
-            // Find the correct APK asset
-            String apkName = getApkName();
-            for (int i = 0; i < assets.length(); i++) {
-                JSONObject asset = assets.getJSONObject(i);
-                if (asset.getString("name").equals(apkName)) {
-                    downloadUrl = asset.getString("browser_download_url");
-                    break;
-                }
-            }
-            
-            if (downloadUrl != null && need(tagName)) {
-                download = Download.create(downloadUrl, getFile(), this);
-                App.post(() -> show(activity, tagName, body));
-            } else if (downloadUrl != null) {
-                // 找到APK但不需要更新，只在用户主动检查更新时提示已是最新版
-                if (forceCheck) {
-                    App.post(() -> Notify.show("已是最新版本 " + tagName));
-                }
-                Logger.d("Already latest version: " + tagName);
+            JSONObject object = new JSONObject(response);
+            String name = object.optString("name");
+            String desc = object.optString("desc");
+            int code = object.optInt("code");
+            if (need(code, name)) {
+                App.post(() -> show(activity, name, desc));
             } else {
-                // 未找到对应的APK文件
-                // 只在用户主动检查更新时显示提示
-                if (forceCheck) {
-                    App.post(() -> Notify.show("检查更新完成，未找到适合此设备的安装包"));
-                }
-                Logger.d("APK not found for this device");
+                // 不需要更新，提示已是最新版
+                Logger.d("Already latest version: " + name);
             }
         } catch (Exception e) {
-            Logger.e("Update check failed", e);
             e.printStackTrace();
-            // 添加用户友好的错误提示，只有在用户主动检查更新时才显示
-            App.post(() -> {
-                if (forceCheck) { // 只有在用户主动检查更新时才显示错误提示
-                    String errorMsg = "检查更新失败";
-                    if (e.getMessage() != null && e.getMessage().contains("rate limit")) {
-                        errorMsg = "检查更新失败：API请求过于频繁，请稍后重试"; // 统一错误提示文本
-                    } else if (e.getMessage() != null && e.getMessage().contains("Not Found")) {
-                        errorMsg = "检查更新失败：更新服务暂时不可用";
-                    } else {
-                        errorMsg = "检查更新失败，请稍后重试";
-                    }
-                    Notify.show(errorMsg);
-                }
-            });
+            App.post(() -> Notify.show("检查更新失败：网络连接异常"));
         }
     }
 
@@ -221,16 +145,6 @@ public class Updater implements Download.Callback {
         }
     }
 
-    /**
-     * 只有在用户主动检查更新时才显示错误提示
-     * @param message 错误提示消息
-     */
-    private void showErrorIfForceCheck(String message) {
-        if (forceCheck) {
-            App.post(() -> Notify.show(message));
-        }
-    }
-
     @Override
     public void progress(int progress) {
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(String.format(Locale.getDefault(), "%1$d%%", progress));
@@ -238,7 +152,6 @@ public class Updater implements Download.Callback {
 
     @Override
     public void error(String msg) {
-        Logger.e("Download error: " + msg);
         Notify.show(msg);
         dismiss();
     }
