@@ -205,12 +205,14 @@
 
             </LinearLayout>
 
+            <!-- 壁纸功能已隐藏 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:id="@+id/wall"
