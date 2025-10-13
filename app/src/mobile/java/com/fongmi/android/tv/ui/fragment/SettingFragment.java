@@ -104,21 +104,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
         mBinding.versionText.setText(getString(R.string.setting_version) + " " + BuildConfig.VERSION_NAME);
         
-        // 设置开关的颜色为黄色
-        int accentColor = getResources().getColor(R.color.accent);
-        android.content.res.ColorStateList colorStateList = new android.content.res.ColorStateList(
-            new int[][]{
-                new int[]{-android.R.attr.state_checked},
-                new int[]{android.R.attr.state_checked}
-            },
-            new int[]{
-                0x66FFFFFF,  // 未选中时的颜色
-                accentColor   // 选中时的颜色
-            }
-        );
-        mBinding.incognitoSwitch.setThumbTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE));
-        mBinding.incognitoSwitch.setTrackTintList(colorStateList);
-        
         setOtherText();
         setCacheText();
         String[] quotes = getResources().getStringArray(R.array.motivational_quotes);

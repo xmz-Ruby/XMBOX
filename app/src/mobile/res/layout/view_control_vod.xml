@@ -64,7 +64,7 @@
                 android:layout_height="20dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="2dp"
                 android:src="@drawable/ic_charging_bolt"
                 android:visibility="gone"
                 tools:visibility="visible" />
@@ -76,7 +76,7 @@
                 android:layout_gravity="center_vertical"
                 android:paddingEnd="8dp"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:visibility="gone"
                 tools:text="85%"
                 tools:visibility="visible" />

@@ -59,28 +59,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[Setting.getBackground()]);
-        
-        // 设置开关的颜色为黄色
-        int accentColor = getResources().getColor(R.color.accent);
-        android.content.res.ColorStateList colorStateList = new android.content.res.ColorStateList(
-            new int[][]{
-                new int[]{-android.R.attr.state_checked},
-                new int[]{android.R.attr.state_checked}
-            },
-            new int[]{
-                0x66FFFFFF,  // 未选中时的颜色
-                accentColor   // 选中时的颜色
-            }
-        );
-        
-        mBinding.tunnelSwitch.setThumbTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE));
-        mBinding.tunnelSwitch.setTrackTintList(colorStateList);
-        mBinding.audioDecodeSwitch.setThumbTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE));
-        mBinding.audioDecodeSwitch.setTrackTintList(colorStateList);
-        mBinding.aacSwitch.setThumbTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE));
-        mBinding.aacSwitch.setTrackTintList(colorStateList);
-        mBinding.danmakuLoadSwitch.setThumbTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE));
-        mBinding.danmakuLoadSwitch.setTrackTintList(colorStateList);
     }
 
     @Override

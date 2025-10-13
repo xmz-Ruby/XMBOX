@@ -78,14 +78,12 @@
         <item name="android:background">@null</item>
     </style>
 
-    <!-- M3 Switch Style -->
-    <style name="M3SwitchStyle" parent="Widget.AppCompat.CompoundButton.Switch">
-        <item name="android:thumb">@drawable/m3_switch_thumb</item>
-        <item name="track">@drawable/m3_switch_track</item>
-        <item name="android:switchMinWidth">52dp</item>
-        <item name="android:switchPadding">8dp</item>
-        <item name="android:colorControlActivated">#FFEB3B</item>
-        <item name="android:colorControlHighlight">@android:color/transparent</item>
+    <!-- M3 Switch Style (Material Design) - 使用CustomSwitch完全自定义 -->
+    <style name="M3SwitchStyle" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:button">@null</item>
+        <item name="android:background">@drawable/custom_switch_bg</item>
+        <item name="android:minHeight">30dp</item>
+        <item name="android:minWidth">50dp</item>
     </style>
     
     <!-- 自定义数据源按钮样式 -->

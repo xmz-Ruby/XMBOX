@@ -222,11 +222,10 @@
                     android:textColor="@color/white"
                     android:textSize="16sp" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.fongmi.android.tv.ui.custom.CustomSwitch
                     android:id="@+id/tunnelSwitch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/M3SwitchStyle" />
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -249,11 +248,10 @@
                     android:textColor="@color/white"
                     android:textSize="16sp" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.fongmi.android.tv.ui.custom.CustomSwitch
                     android:id="@+id/audioDecodeSwitch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/M3SwitchStyle" />
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -276,11 +274,10 @@
                     android:textColor="@color/white"
                     android:textSize="16sp" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.fongmi.android.tv.ui.custom.CustomSwitch
                     android:id="@+id/aacSwitch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/M3SwitchStyle" />
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -303,11 +300,10 @@
                     android:textColor="@color/white"
                     android:textSize="16sp" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.fongmi.android.tv.ui.custom.CustomSwitch
                     android:id="@+id/danmakuLoadSwitch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/M3SwitchStyle" />
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
