@@ -163,6 +163,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private Runnable mTimeUpdateRunnable;
     private BroadcastReceiver mBatteryReceiver;
     private int mBatteryLevel = -1;
+    private boolean mIsCharging = false;
 
     public static void push(FragmentActivity activity, String text) {
         if (FileChooser.isValid(activity, Uri.parse(text))) file(activity, FileChooser.getPathFromUri(activity, Uri.parse(text)));
@@ -328,8 +329,12 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
                     int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
                     int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                    int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                    
                     if (level != -1 && scale != -1) {
                         mBatteryLevel = (int) ((level / (float) scale) * 100);
+                        mIsCharging = (status == BatteryManager.BATTERY_STATUS_CHARGING || 
+                                      status == BatteryManager.BATTERY_STATUS_FULL);
                         updateTimeBattery();
                     }
                 }
@@ -346,18 +351,41 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void updateTimeBattery() {
-        TextView timeBattery = mBinding.getRoot().findViewById(R.id.time_battery);
-        if (timeBattery == null) return;
+        TextView timeBattery = findViewById(R.id.time_battery);
+        TextView batteryText = findViewById(R.id.battery_icon);
+        android.widget.ImageView chargingIndicator = findViewById(R.id.charging_indicator);
         
-        // 只在横屏模式下显示
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            String time = DateFormat.getTimeFormat(this).format(System.currentTimeMillis());
-            String battery = mBatteryLevel >= 0 ? mBatteryLevel + "%" : "";
-            String text = time + (battery.isEmpty() ? "" : " | " + battery);
-            timeBattery.setText(text);
-            timeBattery.setVisibility(View.VISIBLE);
+        // 只在全屏模式下显示
+        if (isFullscreen()) {
+            // 更新时间
+            if (timeBattery != null) {
+                String time = DateFormat.getTimeFormat(this).format(System.currentTimeMillis());
+                timeBattery.setText(time);
+                timeBattery.setVisibility(View.VISIBLE);
+            }
+            
+            // 更新充电图标
+            if (chargingIndicator != null) {
+                chargingIndicator.setVisibility(mIsCharging && mBatteryLevel >= 0 ? View.VISIBLE : View.GONE);
+            }
+            
+            // 更新电池百分比文字
+            if (batteryText != null && mBatteryLevel >= 0) {
+                batteryText.setText(mBatteryLevel + "%");
+                batteryText.setVisibility(View.VISIBLE);
+            } else if (batteryText != null) {
+                batteryText.setVisibility(View.GONE);
+            }
         } else {
-            timeBattery.setVisibility(View.GONE);
+            if (timeBattery != null) {
+                timeBattery.setVisibility(View.GONE);
+            }
+            if (batteryText != null) {
+                batteryText.setVisibility(View.GONE);
+            }
+            if (chargingIndicator != null) {
+                chargingIndicator.setVisibility(View.GONE);
+            }
         }
     }
 

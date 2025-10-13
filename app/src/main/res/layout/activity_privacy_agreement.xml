@@ -15,13 +15,6 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- 应用图标 -->
-        <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@mipmap/ic_launcher"
-            android:contentDescription="@string/app_name" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

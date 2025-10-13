@@ -42,6 +42,9 @@ public class PrivacyAgreementActivity extends BaseActivity {
         // 用户同意协议
         Setting.setPrivacyAgreed(true);
         
+        // 创建通知渠道（此时才请求通知权限）
+        com.fongmi.android.tv.utils.Notify.createChannel();
+        
         // 跳转到主界面，清除任务栈避免用户通过任务管理器回到协议页面
         Intent intent = new Intent(this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

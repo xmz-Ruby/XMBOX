@@ -126,7 +126,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Notify.createChannel();
         Logger.addLogAdapter(getLogAdapter());
         OkHttp.get().setProxy(Setting.getProxy());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
