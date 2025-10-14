@@ -32,7 +32,7 @@ public class Updater implements Download.Callback {
     private boolean forceCheck; // 是否为手动检查
 
     private File getFile() {
-        return Path.cache("update.apk");
+        return Path.root("Download", "XMBOX-update.apk");
     }
 
     private String getJson() {
@@ -40,6 +40,26 @@ public class Updater implements Download.Callback {
     }
 
     private String getApk() {
+        // 使用JSON中指定的具体下载路径
+        try {
+            String response = OkHttp.string(getJson());
+            JSONObject object = new JSONObject(response);
+            JSONObject downloads = object.optJSONObject("downloads");
+            if (downloads != null) {
+                String abi = BuildConfig.FLAVOR_abi;
+                String downloadPath = downloads.optString(abi);
+                if (!downloadPath.isEmpty()) {
+                    // 直接构建完整URL，不通过Github.getApk()避免重复添加路径
+                    String baseUrl = Github.useCnMirror() ? 
+                        "https://gitee.com/ochenoktochen/XMBOX-Release/raw/main" :
+                        "https://raw.githubusercontent.com/Tosencen/XMBOX-Release/main";
+                    return baseUrl + "/apk/" + (dev ? "dev" : "release") + "/" + downloadPath;
+                }
+            }
+        } catch (Exception e) {
+            Logger.e("Failed to get download path from JSON: " + e.getMessage());
+        }
+        // 回退到原来的方式
         return Github.getApk(dev, BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_abi);
     }
 

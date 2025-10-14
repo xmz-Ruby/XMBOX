@@ -67,33 +67,44 @@ public class Github {
     private static boolean testMirrorSpeed() {
         try {
             OkHttpClient client = new OkHttpClient.Builder()
-                    .connectTimeout(3, TimeUnit.SECONDS)
-                    .readTimeout(3, TimeUnit.SECONDS)
+                    .connectTimeout(5, TimeUnit.SECONDS)  // 增加超时时间
+                    .readTimeout(5, TimeUnit.SECONDS)
                     .build();
             
             // 测试国际源
             long startTime = System.currentTimeMillis();
             boolean intlSuccess = testUrl(client, URL + "/README.md");
             long intlTime = System.currentTimeMillis() - startTime;
+            Logger.d("Github: International mirror test - success: " + intlSuccess + ", time: " + intlTime + "ms");
             
             // 测试国内源
             startTime = System.currentTimeMillis();
             boolean cnSuccess = testUrl(client, CN_URL + "/README.md");
             long cnTime = System.currentTimeMillis() - startTime;
+            Logger.d("Github: Chinese mirror test - success: " + cnSuccess + ", time: " + cnTime + "ms");
             
             // 如果两个都成功，选择更快的
             if (intlSuccess && cnSuccess) {
-                return cnTime < intlTime;
+                boolean useCn = cnTime < intlTime;
+                Logger.d("Github: Both mirrors work, choosing " + (useCn ? "Chinese" : "International") + " mirror");
+                return useCn;
             }
             
             // 如果只有一个成功，选择成功的那个
-            if (intlSuccess) return false;
-            if (cnSuccess) return true;
+            if (intlSuccess) {
+                Logger.d("Github: Only international mirror works, using it");
+                return false;
+            }
+            if (cnSuccess) {
+                Logger.d("Github: Only Chinese mirror works, using it");
+                return true;
+            }
             
             // 如果都失败，默认国际源
+            Logger.e("Github: Both mirrors failed, defaulting to international");
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.e("Github: Mirror test exception: " + e.getMessage());
             return false; // 出错时默认使用国际源
         }
     }

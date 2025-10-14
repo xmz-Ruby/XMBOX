@@ -11,6 +11,7 @@ import androidx.core.content.FileProvider;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.impl.Callback;
+import com.github.catvod.utils.Logger;
 import com.github.catvod.utils.Path;
 
 import java.io.BufferedInputStream;
@@ -34,11 +35,35 @@ public class FileUtil {
     }
 
     public static void openFile(File file) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.setDataAndType(getShareUri(file), FileUtil.getMimeType(file.getName()));
-        App.get().startActivity(intent);
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            
+            // 对于APK文件，使用特定的MIME类型
+            String mimeType = file.getName().toLowerCase().endsWith(".apk") ? 
+                "application/vnd.android.package-archive" : getMimeType(file.getName());
+            
+            intent.setDataAndType(getShareUri(file), mimeType);
+            
+            // 添加额外的安装权限检查
+            if (file.getName().toLowerCase().endsWith(".apk")) {
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+            
+            App.get().startActivity(intent);
+        } catch (Exception e) {
+            Logger.e("Failed to open file: " + e.getMessage());
+            // 如果失败，尝试使用通用方式
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setDataAndType(getShareUri(file), "*/*");
+                App.get().startActivity(intent);
+            } catch (Exception ex) {
+                Logger.e("Fallback open file also failed: " + ex.getMessage());
+            }
+        }
     }
 
     public static void gzipCompress(File target) {

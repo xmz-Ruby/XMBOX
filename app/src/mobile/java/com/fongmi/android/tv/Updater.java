@@ -32,7 +32,7 @@ public class Updater implements Download.Callback {
     private boolean forceCheck; // 是否为手动检查
 
     private File getFile() {
-        return Path.cache("update.apk");
+        return Path.root("Download", "XMBOX-update.apk");
     }
 
     private String getJson() {
@@ -40,7 +40,31 @@ public class Updater implements Download.Callback {
     }
 
     private String getApk() {
-        return Github.getApk(dev, BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_abi);
+        // 使用JSON中指定的具体下载路径
+        try {
+            String response = OkHttp.string(getJson());
+            JSONObject object = new JSONObject(response);
+            JSONObject downloads = object.optJSONObject("downloads");
+            if (downloads != null) {
+                String abi = BuildConfig.FLAVOR_abi;
+                String downloadPath = downloads.optString(abi);
+                if (!downloadPath.isEmpty()) {
+                    // 直接构建完整URL，不通过Github.getApk()避免重复添加路径
+                    String baseUrl = Github.useCnMirror() ? 
+                        "https://gitee.com/ochenoktochen/XMBOX-Release/raw/main" :
+                        "https://raw.githubusercontent.com/Tosencen/XMBOX-Release/main";
+                    String fullUrl = baseUrl + "/apk/" + (dev ? "dev" : "release") + "/" + downloadPath;
+                    Logger.d("APK download URL: " + fullUrl);
+                    return fullUrl;
+                }
+            }
+        } catch (Exception e) {
+            Logger.e("Failed to get download path from JSON: " + e.getMessage());
+        }
+        // 回退到原来的方式
+        String fallbackUrl = Github.getApk(dev, BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_abi);
+        Logger.d("APK fallback URL: " + fallbackUrl);
+        return fallbackUrl;
     }
 
     public static Updater create() {
@@ -83,11 +107,17 @@ public class Updater implements Download.Callback {
     }
 
     private void doInBackground(Activity activity) {
+        Logger.d("Updater: Starting update check...");
         try {
-            String response = OkHttp.string(getJson());
+            String jsonUrl = getJson();
+            Logger.d("Updater: JSON URL: " + jsonUrl);
+            
+            String response = OkHttp.string(jsonUrl);
+            Logger.d("Updater: JSON response length: " + response.length());
             
             // 检查响应是否包含错误信息，只在手动检查时提示
             if (response.contains("rate limit exceeded")) {
+                Logger.e("Updater: Rate limit exceeded");
                 if (forceCheck) {
                     App.post(() -> Notify.show("检查更新失败：API请求过于频繁，请稍后重试"));
                 }
@@ -95,6 +125,7 @@ public class Updater implements Download.Callback {
             }
             
             if (response.contains("Not Found Project") || response.contains("Not Found")) {
+                Logger.e("Updater: Project not found");
                 if (forceCheck) {
                     App.post(() -> Notify.show("检查更新失败：更新服务暂时不可用"));
                 }
@@ -105,9 +136,15 @@ public class Updater implements Download.Callback {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
+            
+            Logger.d("Updater: Remote version: " + name + " (code: " + code + ")");
+            Logger.d("Updater: Local version: " + BuildConfig.VERSION_NAME + " (code: " + BuildConfig.VERSION_CODE + ")");
+            
             if (need(code, name)) {
+                Logger.d("Updater: Update needed, showing dialog");
                 App.post(() -> show(activity, name, desc));
             } else {
+                Logger.d("Updater: No update needed");
                 // 只在手动检查时提示已是最新版
                 if (forceCheck) {
                     App.post(() -> Notify.show("已是最新版本 " + name));
@@ -115,6 +152,7 @@ public class Updater implements Download.Callback {
                 Logger.d("Already latest version: " + name);
             }
         } catch (Exception e) {
+            Logger.e("Updater: Exception during update check: " + e.getMessage());
             e.printStackTrace();
             // 只在手动检查时提示网络错误
             if (forceCheck) {

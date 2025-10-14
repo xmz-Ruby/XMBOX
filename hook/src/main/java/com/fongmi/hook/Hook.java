@@ -499,6 +499,6 @@ public class Hook extends PackageManager {
 
     @Override
     public boolean canRequestPackageInstalls() {
-        return false;
+        return true;  // 允许请求安装包权限
     }
 }
