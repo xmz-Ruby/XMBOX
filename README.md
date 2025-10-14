@@ -2,7 +2,7 @@
   </h1>
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.0.7-blue.svg)
+![Version](https://img.shields.io/badge/version-3.0.8-blue.svg)
 ![Android](https://img.shields.io/badge/platform-Android-green.svg)
 ![License](https://img.shields.io/badge/license-GPL--3.0-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
@@ -36,7 +36,7 @@
 
 ## 📥 下载安装
 
-### 最新版本: v3.0.7
+### 最新版本: v3.0.8
 
 | 平台 | ARM64-V8A | ARM V7A |
 |------|-----------|---------|
@@ -122,7 +122,7 @@ XMBOX/
 
 ## 📝 更新日志
 
-### v3.0.7 (2025-09-26)
+### v3.0.8 (2025-10-14)
 
 #### 🐛 核心修复
 * **修复关键崩溃问题** - 解决 VodConfig/LiveConfig 空指针异常
