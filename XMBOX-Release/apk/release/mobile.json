@@ -1,0 +1,9 @@
+{
+  "name": "3.0.8",
+  "desc": "XMBOX 手机版 v3.0.8\n\n✨ UI优化：\n• 修复按钮点击效果过于明显的问题\n• 统一使用自定义背景替代系统selectableItemBackgroundBorderless\n• 移除Control.Action样式中的文字阴影效果\n• 优化直播页面选择按钮颜色为主题黄色\n• 调整许可协议页面按钮区域上间距为8dp\n• 修复跨类和换源按钮的文字重叠问题\n• 提升整体UI视觉一致性和用户体验\n\n🔧 改进优化：\n• 优化内存使用\n• 提升播放稳定性\n\n📱 支持架构：ARM64-v8a | ARMv7a",
+  "code": 308,
+  "downloads": {
+    "arm64_v8a": "v3.0.8/mobile-arm64_v8a-v3.0.8.apk",
+    "armeabi_v7a": "v3.0.8/mobile-armeabi_v7a-v3.0.8.apk"
+  }
+}
