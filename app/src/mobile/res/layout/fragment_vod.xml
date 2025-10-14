@@ -28,7 +28,7 @@
                 android:id="@+id/logo"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/shape_action_background"
                 android:src="@drawable/ic_logo" />
 
             <LinearLayout
@@ -66,14 +66,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginEnd="12dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/shape_action_background"
                 android:src="@drawable/ic_action_keep" />
 
             <ImageView
                 android:id="@+id/history"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/shape_action_background"
                 android:src="@drawable/ic_action_history" />
 
         </LinearLayout>
@@ -144,7 +144,7 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_gravity="center"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="@drawable/shape_action_background"
         android:src="@drawable/ic_action_retry"
         android:visibility="gone" />
 
