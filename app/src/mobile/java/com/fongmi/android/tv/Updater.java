@@ -2,6 +2,8 @@ package com.fongmi.android.tv;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -109,13 +111,14 @@ public class Updater implements Download.Callback {
     private void doInBackground(Activity activity) {
         Logger.d("Updater: Starting update check...");
         try {
-            String jsonUrl = getJson();
-            Logger.d("Updater: JSON URL: " + jsonUrl);
+            // 直接使用GitHub Releases API检测最新版本
+            String releasesUrl = "https://api.github.com/repos/Tosencen/XMBOX/releases/latest";
+            Logger.d("Updater: GitHub Releases API URL: " + releasesUrl);
             
-            String response = OkHttp.string(jsonUrl);
-            Logger.d("Updater: JSON response length: " + response.length());
+            String response = OkHttp.string(releasesUrl);
+            Logger.d("Updater: API response length: " + response.length());
             
-            // 检查响应是否包含错误信息，只在手动检查时提示
+            // 检查响应是否包含错误信息
             if (response.contains("rate limit exceeded")) {
                 Logger.e("Updater: Rate limit exceeded");
                 if (forceCheck) {
@@ -124,40 +127,68 @@ public class Updater implements Download.Callback {
                 return;
             }
             
-            if (response.contains("Not Found Project") || response.contains("Not Found")) {
-                Logger.e("Updater: Project not found");
+            if (response.contains("Not Found") || response.contains("404")) {
+                Logger.e("Updater: Release not found");
                 if (forceCheck) {
                     App.post(() -> Notify.show("检查更新失败：更新服务暂时不可用"));
                 }
                 return;
             }
             
-            JSONObject object = new JSONObject(response);
-            String name = object.optString("name");
-            String desc = object.optString("desc");
-            int code = object.optInt("code");
+            JSONObject release = new JSONObject(response);
+            String tagName = release.optString("tag_name");
+            String body = release.optString("body");
             
-            Logger.d("Updater: Remote version: " + name + " (code: " + code + ")");
-            Logger.d("Updater: Local version: " + BuildConfig.VERSION_NAME + " (code: " + BuildConfig.VERSION_CODE + ")");
+            // 提取版本号（去掉v前缀）
+            String version = tagName.startsWith("v") ? tagName.substring(1) : tagName;
             
-            if (need(code, name)) {
+            Logger.d("Updater: Remote version: " + version);
+            Logger.d("Updater: Local version: " + BuildConfig.VERSION_NAME);
+            
+            // 比较版本号
+            if (needUpdate(version)) {
                 Logger.d("Updater: Update needed, showing dialog");
-                App.post(() -> show(activity, name, desc));
+                App.post(() -> show(activity, version, body));
             } else {
                 Logger.d("Updater: No update needed");
-                // 只在手动检查时提示已是最新版
                 if (forceCheck) {
-                    App.post(() -> Notify.show("已是最新版本 " + name));
+                    App.post(() -> Notify.show("已是最新版本 " + version));
                 }
-                Logger.d("Already latest version: " + name);
             }
         } catch (Exception e) {
             Logger.e("Updater: Exception during update check: " + e.getMessage());
             e.printStackTrace();
-            // 只在手动检查时提示网络错误
             if (forceCheck) {
                 App.post(() -> Notify.show("检查更新失败：网络连接异常"));
             }
+        }
+    }
+    
+    private boolean needUpdate(String remoteVersion) {
+        if (!Setting.getUpdate()) return false;
+        
+        try {
+            // 简单的版本号比较，假设版本格式为 x.y.z
+            String[] remoteParts = remoteVersion.split("\\.");
+            String[] localParts = BuildConfig.VERSION_NAME.split("\\.");
+            
+            // 确保两个版本号都有足够的段
+            int maxLength = Math.max(remoteParts.length, localParts.length);
+            
+            for (int i = 0; i < maxLength; i++) {
+                int remotePart = i < remoteParts.length ? Integer.parseInt(remoteParts[i]) : 0;
+                int localPart = i < localParts.length ? Integer.parseInt(localParts[i]) : 0;
+                
+                if (remotePart > localPart) {
+                    return true;
+                } else if (remotePart < localPart) {
+                    return false;
+                }
+            }
+            return false; // 版本相同
+        } catch (Exception e) {
+            Logger.e("Updater: Version comparison error: " + e.getMessage());
+            return false;
         }
     }
 
@@ -180,8 +211,18 @@ public class Updater implements Download.Callback {
     }
 
     private void confirm(View view) {
-        view.setEnabled(false);
-        download.start();
+        // 跳转到GitHub Releases页面而不是直接下载
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://github.com/Tosencen/XMBOX/releases/tag/v3.0.8"));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            App.get().startActivity(intent);
+            dismiss();
+        } catch (Exception e) {
+            Logger.e("Failed to open GitHub releases page: " + e.getMessage());
+            Notify.show("无法打开更新页面，请手动访问GitHub下载");
+            dismiss();
+        }
     }
 
     private void dismiss() {
