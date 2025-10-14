@@ -9,7 +9,7 @@
 
 一个操作方便、界面简洁的Android视频播放器盒子，需自行添源，支持TV和手机双平台。
 
-[下载APK](../../releases) • [功能特性](#-功能特性) • [构建指南](#-构建指南) • [API文档](#-api文档)
+[下载APK](https://github.com/Tosencen/XMBOX-Release/tree/main/apk/release) • [功能特性](#-功能特性) • [构建指南](#-构建指南) • [API文档](#-api文档)
 
 </div>
 
@@ -40,8 +40,18 @@
 
 | 平台 | ARM64-V8A | ARM V7A |
 |------|-----------|---------|
-| **📱 手机版** | [下载 (37MB)](../../releases/download/v3.0.7/mobile-arm64_v8a.apk) | [下载 (35MB)](../../releases/download/v3.0.7/mobile-armeabi_v7a.apk) |
-| **📺 TV版** | [下载 (35MB)](../../releases/download/v3.0.7/leanback-arm64_v8a.apk) | [下载 (36MB)](../../releases/download/v3.0.7/leanback-armeabi_v7a.apk) |
+| **📱 手机版** | [下载 (34MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.8/mobile-arm64_v8a-v3.0.8.apk) | [下载 (30MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.8/mobile-armeabi_v7a-v3.0.8.apk) |
+| **📺 TV版** | [下载 (34MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.8/leanback-arm64_v8a-v3.0.8.apk) | [下载 (30MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.8/leanback-armeabi_v7a-v3.0.8.apk) |
+
+### 📁 版本历史
+- **v3.0.8**: [查看v3.0.8版本](https://github.com/Tosencen/XMBOX-Release/tree/main/apk/release/v3.0.8) - UI交互体验全面优化
+- **v3.0.7**: [查看v3.0.7版本](https://github.com/Tosencen/XMBOX-Release/tree/main/apk/release/v3.0.7) - 全面优化稳定性和用户体验
+
+### 📦 下载说明
+- **最新版本**: 根目录的 `mobile.json` 和 `leanback.json` 包含最新版本信息
+- **历史版本**: 每个版本都有独立的文件夹，包含完整的APK文件和版本信息
+- **文件结构**: 按版本号组织，便于管理和下载
+- **签名保护**: 所有APK均使用v1/v2/v3/v4多重签名保护
 
 TV版基于 [FongMi/TV](https://github.com/FongMi/TV) 原项目就改了些配色，想要嘿稳定的可去原项目体验
 ### 📋 系统要求
@@ -124,26 +134,19 @@ XMBOX/
 
 ### v3.0.8 (2025-10-14)
 
-#### 🐛 核心修复
-* **修复关键崩溃问题** - 解决 VodConfig/LiveConfig 空指针异常
-* **增强构造函数初始化** - 防止 clear() 方法调用时出现空指针
-* **优化生命周期管理** - 改进 Activity 销毁时的资源清理
+#### 🎨 UI交互体验全面优化
+* **修复按钮点击效果** - 解决按钮点击效果过于明显的问题
+* **统一自定义背景** - 使用自定义背景替代系统selectableItemBackgroundBorderless
+* **移除文字阴影** - 清理Control.Action样式中的文字阴影效果
+* **优化直播页面** - 选择按钮颜色统一为主题黄色
+* **调整页面布局** - 许可协议页面按钮区域上间距调整为8dp
+* **修复文字重叠** - 解决跨类和换源按钮的文字重叠问题
+* **提升视觉一致性** - 整体UI视觉一致性和用户体验优化
 
-#### 🎨 UI/UX 全面升级
-* **新增隐私协议页面** - 符合应用商店规范的隐私政策
-* **修复按钮文字显示** - 解决长文本显示不完整问题
-* **空状态动画优化** - 恢复完整 Lottie 动画，位置向上调整40dp
-* **川渝方言文案** - 空状态文案改为"这里撒子内容都没得～"
-
-#### 📺 TV版本专项优化
-* **选集按钮高亮** - 选中状态文字改为黄色显示 (#FFEB3B)
-* **专用颜色方案** - 新增 episode_text.xml 选择器
-* **精准影响范围** - 仅修改视频详情页，不干扰其他界面
-
-#### ⚡ 技术改进
-* **任务栈管理** - 防止用户通过任务管理器返回协议页面
-* **空值安全检查** - 全面增强空指针保护
-* **错误处理机制** - 改进异常捕获和处理逻辑
+#### 🔧 技术改进
+* **优化内存使用** - 改进内存管理机制
+* **提升播放稳定性** - 增强播放器稳定性
+* **文件结构重组** - 按版本号重新组织发布文件结构
 
 ### v3.0.5 (2025-08-20)
 #### 🎨 界面优化
