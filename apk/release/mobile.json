@@ -1,9 +1,9 @@
 {
-  "name": "3.0.8",
-  "desc": "XMBOX 手机版 v3.0.8\n\n✨ UI优化：\n• 修复按钮点击效果过于明显的问题\n• 统一使用自定义背景替代系统selectableItemBackgroundBorderless\n• 移除Control.Action样式中的文字阴影效果\n• 优化直播页面选择按钮颜色为主题黄色\n• 调整许可协议页面按钮区域上间距为8dp\n• 修复跨类和换源按钮的文字重叠问题\n• 提升整体UI视觉一致性和用户体验\n\n🔧 改进优化：\n• 优化内存使用\n• 提升播放稳定性\n\n📱 支持架构：ARM64-v8a | ARMv7a",
-  "code": 308,
+  "name": "3.0.9",
+  "desc": "XMBOX 手机版 v3.0.9\n\n✨ 新功能：\n• 新增直播开关控制功能，可隐藏/显示直播tab\n• 新增实时倍速显示功能，播放控制对话框显示当前倍速\n• 优化源管理模块间距动态调整\n\n🎨 UI优化：\n• 滑杆圆球大小优化至20dp直径，提升操作体验\n• 改进滑杆刻度显示，非激活轨道显示刻度\n• 增强播放进度条动态大小调整功能\n• 修复播放进度条圆球跳回问题\n• 完善直播开关逻辑和UI交互\n\n🔧 改进优化：\n• 优化内存使用\n• 提升播放稳定性\n• 增强UI交互体验\n\n📱 支持架构：ARM64-v8a | ARMv7a",
+  "code": 309,
   "downloads": {
-    "arm64_v8a": "v3.0.8/mobile-arm64_v8a-v3.0.8.apk",
-    "armeabi_v7a": "v3.0.8/mobile-armeabi_v7a-v3.0.8.apk"
+    "arm64_v8a": "v3.0.9/mobile-arm64_v8a-v3.0.9.apk",
+    "armeabi_v7a": "v3.0.9/mobile-armeabi_v7a-v3.0.9.apk"
   }
 }
