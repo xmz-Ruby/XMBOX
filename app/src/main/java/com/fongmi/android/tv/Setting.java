@@ -324,4 +324,12 @@ public class Setting {
     public static void setPrivacyAgreed(boolean agreed) {
         Prefers.put("privacy_agreed_v1", agreed);
     }
+
+    public static boolean isLiveTabVisible() {
+        return Prefers.getBoolean("live_tab_visible", true);
+    }
+
+    public static void putLiveTabVisible(boolean visible) {
+        Prefers.put("live_tab_visible", visible);
+    }
 }

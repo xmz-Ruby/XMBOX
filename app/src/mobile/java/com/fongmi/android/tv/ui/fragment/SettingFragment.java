@@ -8,9 +8,11 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -101,7 +103,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     protected void initView() {
         setSourceHintText(mBinding.vodUrl, VodConfig.getDesc(), R.string.source_hint_setting);
         setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
-        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
+        // setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall); // 壁纸功能已移除
         mBinding.versionText.setText(getString(R.string.setting_version) + " " + BuildConfig.VERSION_NAME);
         
         setOtherText();
@@ -115,7 +117,30 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.proxyText.setText(getProxy(Setting.getProxy()));
         mBinding.incognitoSwitch.setChecked(Setting.isIncognito());
+        mBinding.liveTabVisibleSwitch.setChecked(Setting.isLiveTabVisible());
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
+        setLiveSettingsVisibility();
+    }
+
+    private void setLiveSettingsVisibility() {
+        boolean isLiveTabVisible = !Setting.isLiveTabVisible(); // 注意：这里取反，因为开关是"隐藏直播"
+        
+        // 获取直播容器的布局参数
+        LinearLayout.LayoutParams liveContainerParams = (LinearLayout.LayoutParams) mBinding.liveContainer.getLayoutParams();
+        
+        if (isLiveTabVisible) {
+            // 直播开关打开：显示直播模块，间距为12dp
+            mBinding.liveContainer.setVisibility(View.VISIBLE);
+            liveContainerParams.topMargin = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics());
+        } else {
+            // 直播开关关闭：隐藏直播模块，间距为0dp（这样视频模块和下一个模块之间会有正常间距）
+            mBinding.liveContainer.setVisibility(View.GONE);
+            liveContainerParams.topMargin = 0;
+        }
+        
+        // 应用布局参数
+        mBinding.liveContainer.setLayoutParams(liveContainerParams);
     }
 
     private void setCacheText() {
@@ -131,7 +156,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     protected void initEvent() {
         mBinding.vod.setOnClickListener(this::onVod);
         mBinding.live.setOnClickListener(this::onLive);
-        mBinding.wall.setOnClickListener(this::onWall);
+        // mBinding.wall.setOnClickListener(this::onWall); // 壁纸功能已移除
         mBinding.proxy.setOnClickListener(this::onProxy);
         mBinding.cache.setOnClickListener(this::onCache);
         mBinding.backup.setOnClickListener(this::onBackup);
@@ -143,13 +168,14 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodHome.setOnClickListener(this::onVodHome);
         mBinding.live.setOnLongClickListener(this::onLiveEdit);
         mBinding.liveHome.setOnClickListener(this::onLiveHome);
-        mBinding.wall.setOnLongClickListener(this::onWallEdit);
+        // mBinding.wall.setOnLongClickListener(this::onWallEdit); // 壁纸功能已移除
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
-        mBinding.wallDefault.setOnClickListener(this::setWallDefault);
-        mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
-        mBinding.incognito.setOnClickListener(this::setIncognito);
+        // mBinding.wallDefault.setOnClickListener(this::setWallDefault); // 壁纸功能已移除
+        // mBinding.wallRefresh.setOnClickListener(this::setWallRefresh); // 壁纸功能已移除
+        mBinding.incognitoSwitch.setOnClickListener(this::setIncognito);
+        mBinding.liveTabVisibleSwitch.setOnClickListener(this::setLiveTabVisible);
         mBinding.size.setOnClickListener(this::setSize);
         mBinding.doh.setOnClickListener(this::setDoh);
     }
@@ -200,9 +226,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 case 2:
                     Notify.progress(getActivity());
                     WallConfig.load(config, getCallback(2));
-                    if (mBinding != null && mBinding.wallUrl != null) {
-                        mBinding.wallUrl.setText(config.getDesc());
-                    }
+                    // if (mBinding != null && mBinding.wallUrl != null) { // 壁纸功能已移除
+                    //     mBinding.wallUrl.setText(config.getDesc());
+                    // }
                     break;
             }
         } catch (Exception e) {
@@ -241,7 +267,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                         setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
                         break;
                     case 2:
-                        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
+                        // setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall); // 壁纸功能已移除
                         break;
                 }
             }
@@ -257,7 +283,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 RefreshEvent.config();
                 setSourceHintText(mBinding.vodUrl, VodConfig.getDesc(), R.string.source_hint_setting);
                 setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
-                setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
+                // setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall); // 壁纸功能已移除
                 break;
             case 1:
                 setCacheText();
@@ -268,7 +294,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             case 2:
                 setCacheText();
                 Notify.dismiss();
-                setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
+                // setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall); // 壁纸功能已移除
                 break;
         }
     }
@@ -379,7 +405,17 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     private void setIncognito(View view) {
         boolean isChecked = !Setting.isIncognito();
         Setting.putIncognito(isChecked);
-        mBinding.incognitoSwitch.setChecked(isChecked);
+        // 不需要再次调用 setChecked，因为点击已经触发了状态变化
+    }
+
+    private void setLiveTabVisible(View view) {
+        boolean isChecked = !Setting.isLiveTabVisible();
+        Setting.putLiveTabVisible(isChecked);
+        // 发送刷新事件，通知主界面更新导航栏
+        RefreshEvent.config();
+        // 更新直播设置项的可见性
+        setLiveSettingsVisibility();
+        // 不需要再次调用 setChecked，因为点击已经触发了状态变化
     }
 
     private void setSize(View view) {
@@ -473,7 +509,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         if (hidden) return;
         setSourceHintText(mBinding.vodUrl, VodConfig.getDesc(), R.string.source_hint_setting);
         setSourceHintText(mBinding.liveUrl, LiveConfig.getDesc(), R.string.source_hint_live);
-        setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall);
+        // setSourceHintText(mBinding.wallUrl, WallConfig.getDesc(), R.string.source_hint_wall); // 壁纸功能已移除
         setCacheText();
     }
 

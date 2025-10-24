@@ -59,7 +59,7 @@ public class Timer {
 
     public void delay() {
         cancel();
-        set(TimeUnit.MINUTES.toMillis(5) + tick);
+        set(TimeUnit.MINUTES.toMillis(15) + tick);
     }
 
     public void reset() {

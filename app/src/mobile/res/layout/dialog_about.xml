@@ -54,7 +54,7 @@
         android:layout_marginTop="24dp"
         android:background="@drawable/shape_about_button"
         android:text="我的GitHub"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="14sp"
         android:padding="12dp"/>
 

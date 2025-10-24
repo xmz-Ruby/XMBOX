@@ -65,17 +65,19 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     protected void initEvent() {
         mBinding.back.setOnClickListener(v -> finish());
         mBinding.ua.setOnClickListener(this::onUa);
-        mBinding.aac.setOnClickListener(this::setAAC);
         mBinding.scale.setOnClickListener(this::onScale);
         mBinding.speed.setOnClickListener(this::onSpeed);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.render.setOnClickListener(this::setRender);
-        mBinding.tunnel.setOnClickListener(this::setTunnel);
         mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.caption.setOnLongClickListener(this::onCaption);
         mBinding.background.setOnClickListener(this::onBackground);
-        mBinding.audioDecode.setOnClickListener(this::setAudioDecode);
-        mBinding.danmakuLoad.setOnClickListener(this::setDanmakuLoad);
+        
+        // 直接给开关按钮设置点击监听器，避免双重点击冲突
+        mBinding.tunnelSwitch.setOnClickListener(this::setTunnel);
+        mBinding.audioDecodeSwitch.setOnClickListener(this::setAudioDecode);
+        mBinding.aacSwitch.setOnClickListener(this::setAAC);
+        mBinding.danmakuLoadSwitch.setOnClickListener(this::setDanmakuLoad);
     }
 
     private void onUa(View view) {
@@ -91,7 +93,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private void setAAC(View view) {
         boolean isChecked = !Setting.isPreferAAC();
         Setting.putPreferAAC(isChecked);
-        mBinding.aacSwitch.setChecked(isChecked);
+        // 不需要再次调用 setChecked，因为点击已经触发了状态变化
     }
 
     private void onScale(View view) {
@@ -132,7 +134,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private void setTunnel(View view) {
         boolean isChecked = !Setting.isTunnel();
         Setting.putTunnel(isChecked);
-        mBinding.tunnelSwitch.setChecked(isChecked);
+        // 不需要再次调用 setChecked，因为点击已经触发了状态变化
         if (isChecked && Setting.getRender() == 1) setRender(view);
     }
 
@@ -157,12 +159,12 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private void setAudioDecode(View view) {
         boolean isChecked = !Setting.isAudioPrefer();
         Setting.putAudioPrefer(isChecked);
-        mBinding.audioDecodeSwitch.setChecked(isChecked);
+        // 不需要再次调用 setChecked，因为点击已经触发了状态变化
     }
 
     private void setDanmakuLoad(View view) {
         boolean isChecked = !Setting.isDanmakuLoad();
         Setting.putDanmakuLoad(isChecked);
-        mBinding.danmakuLoadSwitch.setChecked(isChecked);
+        // 不需要再次调用 setChecked，因为点击已经触发了状态变化
     }
 } 

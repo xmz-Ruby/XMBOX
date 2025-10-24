@@ -213,13 +213,26 @@ public class Updater implements Download.Callback {
     private void confirm(View view) {
         // 跳转到GitHub Releases页面而不是直接下载
         try {
+            String url = "https://github.com/Tosencen/XMBOX/releases/tag/v3.0.8";
+            Logger.d("Updater: Attempting to open URL: " + url);
+            
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://github.com/Tosencen/XMBOX/releases/tag/v3.0.8"));
+            intent.setData(Uri.parse(url));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            App.get().startActivity(intent);
-            dismiss();
+            
+            // 检查是否有应用可以处理这个Intent
+            if (intent.resolveActivity(App.get().getPackageManager()) != null) {
+                App.get().startActivity(intent);
+                Logger.d("Updater: Successfully started browser intent");
+                dismiss();
+            } else {
+                Logger.e("Updater: No app can handle the URL");
+                Notify.show("没有找到可以打开链接的应用，请手动访问GitHub下载");
+                dismiss();
+            }
         } catch (Exception e) {
-            Logger.e("Failed to open GitHub releases page: " + e.getMessage());
+            Logger.e("Updater: Failed to open GitHub releases page: " + e.getMessage());
+            e.printStackTrace();
             Notify.show("无法打开更新页面，请手动访问GitHub下载");
             dismiss();
         }

@@ -6,10 +6,10 @@
             <solid android:color="@color/primary" />
             <corners android:radius="8dp" />
             <padding
-                android:bottom="18dp"
+                android:bottom="12dp"
                 android:left="16dp"
                 android:right="16dp"
-                android:top="18dp" />
+                android:top="12dp" />
         </shape>
     </item>
-</ripple> 
+</ripple>

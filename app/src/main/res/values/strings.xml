@@ -78,6 +78,7 @@
     <string name="setting_data">Data Management</string>
     <string name="setting_player">Player setting</string>
     <string name="setting_incognito">Incognito mode</string>
+    <string name="setting_live_tab_visible">Hide Live Tab</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
     <string name="setting_doh">DoH</string>

@@ -126,6 +126,8 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
     private void setSpeed(@NonNull Slider slider, float value, boolean fromUser) {
         parent.control.action.speed.setText(player.setSpeed(value));
         if (history != null) history.setSpeed(player.getSpeed());
+        // 实时更新倍速数值显示
+        binding.speedValue.setText(String.format("%.1fx", value));
     }
 
     private void setScaleText() {
@@ -179,6 +181,8 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.player.setText(parent.control.action.player.getText());
         binding.decode.setVisibility(parent.control.action.decode.getVisibility());
         binding.danmaku.setVisibility(parent.control.action.danmaku.getVisibility());
+        // 初始化倍速数值显示
+        binding.speedValue.setText(String.format("%.1fx", Math.max(player.getSpeed(), 0.5f)));
     }
 
     public void setParseVisible(boolean visible) {

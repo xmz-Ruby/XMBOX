@@ -15,9 +15,12 @@
         android:stepSize="1"
         android:valueFrom="1"
         android:valueTo="10"
-        app:thumbColor="@color/yellow_500"
-        app:tickVisible="false"
-        app:trackColorActive="@color/yellow_500"
-        app:trackColorInactive="@color/yellow_50" />
+        app:thumbColor="@color/accent"
+        app:thumbRadius="10dp"
+        app:tickVisible="true"
+        app:tickColor="@color/black_50"
+        app:trackColorActive="@color/accent"
+        app:trackColorInactive="@color/white_20"
+        app:trackHeight="6dp" />
 
 </LinearLayout>

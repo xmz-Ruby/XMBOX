@@ -60,6 +60,8 @@ public class TimerDialog extends BaseDialog implements Timer.Callback {
         binding.time2.setOnClickListener(this::setTimer);
         binding.time3.setOnClickListener(this::setTimer);
         binding.time4.setOnClickListener(this::setTimer);
+        binding.time5.setOnClickListener(this::setTimer);
+        binding.time6.setOnClickListener(this::setTimer);
     }
 
     private void setTimer(View view) {

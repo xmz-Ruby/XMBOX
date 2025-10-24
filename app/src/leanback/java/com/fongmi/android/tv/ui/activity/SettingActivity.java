@@ -99,8 +99,17 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.proxyText.setText(getProxy(Setting.getProxy()));
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
+        mBinding.liveTabVisibleText.setText(getSwitch(Setting.isLiveTabVisible()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Setting.getQuality()]);
+        setLiveSettingsVisibility();
+    }
+
+    private void setLiveSettingsVisibility() {
+        boolean isLiveTabVisible = !Setting.isLiveTabVisible(); // 注意：这里取反，因为开关是"隐藏直播"
+        mBinding.live.setVisibility(isLiveTabVisible ? View.VISIBLE : View.GONE);
+        mBinding.liveHome.setVisibility(isLiveTabVisible ? View.VISIBLE : View.GONE);
+        mBinding.liveHistory.setVisibility(isLiveTabVisible ? View.VISIBLE : View.GONE);
     }
 
     private void setCacheText() {
@@ -134,6 +143,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.incognito.setOnClickListener(this::setIncognito);
+        mBinding.liveTabVisible.setOnClickListener(this::setLiveTabVisible);
         mBinding.quality.setOnClickListener(this::setQuality);
         mBinding.size.setOnClickListener(this::setSize);
         mBinding.doh.setOnClickListener(this::setDoh);
@@ -302,6 +312,15 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     private void setIncognito(View view) {
         Setting.putIncognito(!Setting.isIncognito());
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
+    }
+
+    private void setLiveTabVisible(View view) {
+        Setting.putLiveTabVisible(!Setting.isLiveTabVisible());
+        mBinding.liveTabVisibleText.setText(getSwitch(Setting.isLiveTabVisible()));
+        // 发送刷新事件，通知主界面更新导航栏
+        RefreshEvent.config();
+        // 更新直播设置项的可见性
+        setLiveSettingsVisibility();
     }
 
     private void setQuality(View view) {

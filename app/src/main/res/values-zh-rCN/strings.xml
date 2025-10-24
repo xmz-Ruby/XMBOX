@@ -73,6 +73,7 @@
     <string name="setting_subscription">订阅管理</string>
     <string name="setting_player">播放设置</string>
     <string name="setting_incognito">无痕模式</string>
+    <string name="setting_live_tab_visible">隐藏直播</string>
     <string name="setting_quality">图片品质</string>
     <string name="setting_size">图片尺寸</string>
     <string name="setting_doh">DoH</string>
