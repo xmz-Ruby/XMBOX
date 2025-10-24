@@ -32,6 +32,7 @@ public class Updater implements Download.Callback {
     private AlertDialog dialog;
     private boolean dev;
     private boolean forceCheck; // 是否为手动检查
+    private String latestVersion; // 存储检测到的最新版本
 
     private File getFile() {
         return Path.root("Download", "XMBOX-update.apk");
@@ -148,6 +149,7 @@ public class Updater implements Download.Callback {
             // 比较版本号
             if (needUpdate(version)) {
                 Logger.d("Updater: Update needed, showing dialog");
+                this.latestVersion = version; // 保存最新版本号
                 App.post(() -> show(activity, version, body));
             } else {
                 Logger.d("Updater: No update needed");
@@ -211,9 +213,9 @@ public class Updater implements Download.Callback {
     }
 
     private void confirm(View view) {
-        // 跳转到GitHub Releases页面而不是直接下载
+        // 跳转到具体版本的GitHub Releases页面
         try {
-            String url = "https://github.com/Tosencen/XMBOX/releases/tag/v3.0.8";
+            String url = "https://github.com/Tosencen/XMBOX/releases/tag/v" + latestVersion;
             Logger.d("Updater: Attempting to open URL: " + url);
             
             Intent intent = new Intent(Intent.ACTION_VIEW);
