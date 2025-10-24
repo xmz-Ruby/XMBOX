@@ -2,7 +2,7 @@
   </h1>
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.0.8-blue.svg)
+![Version](https://img.shields.io/badge/version-3.0.9-blue.svg)
 ![Android](https://img.shields.io/badge/platform-Android-green.svg)
 ![License](https://img.shields.io/badge/license-GPL--3.0-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
@@ -36,14 +36,15 @@
 
 ## 📥 下载安装
 
-### 最新版本: v3.0.8
+### 最新版本: v3.0.9
 
 | 平台 | ARM64-V8A | ARM V7A |
 |------|-----------|---------|
-| **📱 手机版** | [下载 (34MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.8/mobile-arm64_v8a-v3.0.8.apk) | [下载 (30MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.8/mobile-armeabi_v7a-v3.0.8.apk) |
-| **📺 TV版** | [下载 (34MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.8/leanback-arm64_v8a-v3.0.8.apk) | [下载 (30MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.8/leanback-armeabi_v7a-v3.0.8.apk) |
+| **📱 手机版** | [下载 (35.8MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.9/mobile-arm64_v8a-v3.0.9.apk) | [下载 (31.6MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.9/mobile-armeabi_v7a-v3.0.9.apk) |
+| **📺 TV版** | [下载 (35.9MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.9/leanback-arm64_v8a-v3.0.9.apk) | [下载 (31.7MB)](https://github.com/Tosencen/XMBOX-Release/raw/main/apk/release/v3.0.9/leanback-armeabi_v7a-v3.0.9.apk) |
 
 ### 📁 版本历史
+- **v3.0.9**: [查看v3.0.9版本](https://github.com/Tosencen/XMBOX-Release/tree/main/apk/release/v3.0.9) - 新增直播开关控制和UI交互优化
 - **v3.0.8**: [查看v3.0.8版本](https://github.com/Tosencen/XMBOX-Release/tree/main/apk/release/v3.0.8) - UI交互体验全面优化
 - **v3.0.7**: [查看v3.0.7版本](https://github.com/Tosencen/XMBOX-Release/tree/main/apk/release/v3.0.7) - 全面优化稳定性和用户体验
 
@@ -131,6 +132,24 @@ XMBOX/
 - **数据库**: Room
 
 ## 📝 更新日志
+
+### v3.0.9 (2025-10-24)
+
+#### ✨ 新功能
+* **直播开关控制** - 新增直播tab显示/隐藏开关，用户可根据需要控制直播功能
+* **实时倍速显示** - 播放控制对话框新增实时倍速数值显示，提升用户体验
+* **源管理优化** - 优化源管理模块间距动态调整，界面更加协调
+
+#### 🎨 UI优化
+* **滑杆交互优化** - 滑杆圆球大小优化至20dp直径，提升操作体验
+* **刻度显示改进** - 改进滑杆刻度显示，非激活轨道显示刻度，激活轨道保持干净
+* **播放进度条增强** - 增强播放进度条动态大小调整功能，修复圆球跳回问题
+* **直播开关逻辑** - 完善直播开关逻辑和UI交互，确保功能一致性
+
+#### 🔧 技术改进
+* **优化内存使用** - 进一步优化内存管理机制
+* **提升播放稳定性** - 增强播放器稳定性
+* **增强UI交互体验** - 改进用户界面交互响应
 
 ### v3.0.8 (2025-10-14)
 
