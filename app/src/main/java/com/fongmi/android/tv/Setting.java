@@ -137,6 +137,46 @@ public class Setting {
         Prefers.put("background", background);
     }
 
+    public static int getDanmakuDensity() {
+        return Prefers.getInt("danmaku_density", 30);
+    }
+
+    public static void putDanmakuDensity(int density) {
+        Prefers.put("danmaku_density", density);
+    }
+
+    public static float getDanmakuAlpha() {
+        return Prefers.getFloat("danmaku_alpha", 0.8f);
+    }
+
+    public static void putDanmakuAlpha(float alpha) {
+        Prefers.put("danmaku_alpha", alpha);
+    }
+
+    public static float getDanmakuTextSize() {
+        return Prefers.getFloat("danmaku_text_size", 0.75f);
+    }
+
+    public static void putDanmakuTextSize(float size) {
+        Prefers.put("danmaku_text_size", size);
+    }
+
+    public static float getDanmakuSpeed() {
+        return Prefers.getFloat("danmaku_speed", 1.2f);
+    }
+
+    public static void putDanmakuSpeed(float speed) {
+        Prefers.put("danmaku_speed", speed);
+    }
+
+    public static boolean getDanmakuStroke() {
+        return Prefers.getBoolean("danmaku_stroke", false);
+    }
+
+    public static void putDanmakuStroke(boolean stroke) {
+        Prefers.put("danmaku_stroke", stroke);
+    }
+
     public static int getSiteMode() {
         return Prefers.getInt("site_mode");
     }

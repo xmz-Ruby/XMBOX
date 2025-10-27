@@ -32,13 +32,50 @@ public class DanPlayer implements DrawHandler.Callback {
     public DanPlayer() {
         context = DanmakuContext.create();
         executor = Executors.newCachedThreadPool();
+        initConfig();
+    }
+
+    private void initConfig() {
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, 2);
-        maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, 2);
+        maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, 3);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, 2);
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, 2);
-        context.setMaximumLines(maxLines).setScrollSpeedFactor(1.2f).setDanmakuTransparency(0.8f);
-        context.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setDanmakuMargin(ResUtil.dp2px(8)).setScaleTextSize(0.8f);
+
+        int density = com.fongmi.android.tv.Setting.getDanmakuDensity();
+        float alpha = com.fongmi.android.tv.Setting.getDanmakuAlpha();
+        float textSize = com.fongmi.android.tv.Setting.getDanmakuTextSize();
+        float speed = com.fongmi.android.tv.Setting.getDanmakuSpeed();
+        boolean stroke = com.fongmi.android.tv.Setting.getDanmakuStroke();
+
+        HashMap<Integer, Boolean> overlapping = new HashMap<>();
+        overlapping.put(BaseDanmaku.TYPE_SCROLL_RL, true);
+        overlapping.put(BaseDanmaku.TYPE_FIX_TOP, true);
+
+        context.setMaximumLines(maxLines)
+                .setScrollSpeedFactor(speed)
+                .setDanmakuTransparency(alpha)
+                .setDuplicateMergingEnabled(true)
+                .preventOverlapping(overlapping)
+                .setMaximumVisibleSizeInScreen(density)
+                .setCacheStuffer(new master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer(), null);
+
+        if (stroke) {
+            context.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3)
+                    .setDanmakuMargin(ResUtil.dp2px(8))
+                    .setScaleTextSize(textSize);
+        } else {
+            context.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_NONE, 0)
+                    .setDanmakuMargin(ResUtil.dp2px(6))
+                    .setScaleTextSize(textSize);
+        }
+    }
+
+    public void updateConfig() {
+        initConfig();
+        if (view != null && view.isPrepared()) {
+            view.restart();
+        }
     }
 
     public void setView(DanmakuView view) {

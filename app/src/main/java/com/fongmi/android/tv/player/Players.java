@@ -499,6 +499,10 @@ public class Players implements Player.Listener, ParseCallback {
         if (danPlayer != null) danPlayer.setTextSize(size);
     }
 
+    public DanPlayer getDanPlayer() {
+        return danPlayer;
+    }
+
     public void resetTrack() {
         if (exoPlayer != null) ExoUtil.resetTrack(exoPlayer);
     }
