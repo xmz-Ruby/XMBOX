@@ -21,5 +21,13 @@ dependencyResolutionManagement {
 include ':app'
 include ':catvod'
 include ':chaquo'
+include ':DLNA-Cast-master:dlna-core'
+include ':DLNA-Cast-master:dlna-dmc'
+include ':DLNA-Cast-master:dlna-dmr'
+include ':forcetech'
+include ':hook'
+include ':jianpian'
 include ':quickjs'
+include ':thunder'
+include ':tvbus'
 rootProject.name = "TV"

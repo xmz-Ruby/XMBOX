@@ -51,6 +51,10 @@ android {
             dimension "abi"
             ndk { abiFilters "armeabi-v7a" }
         }
+        x86_64 {
+            dimension "abi"
+            ndk { abiFilters "x86_64" }
+        }
     }
 
     buildFeatures {
@@ -111,8 +115,15 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation project(':catvod')
-    // implementation project(':chaquo') // 移除Python支持减少8-10MB体积
+    implementation project(':chaquo') // 移除Python支持减少8-10MB体积
+    implementation project(':DLNA-Cast-master:dlna-dmc')
+    implementation project(':DLNA-Cast-master:dlna-dmr')
+    implementation project(':forcetech')
+    implementation project(':hook')
+    implementation project(':jianpian')
     implementation project(':quickjs')
+    implementation project(':thunder')
+    implementation project(':tvbus')
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.media:media:1.7.0'
     implementation 'androidx.media3:media3-common:' + media3Version
@@ -120,7 +131,7 @@ dependencies {
     implementation 'androidx.media3:media3-database:' + media3Version
     implementation 'androidx.media3:media3-datasource:' + media3Version
     implementation 'androidx.media3:media3-datasource-okhttp:' + media3Version
-    implementation 'androidx.media3:media3-datasource-rtmp:' + media3Version
+    implementation('androidx.media3:media3-datasource-rtmp:' + media3Version) { exclude group: 'io.antmedia', module: 'rtmp-client' }
     implementation 'androidx.media3:media3-decoder:' + media3Version
     implementation 'androidx.media3:media3-effect:' + media3Version
     implementation 'androidx.media3:media3-exoplayer:' + media3Version
@@ -145,7 +156,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.3'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.hierynomus:smbj:0.13.0'
-    implementation 'io.antmedia:rtmp-client:3.1.0'
+    implementation "com.github.mcxinyu:LibRtmp-Client-for-Android:v3.2.0.m2"
     implementation 'javax.servlet:javax.servlet-api:3.1.0'
     implementation 'org.aomedia.avif.android:avif:1.1.1.14d8e3c4'
     implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
@@ -168,4 +179,5 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs_nio:2.1.5'
     implementation 'io.noties.markwon:core:4.6.2'
     implementation 'com.airbnb.android:lottie:5.2.0'
+    implementation 'com.github.bilibili:DanmakuFlameMaster:0.9.25'
 }
