@@ -88,6 +88,7 @@ public class Players implements Player.Listener, ParseCallback {
     private VideoSize size;
     private List<Sub> subs;
     private String format;
+    private String title;
     private String tag;
     private String key;
     private String url;
@@ -541,6 +542,7 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     public void setMetadata(String title, String artist, String artUri, Drawable drawable) {
+        this.title = title;
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
         builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
         builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
@@ -550,6 +552,10 @@ public class Players implements Player.Listener, ParseCallback {
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, getDuration());
         session.setMetadata(putBitmap(builder, drawable).build());
         ActionEvent.update();
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public void share(Activity activity, CharSequence title) {
