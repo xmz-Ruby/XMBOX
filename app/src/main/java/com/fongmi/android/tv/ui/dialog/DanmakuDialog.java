@@ -66,7 +66,7 @@ public final class DanmakuDialog extends BaseDialog implements DanmakuAdapter.On
     }
 
     private void showChooser(View view) {
-        FileChooser.from(this).show(new String[]{"text/*"});
+        FileChooser.from(this).show(new String[]{"text/*", "application/xml", "application/json"});
         player.pause();
     }
 

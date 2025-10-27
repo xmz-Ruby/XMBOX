@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.player.danmaku;
 
 import com.fongmi.android.tv.bean.DanmakuData;
+import com.orhanobut.logger.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,7 +19,7 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class Parser extends BaseDanmakuParser {
 
-    private static final Pattern XML = Pattern.compile("p=\"([^\"]+)\"[^>]*>([^<]+)<");
+    private static final Pattern XML = Pattern.compile("<d p=\"([^\"]+)\"[^>]*>([^<]+)</d>");
     private static final Pattern TXT = Pattern.compile("\\[(.*?)\\](.*)");
 
     @Override
@@ -28,8 +29,10 @@ public class Parser extends BaseDanmakuParser {
         if (mDataSource == null) return null;
         List<DanmakuData> items = new ArrayList<>();
         AndroidFileSource source = (AndroidFileSource) mDataSource;
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(source.data()))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(source.data(), "UTF-8"))) {
             while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.equals("<i>") || line.equals("</i>")) continue;
                 if (pattern == null) pattern = line.startsWith("<") ? XML : TXT;
                 Matcher matcher = pattern.matcher(line);
                 while (matcher.find() && matcher.groupCount() == 2) {
@@ -40,6 +43,7 @@ public class Parser extends BaseDanmakuParser {
                     }
                 }
             }
+            Logger.d("解析到 " + items.size() + " 条弹幕");
             Danmakus result = new Danmakus(IDanmakus.ST_BY_TIME);
             for (int i = 0; i < items.size(); i++) {
                 BaseDanmaku item = mContext.mDanmakuFactory.createDanmaku(items.get(i).getType(), mContext);
@@ -56,6 +60,7 @@ public class Parser extends BaseDanmakuParser {
                     result.addItem(item);
                 }
             }
+            Logger.d("成功添加 " + result.size() + " 条弹幕到渲染队列");
             return result;
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,6 +2,8 @@ package com.fongmi.android.tv.player.danmaku;
 
 import androidx.media3.common.Player;
 
+import android.view.View;
+
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.player.Players;
@@ -106,11 +108,17 @@ public class DanPlayer implements DrawHandler.Callback {
         App.post(() -> {
             boolean playing = player.isPlaying();
             long position = player.getPosition();
+            Logger.t(TAG).d("弹幕准备完成 - 播放状态:" + playing + " 位置:" + position);
             executor.execute(() -> {
-                if (!isDanmakuPrepared()) return;
+                if (!isDanmakuPrepared()) {
+                    Logger.t(TAG).d("弹幕视图未准备好");
+                    return;
+                }
+                App.post(() -> view.setVisibility(android.view.View.VISIBLE));
                 if (playing) view.start(position);
                 else view.pause();
                 view.show();
+                Logger.t(TAG).d("弹幕已显示 - 可见性:" + view.getVisibility() + " 是否显示:" + view.isShown());
             });
         });
     }
