@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.api.loader;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.chaquo.Loader;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 
@@ -10,10 +11,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PyLoader {
 
     private final ConcurrentHashMap<String, Spider> spiders;
+    private final Loader loader;
     private String recent;
 
     public PyLoader() {
-        spiders = new ConcurrentHashMap<>();
+        this.spiders = new ConcurrentHashMap<>();
+        this.loader = new Loader();
     }
 
     public void clear() {
@@ -28,8 +31,8 @@ public class PyLoader {
     public Spider getSpider(String key, String api, String ext) {
         try {
             if (spiders.containsKey(key)) return spiders.get(key);
-            // Since we removed chaquo, return SpiderNull for now
-            Spider spider = new SpiderNull();
+            Spider spider = loader.spider(App.get(), api);
+            spider.init(App.get(), ext);
             spiders.put(key, spider);
             return spider;
         } catch (Throwable e) {
