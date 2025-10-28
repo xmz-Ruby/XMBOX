@@ -77,31 +77,120 @@ git clone https://github.com/yourusername/XMBOX.git
 cd XMBOX
 ```
 
-2. **配置签名** (可选)
+2. **配置签名**
+
+项目已包含签名配置，签名文件位于 `keystore/release.jks`
+
+**默认签名信息：**
+- 密钥库密码：`xmbox123`
+- 密钥别名：`xmbox`
+- 密钥密码：`xmbox123`
+- 签名算法：RSA 2048位 + SHA256
+- 有效期：10000天（约27年）
+
+**如需自定义签名：**
+
+方法一：替换签名文件
 ```bash
-# 将你的签名文件放到 keystore/ 目录
-# 或修改 app/build.gradle 中的签名配置
+# 生成新的签名文件
+keytool -genkeypair -v -keystore keystore/release.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -alias your_alias \
+  -storepass your_store_password \
+  -keypass your_key_password \
+  -dname "CN=YourName, OU=YourUnit, O=YourOrg, L=YourCity, ST=YourState, C=YourCountry"
+```
+
+方法二：修改配置文件
+```gradle
+// 编辑 app/build.gradle 中的 signingConfigs
+signingConfigs {
+    release {
+        storeFile file("../keystore/release.jks")
+        storePassword "your_store_password"
+        keyAlias "your_alias"
+        keyPassword "your_key_password"
+    }
+}
 ```
 
 3. **构建项目**
-```bash
-# 构建所有版本
-./gradlew assembleRelease
 
-# 构建特定版本
-./gradlew assembleMobileArm64_v8aRelease    # 手机版 ARM64
-./gradlew assembleLeanbackArm64_v8aRelease  # TV版 ARM64
-./gradlew assembleMobileArmeabi_v7aRelease  # 手机版 ARM V7A
-./gradlew assembleLeanbackArmeabi_v7aRelease # TV版 ARM V7A
+**构建单架构版本：**
+```bash
+# 手机版
+./gradlew assembleArm64_v8aMobileRelease    # ARM64 手机版
+./gradlew assembleArmeabi_v7aMobileRelease  # ARM V7A 手机版
+./gradlew assembleX86_64MobileRelease       # x86_64 手机版
+
+# TV版
+./gradlew assembleArm64_v8aLeanbackRelease    # ARM64 TV版
+./gradlew assembleArmeabi_v7aLeanbackRelease  # ARM V7A TV版
+./gradlew assembleX86_64LeanbackRelease       # x86_64 TV版
+```
+
+**构建全架构通用版本（推荐）：**
+```bash
+# 包含 ARM64-V8A + ARM V7A + x86_64 三个架构
+./gradlew assembleUniversalMobileRelease    # 手机版全架构通用APK
+./gradlew assembleUniversalLeanbackRelease  # TV版全架构通用APK
+```
+
+**构建AAB格式（用于Google Play）：**
+```bash
+./gradlew bundleUniversalMobileRelease    # 手机版AAB
+./gradlew bundleUniversalLeanbackRelease  # TV版AAB
+```
+
+**构建所有版本：**
+```bash
+./gradlew assembleRelease  # 构建所有架构和平台的Release版本
 ```
 
 4. **生成的APK位置**
+
+**单架构版本：**
 ```
 app/build/outputs/apk/
-├── mobileArm64_v8a/release/mobile-arm64_v8a.apk
-├── leanbackArm64_v8a/release/leanback-arm64_v8a.apk
-├── mobileArmeabi_v7a/release/mobile-armeabi_v7a.apk
-└── leanbackArmeabi_v7a/release/leanback-armeabi_v7a.apk
+├── arm64_v8a/mobile/release/arm64_v8a-mobile.apk
+├── arm64_v8a/leanback/release/arm64_v8a-leanback.apk
+├── armeabi_v7a/mobile/release/armeabi_v7a-mobile.apk
+├── armeabi_v7a/leanback/release/armeabi_v7a-leanback.apk
+├── x86_64/mobile/release/x86_64-mobile.apk
+└── x86_64/leanback/release/x86_64-leanback.apk
+```
+
+**全架构通用版本：**
+```
+app/build/outputs/apk/
+├── universal/mobile/release/universal-mobile.apk      # 约60-70MB
+└── universal/leanback/release/universal-leanback.apk  # 约60-70MB
+```
+
+**AAB格式：**
+```
+app/build/outputs/bundle/
+├── universalMobileRelease/app-universal-mobile-release.aab
+└── universalLeanbackRelease/app-universal-leanback-release.aab
+```
+
+### 📦 版本选择建议
+
+| 版本类型 | 体积 | 兼容性 | 适用场景 |
+|---------|------|--------|---------|
+| **单架构版本** | 小（30-35MB） | 特定架构 | 明确知道设备架构，追求最小体积 |
+| **全架构通用版** | 大（60-70MB） | 所有设备 | 不确定设备架构，追求最大兼容性 |
+| **AAB格式** | 动态 | 所有设备 | Google Play上架，自动优化分发 |
+
+### 🔐 签名验证
+
+验证APK签名信息：
+```bash
+# 查看签名信息
+keytool -printcert -jarfile app/build/outputs/apk/universal/mobile/release/universal-mobile.apk
+
+# 验证签名
+jarsigner -verify -verbose -certs app/build/outputs/apk/universal/mobile/release/universal-mobile.apk
 ```
 
 ## 🏛️ 项目架构
