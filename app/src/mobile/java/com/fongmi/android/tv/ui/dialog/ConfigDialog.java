@@ -106,7 +106,7 @@ public class ConfigDialog {
     }
 
     private void onChoose(View view) {
-        FileChooser.from(fragment).show();
+        FileChooser.from(fragment).show("*/*", new String[]{"*/*"}, FileChooser.REQUEST_PICK_CONFIG_FILE);
         dialog.dismiss();
     }
 

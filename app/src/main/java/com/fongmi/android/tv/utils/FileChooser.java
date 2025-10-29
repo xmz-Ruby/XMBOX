@@ -28,6 +28,7 @@ import java.util.List;
 public class FileChooser {
 
     public static final int REQUEST_PICK_FILE = 9999;
+    public static final int REQUEST_PICK_CONFIG_FILE = 9998;
 
     private Activity activity;
     private Fragment fragment;

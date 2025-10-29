@@ -514,7 +514,16 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
-        setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), ""), type));
+        if (resultCode != Activity.RESULT_OK) return;
+        if (requestCode == FileChooser.REQUEST_PICK_CONFIG_FILE) {
+            // 处理配置文件选择：添加为配置源并刷新
+            String filePath = FileChooser.getPathFromUri(getContext(), data.getData());
+            if (filePath != null) {
+                setConfig(Config.find("file:/" + filePath.replace(Path.rootPath(), ""), type));
+            }
+        } else if (requestCode == FileChooser.REQUEST_PICK_FILE) {
+            // 处理其他文件选择
+            setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), ""), type));
+        }
     }
 }

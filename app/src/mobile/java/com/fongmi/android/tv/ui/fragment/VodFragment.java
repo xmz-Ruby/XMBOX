@@ -546,8 +546,18 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
-        VideoActivity.file(getActivity(), FileChooser.getPathFromUri(getContext(), data.getData()));
+        if (resultCode != Activity.RESULT_OK) return;
+        if (requestCode == FileChooser.REQUEST_PICK_CONFIG_FILE) {
+            // 处理配置文件选择：添加为配置源并刷新播放源
+            String filePath = FileChooser.getPathFromUri(getContext(), data.getData());
+            if (filePath != null) {
+                String fileUrl = "file://" + filePath;
+                setConfig(Config.find(fileUrl, 0));
+            }
+        } else if (requestCode == FileChooser.REQUEST_PICK_FILE) {
+            // 处理视频文件选择：直接播放
+            VideoActivity.file(getActivity(), FileChooser.getPathFromUri(getContext(), data.getData()));
+        }
     }
 
     @Override
