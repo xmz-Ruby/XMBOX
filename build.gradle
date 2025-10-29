@@ -8,6 +8,13 @@ tasks.register('clean', Delete) {
     delete rootProject.layout.buildDirectory
 }
 
+// 自定义任务：仅打包 ARM64 手机版 和 ARM V7A TV版
+tasks.register('assembleMainVersions') {
+    group = 'build'
+    description = '仅构建 ARM64 手机版 和 ARM V7A TV版'
+    dependsOn ':app:assembleArm64_v8aMobileRelease', ':app:assembleArmeabi_v7aLeanbackRelease'
+}
+
 project.ext {
     gsonVersion = '2.11.0'
     media3Version = '1.4.1'
