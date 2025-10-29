@@ -201,6 +201,13 @@ Logger.e("Error message");
 
 ## 更新日志
 
+### v1.1 (2025-10-29)
+- ✅ 添加外部Spider日志捕获
+- ✅ PyLoader日志集成（Python Spider）
+- ✅ JarLoader日志集成（JAR Spider）
+- ✅ Spider加载过程日志记录
+- ✅ Spider错误详细信息捕获
+
 ### v1.0 (2025-10-29)
 - ✅ 实现基础日志收集功能
 - ✅ 实现Web日志监控页面
@@ -208,3 +215,4 @@ Logger.e("Error message");
 - ✅ 添加关键词搜索
 - ✅ 添加调试开关控制
 - ✅ 集成到现有Logger系统
+- ✅ 添加CORS跨域支持

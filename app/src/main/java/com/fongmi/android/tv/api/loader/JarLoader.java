@@ -7,6 +7,7 @@ import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Logger;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
 
@@ -47,9 +48,11 @@ public class JarLoader {
 
     private void load(String key, File file) {
         if (!file.setReadOnly()) return;
+        Logger.i("JarLoader: Loading JAR - key=" + key + ", file=" + file.getName());
         loaders.put(key, dex(file));
         invokeInit(key);
         putProxy(key);
+        Logger.i("JarLoader: JAR loaded successfully - " + key);
     }
 
     private DexClassLoader dex(File file) {
@@ -61,8 +64,9 @@ public class JarLoader {
             Class<?> clz = loaders.get(key).loadClass("com.github.catvod.spider.Init");
             Method method = clz.getMethod("init", Context.class);
             method.invoke(clz, App.get());
+            Logger.i("JarLoader: Init invoked successfully - " + key);
         } catch (Throwable e) {
-            e.printStackTrace();
+            Logger.e("JarLoader: Failed to invoke Init - " + key, e);
         }
     }
 
@@ -71,8 +75,9 @@ public class JarLoader {
             Class<?> clz = loaders.get(key).loadClass("com.github.catvod.spider.Proxy");
             Method method = clz.getMethod("proxy", Map.class);
             methods.put(key, method);
+            Logger.i("JarLoader: Proxy method registered - " + key);
         } catch (Throwable e) {
-            e.printStackTrace();
+            Logger.w("JarLoader: No Proxy class found - " + key);
         }
     }
 
@@ -118,12 +123,14 @@ public class JarLoader {
             String spKey = jaKey + key;
             if (spiders.containsKey(spKey)) return spiders.get(spKey);
             if (!loaders.containsKey(jaKey)) parseJar(jaKey, jar);
+            Logger.i("JarLoader: Loading spider class - key=" + key + ", api=" + api);
             Spider spider = (Spider) loaders.get(jaKey).loadClass("com.github.catvod.spider." + api.split("csp_")[1]).newInstance();
             spider.init(App.get(), ext);
             spiders.put(spKey, spider);
+            Logger.i("JarLoader: Spider loaded successfully - " + key);
             return spider;
         } catch (Throwable e) {
-            e.printStackTrace();
+            Logger.e("JarLoader: Failed to load spider - key=" + key + ", api=" + api, e);
             return new SpiderNull();
         }
     }
@@ -158,7 +165,7 @@ public class JarLoader {
         try {
             return (Object[]) method.invoke(null, params);
         } catch (Throwable e) {
-            e.printStackTrace();
+            Logger.e("JarLoader: proxyInvoke failed", e);
             return null;
         }
     }
