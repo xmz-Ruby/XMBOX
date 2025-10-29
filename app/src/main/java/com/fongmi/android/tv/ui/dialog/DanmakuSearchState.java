@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.dialog;
 
 import com.fongmi.android.tv.bean.DanmakuAnime;
 import com.fongmi.android.tv.bean.DanmakuEpisode;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
  */
 public class DanmakuSearchState {
 
+    private static final String TAG = DanmakuSearchState.class.getSimpleName();
     private static DanmakuSearchState instance;
 
     private String lastKeyword = "";
@@ -75,12 +77,32 @@ public class DanmakuSearchState {
         return episodes != null && !episodes.isEmpty();
     }
 
+    /**
+     * 检查当前关键词是否匹配指定的标题
+     * 用于判断是否需要清理状态
+     */
+    public boolean isKeywordMatchTitle(String title) {
+        if (lastKeyword.isEmpty() || title == null || title.isEmpty()) {
+            return false;
+        }
+        // 清理标题中的集数信息
+        String cleanTitle = title.replaceAll("第\\d+集", "")
+                                 .replaceAll("\\d+集", "")
+                                 .replaceAll("EP\\d+", "")
+                                 .replaceAll("\\[.*?\\]", "")
+                                 .replaceAll("\\(.*?\\)", "")
+                                 .trim();
+        return cleanTitle.contains(lastKeyword) || lastKeyword.contains(cleanTitle);
+    }
+
     public void clear() {
+        Logger.t(TAG).d("清理弹幕搜索状态 - keyword: " + lastKeyword + ", searchResults: " + searchResults.size() + ", episodes: " + episodes.size());
         lastKeyword = "";
         searchResults.clear();
         selectedAnime = null;
         episodes.clear();
         selectedAnimePosition = -1;
+        Logger.t(TAG).d("状态已清理");
     }
 
     public void clearEpisodes() {

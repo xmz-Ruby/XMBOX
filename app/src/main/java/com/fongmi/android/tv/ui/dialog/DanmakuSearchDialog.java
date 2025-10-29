@@ -25,6 +25,7 @@ import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.bean.DanmakuAnime;
 import com.fongmi.android.tv.bean.DanmakuEpisode;
 import com.fongmi.android.tv.player.Players;
+import com.orhanobut.logger.Logger;
 
 import java.util.List;
 
@@ -37,6 +38,8 @@ import java.util.List;
  * 4. 搜索结果和剧集列表在同一界面切换
  */
 public class DanmakuSearchDialog extends BaseDialog {
+
+    private static final String TAG = DanmakuSearchDialog.class.getSimpleName();
 
     private EditText searchInput;
     private ImageView searchButton;
@@ -137,13 +140,31 @@ public class DanmakuSearchDialog extends BaseDialog {
     }
 
     private void restoreSearchState() {
+        Logger.t(TAG).d("恢复搜索状态 - hasKeyword: " + !searchState.getLastKeyword().isEmpty() +
+                       ", hasSearchResults: " + searchState.hasSearchResults() +
+                       ", hasEpisodes: " + searchState.hasEpisodes());
+
+        // 检查当前播放的影视剧是否与保存的关键词匹配
+        String currentTitle = player != null ? player.getTitle() : "";
+        if (!searchState.getLastKeyword().isEmpty() && !currentTitle.isEmpty()) {
+            boolean isMatch = searchState.isKeywordMatchTitle(currentTitle);
+            Logger.t(TAG).d("关键词匹配检查 - 当前标题: " + currentTitle + ", 保存关键词: " + searchState.getLastKeyword() + ", 匹配: " + isMatch);
+
+            if (!isMatch) {
+                Logger.t(TAG).d("检测到影视剧切换，清理旧状态");
+                searchState.clear();
+            }
+        }
+
         // 恢复搜索关键词
         if (!searchState.getLastKeyword().isEmpty()) {
+            Logger.t(TAG).d("恢复关键词: " + searchState.getLastKeyword());
             searchInput.setText(searchState.getLastKeyword());
             searchInput.setSelection(searchInput.getText().length());
         } else {
             // 尝试从播放器获取默认关键词
             String defaultKeyword = getDefaultSearchKeyword();
+            Logger.t(TAG).d("使用默认关键词: " + defaultKeyword);
             if (!defaultKeyword.isEmpty()) {
                 searchInput.setText(defaultKeyword);
                 searchInput.setSelection(searchInput.getText().length());
@@ -152,10 +173,13 @@ public class DanmakuSearchDialog extends BaseDialog {
 
         // 恢复搜索结果
         if (searchState.hasSearchResults()) {
+            Logger.t(TAG).d("显示搜索结果");
             showSearchResultsView(searchState.getSearchResults());
         } else if (searchState.hasEpisodes()) {
+            Logger.t(TAG).d("显示剧集列表");
             showEpisodesView(searchState.getEpisodes());
         } else {
+            Logger.t(TAG).d("显示空白状态");
             showEmptyView("输入剧名开始搜索");
         }
     }
@@ -264,76 +288,76 @@ public class DanmakuSearchDialog extends BaseDialog {
      * 4. 最后按集数数字匹配
      */
     private int findCurrentEpisodePosition(List<DanmakuEpisode> episodes) {
-        android.util.Log.d("DanmakuSearch", "=== 开始查找当前集数位置 ===");
+        Logger.t(TAG).d("=== 开始查找当前集数位置 ===");
 
         if (episodes == null || episodes.isEmpty()) {
-            android.util.Log.d("DanmakuSearch", "剧集列表为空");
+            Logger.t(TAG).d("剧集列表为空");
             return -1;
         }
 
         if (player == null) {
-            android.util.Log.d("DanmakuSearch", "播放器为空");
+            Logger.t(TAG).d("播放器为空");
             return -1;
         }
 
         try {
             String currentTitle = player.getTitle();
             String currentArtist = player.getArtist();
-            android.util.Log.d("DanmakuSearch", "当前播放标题: " + currentTitle);
-            android.util.Log.d("DanmakuSearch", "当前播放Artist: " + currentArtist);
+            Logger.t(TAG).d("当前播放标题: " + currentTitle);
+            Logger.t(TAG).d("当前播放Artist: " + currentArtist);
 
             // 从 artist 中提取剧集名称（格式：正在播放：第 1 季|涌江龙宫）
             String episodeName = null;
             if (currentArtist != null && currentArtist.contains("|")) {
                 episodeName = currentArtist.substring(currentArtist.lastIndexOf("|") + 1).trim();
-                android.util.Log.d("DanmakuSearch", "从Artist提取的剧集名称: " + episodeName);
+                Logger.t(TAG).d( "从Artist提取的剧集名称: " + episodeName);
             }
 
             // 优先从 artist 字段提取集数
             int currentEpisodeNumber = -1;
             if (currentArtist != null && !currentArtist.isEmpty()) {
                 currentEpisodeNumber = extractEpisodeNumber(currentArtist);
-                android.util.Log.d("DanmakuSearch", "从Artist提取的集数: " + currentEpisodeNumber);
+                Logger.t(TAG).d( "从Artist提取的集数: " + currentEpisodeNumber);
             }
 
             // 如果 artist 中没有集数，尝试从 title 提取
             if (currentEpisodeNumber <= 0 && currentTitle != null && !currentTitle.isEmpty()) {
                 currentEpisodeNumber = extractEpisodeNumber(currentTitle);
-                android.util.Log.d("DanmakuSearch", "从Title提取的集数: " + currentEpisodeNumber);
+                Logger.t(TAG).d( "从Title提取的集数: " + currentEpisodeNumber);
             }
 
-            android.util.Log.d("DanmakuSearch", "最终提取的集数: " + currentEpisodeNumber);
+            Logger.t(TAG).d( "最终提取的集数: " + currentEpisodeNumber);
 
             // 打印所有剧集信息
-            android.util.Log.d("DanmakuSearch", "剧集列表 (共" + episodes.size() + "集):");
+            Logger.t(TAG).d( "剧集列表 (共" + episodes.size() + "集):");
             for (int i = 0; i < Math.min(episodes.size(), 5); i++) {
-                android.util.Log.d("DanmakuSearch", "  [" + i + "] episodeNumber=" + episodes.get(i).getEpisodeNumber() +
+                Logger.t(TAG).d( "  [" + i + "] episodeNumber=" + episodes.get(i).getEpisodeNumber() +
                     ", displayTitle=" + episodes.get(i).getDisplayTitle());
             }
 
             // 方法0: 如果有剧集名称，先用剧集名称匹配（最准确）
             if (episodeName != null && !episodeName.isEmpty()) {
-                android.util.Log.d("DanmakuSearch", "尝试方法0: 剧集名称匹配");
+                Logger.t(TAG).d( "尝试方法0: 剧集名称匹配");
                 for (int i = 0; i < episodes.size(); i++) {
                     String displayTitle = episodes.get(i).getDisplayTitle();
                     if (displayTitle != null && displayTitle.contains(episodeName)) {
-                        android.util.Log.d("DanmakuSearch", "✓ 方法0匹配成功! 位置: " + i + ", 匹配: " + displayTitle);
+                        Logger.t(TAG).d( "✓ 方法0匹配成功! 位置: " + i + ", 匹配: " + displayTitle);
                         return i;
                     }
                 }
-                android.util.Log.d("DanmakuSearch", "✗ 方法0未匹配");
+                Logger.t(TAG).d( "✗ 方法0未匹配");
             }
 
             // 方法1: 使用DanmakuEpisode的episodeNumber字段直接匹配
             if (currentEpisodeNumber > 0) {
-                android.util.Log.d("DanmakuSearch", "尝试方法1: episodeNumber字段匹配");
+                Logger.t(TAG).d( "尝试方法1: episodeNumber字段匹配");
                 for (int i = 0; i < episodes.size(); i++) {
                     try {
                         String episodeNumberStr = episodes.get(i).getEpisodeNumber();
                         if (episodeNumberStr != null) {
                             int episodeNum = Integer.parseInt(episodeNumberStr.trim());
                             if (episodeNum == currentEpisodeNumber) {
-                                android.util.Log.d("DanmakuSearch", "✓ 方法1匹配成功! 位置: " + i);
+                                Logger.t(TAG).d( "✓ 方法1匹配成功! 位置: " + i);
                                 return i;
                             }
                         }
@@ -341,46 +365,46 @@ public class DanmakuSearchDialog extends BaseDialog {
                         // 继续尝试其他方法
                     }
                 }
-                android.util.Log.d("DanmakuSearch", "✗ 方法1未匹配");
+                Logger.t(TAG).d( "✗ 方法1未匹配");
             }
 
             // 方法2: 完全匹配剧集名称
-            android.util.Log.d("DanmakuSearch", "尝试方法2: 完全匹配剧集名称");
+            Logger.t(TAG).d( "尝试方法2: 完全匹配剧集名称");
             for (int i = 0; i < episodes.size(); i++) {
                 String episodeTitle = episodes.get(i).getDisplayTitle();
                 if (episodeTitle != null && episodeTitle.equals(currentTitle)) {
-                    android.util.Log.d("DanmakuSearch", "✓ 方法2匹配成功! 位置: " + i);
+                    Logger.t(TAG).d( "✓ 方法2匹配成功! 位置: " + i);
                     return i;
                 }
             }
-            android.util.Log.d("DanmakuSearch", "✗ 方法2未匹配");
+            Logger.t(TAG).d( "✗ 方法2未匹配");
 
             // 方法3: 模糊匹配剧集名称（去除特殊字符后比较）
-            android.util.Log.d("DanmakuSearch", "尝试方法3: 模糊匹配");
+            Logger.t(TAG).d( "尝试方法3: 模糊匹配");
             String cleanCurrentTitle = cleanTitle(currentTitle);
-            android.util.Log.d("DanmakuSearch", "清理后的标题: " + cleanCurrentTitle);
+            Logger.t(TAG).d( "清理后的标题: " + cleanCurrentTitle);
             for (int i = 0; i < episodes.size(); i++) {
                 String episodeTitle = episodes.get(i).getDisplayTitle();
                 if (episodeTitle != null && cleanTitle(episodeTitle).contains(cleanCurrentTitle)) {
-                    android.util.Log.d("DanmakuSearch", "✓ 方法3匹配成功! 位置: " + i);
+                    Logger.t(TAG).d( "✓ 方法3匹配成功! 位置: " + i);
                     return i;
                 }
             }
-            android.util.Log.d("DanmakuSearch", "✗ 方法3未匹配");
+            Logger.t(TAG).d( "✗ 方法3未匹配");
 
             // 方法4: 按集数数字匹配（从displayTitle提取）
             if (currentEpisodeNumber > 0) {
-                android.util.Log.d("DanmakuSearch", "尝试方法4: 集数数字匹配");
+                Logger.t(TAG).d( "尝试方法4: 集数数字匹配");
                 for (int i = 0; i < episodes.size(); i++) {
                     int episodeNumber = extractEpisodeNumber(episodes.get(i).getDisplayTitle());
                     if (episodeNumber == currentEpisodeNumber) {
-                        android.util.Log.d("DanmakuSearch", "✓ 方法4匹配成功! 位置: " + i);
+                        Logger.t(TAG).d( "✓ 方法4匹配成功! 位置: " + i);
                         return i;
                     }
                 }
 
                 // 如果没有完全匹配，找最接近的集数
-                android.util.Log.d("DanmakuSearch", "尝试查找最接近的集数");
+                Logger.t(TAG).d( "尝试查找最接近的集数");
                 int closestIndex = -1;
                 int minDiff = Integer.MAX_VALUE;
                 for (int i = 0; i < episodes.size(); i++) {
@@ -394,18 +418,18 @@ public class DanmakuSearchDialog extends BaseDialog {
                     }
                 }
                 if (closestIndex >= 0) {
-                    android.util.Log.d("DanmakuSearch", "✓ 找到最接近的集数! 位置: " + closestIndex + ", 差值: " + minDiff);
+                    Logger.t(TAG).d( "✓ 找到最接近的集数! 位置: " + closestIndex + ", 差值: " + minDiff);
                     return closestIndex;
                 }
-                android.util.Log.d("DanmakuSearch", "✗ 方法4未匹配");
+                Logger.t(TAG).d( "✗ 方法4未匹配");
             }
         } catch (Exception e) {
-            android.util.Log.e("DanmakuSearch", "匹配过程出错", e);
+            Logger.t(TAG).e( "匹配过程出错", e);
             e.printStackTrace();
         }
 
         // 如果所有方法都未匹配，默认返回第1集（索引0）
-        android.util.Log.d("DanmakuSearch", "所有匹配方法都失败，默认返回第1集");
+        Logger.t(TAG).d( "所有匹配方法都失败，默认返回第1集");
         return 0;
     }
 
@@ -424,11 +448,11 @@ public class DanmakuSearchDialog extends BaseDialog {
             boolean hasEpisode = title.contains("集") || title.contains("话") ||
                                  title.toUpperCase().contains("EP") || title.toUpperCase().contains(" E");
 
-            android.util.Log.d("DanmakuSearch", "标题分析: 包含'季'=" + hasSeason + ", 包含'集/话/EP'=" + hasEpisode);
+            Logger.t(TAG).d( "标题分析: 包含'季'=" + hasSeason + ", 包含'集/话/EP'=" + hasEpisode);
 
             // 如果只有"季"没有"集"相关标识，直接返回-1
             if (hasSeason && !hasEpisode) {
-                android.util.Log.d("DanmakuSearch", "只包含'季'信息，无集数信息");
+                Logger.t(TAG).d( "只包含'季'信息，无集数信息");
                 return -1;
             }
 
@@ -449,12 +473,12 @@ public class DanmakuSearchDialog extends BaseDialog {
                 java.util.regex.Matcher matcher = pattern.matcher(title);
                 if (matcher.find()) {
                     int episodeNum = Integer.parseInt(matcher.group(1));
-                    android.util.Log.d("DanmakuSearch", "正则匹配: " + pattern.pattern() + " -> " + episodeNum);
+                    Logger.t(TAG).d( "正则匹配: " + pattern.pattern() + " -> " + episodeNum);
                     return episodeNum;
                 }
             }
         } catch (Exception e) {
-            android.util.Log.e("DanmakuSearch", "提取集数失败", e);
+            Logger.t(TAG).e( "提取集数失败", e);
             e.printStackTrace();
         }
 
@@ -610,8 +634,8 @@ public class DanmakuSearchDialog extends BaseDialog {
     }
 
     private void showEpisodesView(List<DanmakuEpisode> episodes) {
-        android.util.Log.d("DanmakuSearch", "=== showEpisodesView 被调用 ===");
-        android.util.Log.d("DanmakuSearch", "剧集数量: " + (episodes != null ? episodes.size() : 0));
+        Logger.t(TAG).d( "=== showEpisodesView 被调用 ===");
+        Logger.t(TAG).d( "剧集数量: " + (episodes != null ? episodes.size() : 0));
 
         currentEpisodes = new java.util.ArrayList<>(episodes);
         isReversed = false;
@@ -622,19 +646,19 @@ public class DanmakuSearchDialog extends BaseDialog {
         emptyContainer.setVisibility(View.GONE);
         searchResults.setVisibility(View.GONE);
 
-        android.util.Log.d("DanmakuSearch", "UI状态已更新，开始查找当前集数");
+        Logger.t(TAG).d( "UI状态已更新，开始查找当前集数");
 
         // 智能滚动到当前播放的集数并自动加载弹幕
         int currentPosition = findCurrentEpisodePosition(currentEpisodes);
-        android.util.Log.d("DanmakuSearch", "findCurrentEpisodePosition 返回: " + currentPosition);
+        Logger.t(TAG).d( "findCurrentEpisodePosition 返回: " + currentPosition);
 
         if (currentPosition >= 0) {
-            android.util.Log.d("DanmakuSearch", "找到匹配集数，开始滚动和加载弹幕");
+            Logger.t(TAG).d( "找到匹配集数，开始滚动和加载弹幕");
             scrollToPositionWithCenter(currentPosition);
             // 自动加载当前集数的弹幕
             autoLoadCurrentEpisodeDanmaku(currentPosition);
         } else {
-            android.util.Log.d("DanmakuSearch", "未找到匹配集数，不执行滚动");
+            Logger.t(TAG).d( "未找到匹配集数，不执行滚动");
         }
     }
 
@@ -642,37 +666,37 @@ public class DanmakuSearchDialog extends BaseDialog {
      * 自动加载当前播放集数的弹幕
      */
     private void autoLoadCurrentEpisodeDanmaku(int position) {
-        android.util.Log.d("DanmakuSearch", "=== autoLoadCurrentEpisodeDanmaku 被调用 ===");
-        android.util.Log.d("DanmakuSearch", "位置: " + position);
+        Logger.t(TAG).d( "=== autoLoadCurrentEpisodeDanmaku 被调用 ===");
+        Logger.t(TAG).d( "位置: " + position);
 
         if (currentEpisodes == null || position < 0 || position >= currentEpisodes.size()) {
-            android.util.Log.d("DanmakuSearch", "参数无效，取消加载");
+            Logger.t(TAG).d( "参数无效，取消加载");
             return;
         }
 
         try {
             DanmakuEpisode episode = currentEpisodes.get(position);
-            android.util.Log.d("DanmakuSearch", "剧集信息: " + episode.getDisplayTitle());
-            android.util.Log.d("DanmakuSearch", "剧集ID: " + episode.getEpisodeId());
+            Logger.t(TAG).d( "剧集信息: " + episode.getDisplayTitle());
+            Logger.t(TAG).d( "剧集ID: " + episode.getEpisodeId());
 
             String url = DanmakuApi.getDanmakuUrl(episode.getEpisodeId());
-            android.util.Log.d("DanmakuSearch", "弹幕URL: " + url);
+            Logger.t(TAG).d( "弹幕URL: " + url);
 
             Danmaku danmaku = Danmaku.from(url);
             danmaku.setName(episode.getDisplayTitle());
             player.setDanmaku(danmaku);
 
-            android.util.Log.d("DanmakuSearch", "弹幕已设置到播放器");
+            Logger.t(TAG).d( "弹幕已设置到播放器");
 
             // 延迟显示提示，避免与滚动提示冲突
             episodeResults.postDelayed(() -> {
-                android.util.Log.d("DanmakuSearch", "显示弹幕加载提示");
+                Logger.t(TAG).d( "显示弹幕加载提示");
                 android.widget.Toast.makeText(getContext(),
                     "已自动加载弹幕：" + episode.getDisplayTitle(),
                     android.widget.Toast.LENGTH_SHORT).show();
             }, 800);
         } catch (Exception e) {
-            android.util.Log.e("DanmakuSearch", "自动加载弹幕失败", e);
+            Logger.t(TAG).e( "自动加载弹幕失败", e);
             e.printStackTrace();
         }
     }
@@ -682,7 +706,7 @@ public class DanmakuSearchDialog extends BaseDialog {
      * 使用多重策略确保滚动成功
      */
     private void scrollToPositionWithCenter(int position) {
-        android.util.Log.d("DanmakuSearch", "=== 开始滚动到位置: " + position + " ===");
+        Logger.t(TAG).d( "=== 开始滚动到位置: " + position + " ===");
 
         // 等待布局完成后再滚动
         episodeResults.post(() -> {
@@ -690,21 +714,21 @@ public class DanmakuSearchDialog extends BaseDialog {
                 androidx.recyclerview.widget.LinearLayoutManager layoutManager =
                     (androidx.recyclerview.widget.LinearLayoutManager) episodeResults.getLayoutManager();
 
-                android.util.Log.d("DanmakuSearch", "LayoutManager: " + (layoutManager != null ? "存在" : "为空"));
-                android.util.Log.d("DanmakuSearch", "RecyclerView高度: " + episodeResults.getHeight());
-                android.util.Log.d("DanmakuSearch", "RecyclerView可见性: " + episodeResults.getVisibility());
+                Logger.t(TAG).d( "LayoutManager: " + (layoutManager != null ? "存在" : "为空"));
+                Logger.t(TAG).d( "RecyclerView高度: " + episodeResults.getHeight());
+                Logger.t(TAG).d( "RecyclerView可见性: " + episodeResults.getVisibility());
 
                 if (layoutManager != null) {
                     // 策略1: 使用scrollToPositionWithOffset将目标项滚动到可见区域中间
                     // 计算偏移量，使目标项显示在RecyclerView中间
                     int offset = episodeResults.getHeight() / 2;
-                    android.util.Log.d("DanmakuSearch", "策略1: scrollToPositionWithOffset, offset=" + offset);
+                    Logger.t(TAG).d( "策略1: scrollToPositionWithOffset, offset=" + offset);
                     layoutManager.scrollToPositionWithOffset(position, offset);
 
                     // 延迟执行第二次滚动，确保布局稳定后再微调
                     episodeResults.postDelayed(() -> {
                         // 策略2: 使用smoothScrollToPosition进行平滑滚动微调
-                        android.util.Log.d("DanmakuSearch", "策略2: smoothScrollToPosition");
+                        Logger.t(TAG).d( "策略2: smoothScrollToPosition");
                         episodeResults.smoothScrollToPosition(position);
 
                         // 延迟显示提示，让用户看到滚动效果
@@ -712,12 +736,12 @@ public class DanmakuSearchDialog extends BaseDialog {
                             try {
                                 // 获取实际的集数编号用于提示
                                 String episodeNum = currentEpisodes.get(position).getEpisodeNumber();
-                                android.util.Log.d("DanmakuSearch", "显示提示: 第 " + episodeNum + " 集");
+                                Logger.t(TAG).d( "显示提示: 第 " + episodeNum + " 集");
                                 android.widget.Toast.makeText(getContext(),
                                     "已定位到第 " + episodeNum + " 集",
                                     android.widget.Toast.LENGTH_SHORT).show();
                             } catch (Exception e) {
-                                android.util.Log.d("DanmakuSearch", "显示提示: 第 " + (position + 1) + " 个剧集");
+                                Logger.t(TAG).d( "显示提示: 第 " + (position + 1) + " 个剧集");
                                 android.widget.Toast.makeText(getContext(),
                                     "已定位到第 " + (position + 1) + " 个剧集",
                                     android.widget.Toast.LENGTH_SHORT).show();
@@ -725,10 +749,10 @@ public class DanmakuSearchDialog extends BaseDialog {
                         }, 400);
                     }, 100);
                 } else {
-                    android.util.Log.e("DanmakuSearch", "LayoutManager为空，无法滚动");
+                    Logger.t(TAG).e( "LayoutManager为空，无法滚动");
                 }
             } catch (Exception e) {
-                android.util.Log.e("DanmakuSearch", "滚动过程出错", e);
+                Logger.t(TAG).e( "滚动过程出错", e);
                 e.printStackTrace();
                 // 降级方案：使用简单的smoothScrollToPosition
                 episodeResults.smoothScrollToPosition(position);

@@ -87,6 +87,7 @@ import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.dialog.CastDialog;
 import com.fongmi.android.tv.ui.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.dialog.DanmakuDialog;
+import com.fongmi.android.tv.ui.dialog.DanmakuSearchState;
 import com.fongmi.android.tv.ui.dialog.EpisodeGridDialog;
 import com.fongmi.android.tv.ui.dialog.EpisodeListDialog;
 import com.fongmi.android.tv.ui.dialog.InfoDialog;
@@ -535,6 +536,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mClock.setCallback(null);
         mPlayers.reset();
         mPlayers.stop();
+        // 清理弹幕搜索状态，避免切换影视剧后状态混乱
+        DanmakuSearchState.getInstance().clear();
         getDetail();
     }
 

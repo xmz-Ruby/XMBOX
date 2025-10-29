@@ -66,6 +66,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.dialog.DanmakuDialog;
+import com.fongmi.android.tv.ui.dialog.DanmakuSearchState;
 import com.fongmi.android.tv.ui.dialog.DescDialog;
 import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
@@ -422,6 +423,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mClock.setCallback(null);
         mPlayers.reset();
         mPlayers.stop();
+        // 清理弹幕搜索状态，避免切换影视剧后状态混乱
+        DanmakuSearchState.getInstance().clear();
         getDetail();
     }
 
