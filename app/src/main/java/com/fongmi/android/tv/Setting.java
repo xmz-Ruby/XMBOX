@@ -9,6 +9,65 @@ import com.github.catvod.utils.Prefers;
 
 public class Setting {
 
+    /**
+     * 初始化所有设置
+     * 在应用启动时调用，从 SharedPreferences 加载配置
+     * 如果某个配置不存在，则使用默认值
+     */
+    public static void initSettings() {
+        // 网络设置 - 触发读取以确保初始化
+        getDoh();
+        getProxy();
+
+        // 播放器设置
+        getUa();
+        getRender();
+        getScale();
+        getLiveScale();
+        getBuffer();
+        getSpeed();
+        getBackground();
+        isCaption();
+        isTunnel();
+        isAudioPrefer();
+        isPreferAAC();
+        isDanmakuLoad();
+        isDanmakuShow();
+        getDecode();
+
+        // 弹幕设置
+        getDanmakuDensity();
+        getDanmakuAlpha();
+        getDanmakuTextSize();
+        getDanmakuSpeed();
+        getDanmakuStroke();
+
+        // 字幕设置
+        getSubtitleTextSize();
+        getSubtitlePosition();
+
+        // 应用设置
+        isIncognito();
+        isLiveTabVisible();
+        getQuality();
+        getSize();
+        getSiteMode();
+        getSyncMode();
+        isBootLive();
+        isInvert();
+        isAcross();
+        isChange();
+        isZhuyin();
+        isPrivacyAgreed();
+        isLogMonitorEnabled();
+
+        // 其他设置
+        getWall();
+        getReset();
+        getKeyword();
+        getHot();
+    }
+
     public static String getDoh() {
         return Prefers.getString("doh");
     }

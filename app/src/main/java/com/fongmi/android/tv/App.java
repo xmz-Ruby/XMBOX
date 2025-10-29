@@ -127,11 +127,15 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Logger.addLogAdapter(getLogAdapter());
+
+        // 初始化应用设置（从 SharedPreferences 加载，没有配置的使用默认值）
+        Setting.initSettings();
+
         OkHttp.get().setProxy(Setting.getProxy());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         EventBus.builder().addIndex(new EventIndex()).installDefaultEventBus();
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
-        
+
         // 初始化自动缓存清理
         initCacheCleaner();
         
