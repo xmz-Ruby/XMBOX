@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.ui.dialog;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -33,17 +31,7 @@ public class AboutDialog extends BaseDialog {
 
     @Override
     protected void initEvent() {
-        binding.github.setOnClickListener(v -> openGitHub());
-    }
-
-    private void openGitHub() {
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("https://github.com/Tosencen/XMBOX/releases/latest"));
-            startActivity(intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // GitHub link removed
     }
 
     @Override

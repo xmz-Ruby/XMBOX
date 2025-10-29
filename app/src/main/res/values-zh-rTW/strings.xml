@@ -1,7 +1,7 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- App -->
-    <string name="app_name">XMBOX</string>
+    <string name="app_name">讓我看看</string>
 
     <!-- Vod -->
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
@@ -89,8 +89,7 @@
     <string name="setting_app">應用設置</string>
     <string name="setting_network">網絡設置</string>
     <string name="setting_data">數據管理</string>
-    <string name="app_version">v3.0.3</string>
-    <string name="about_github">在GitHub上查看</string>
+    <string name="app_version">v1.0.0</string>
 
     <!-- Backup & Restore -->
     <string name="restore_select">選擇備份</string>
