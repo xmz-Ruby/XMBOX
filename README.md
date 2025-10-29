@@ -21,7 +21,7 @@
 ### 📺 多平台支持
 - **Android TV版本** - 针对电视、盒子优化的遥控器界面
 - **手机版本** - 触屏友好的移动端界面
-- **多架构支持** - ARM64-V8A 和 ARM V7A 双架构
+- **多架构支持** - ARM64-V8A、ARM V7A 和 x86_64 三架构
 
 ### 🎬 强大的播放功能
 - 🎵 **多格式支持** - 支持主流视频格式播放
@@ -47,6 +47,7 @@
 - Android 5.0 (API 21) 及以上
 - ARM64-V8A: 推荐新设备使用，性能更优
 - ARM V7A: 兼容老设备，适配性更强
+- x86_64: 支持x86架构设备和模拟器
 
 ## 🏗️ 构建指南
 
@@ -116,19 +117,6 @@ signingConfigs {
 ./gradlew assembleX86_64LeanbackRelease       # x86_64 TV版
 ```
 
-**构建全架构通用版本（推荐）：**
-```bash
-# 包含 ARM64-V8A + ARM V7A + x86_64 三个架构
-./gradlew assembleUniversalMobileRelease    # 手机版全架构通用APK
-./gradlew assembleUniversalLeanbackRelease  # TV版全架构通用APK
-```
-
-**构建AAB格式（用于Google Play）：**
-```bash
-./gradlew bundleUniversalMobileRelease    # 手机版AAB
-./gradlew bundleUniversalLeanbackRelease  # TV版AAB
-```
-
 **构建所有版本：**
 ```bash
 ./gradlew assembleRelease  # 构建所有架构和平台的Release版本
@@ -136,7 +124,6 @@ signingConfigs {
 
 4. **生成的APK位置**
 
-**单架构版本：**
 ```
 app/build/outputs/apk/
 ├── arm64_v8a/mobile/release/arm64_v8a-mobile.apk
@@ -147,37 +134,23 @@ app/build/outputs/apk/
 └── x86_64/leanback/release/x86_64-leanback.apk
 ```
 
-**全架构通用版本：**
-```
-app/build/outputs/apk/
-├── universal/mobile/release/universal-mobile.apk      # 约60-70MB
-└── universal/leanback/release/universal-leanback.apk  # 约60-70MB
-```
-
-**AAB格式：**
-```
-app/build/outputs/bundle/
-├── universalMobileRelease/app-universal-mobile-release.aab
-└── universalLeanbackRelease/app-universal-leanback-release.aab
-```
-
 ### 📦 版本选择建议
 
-| 版本类型 | 体积 | 兼容性 | 适用场景 |
+| 架构类型 | 体积 | 兼容性 | 适用场景 |
 |---------|------|--------|---------|
-| **单架构版本** | 小（30-35MB） | 特定架构 | 明确知道设备架构，追求最小体积 |
-| **全架构通用版** | 大（60-70MB） | 所有设备 | 不确定设备架构，追求最大兼容性 |
-| **AAB格式** | 动态 | 所有设备 | Google Play上架，自动优化分发 |
+| **ARM64-V8A** | 小（约30MB） | 64位ARM设备 | 推荐新设备使用，性能最优 |
+| **ARM V7A** | 小（约30MB） | 32位ARM设备 | 兼容老设备，适配性强 |
+| **x86_64** | 小（约30MB） | x86架构设备 | 模拟器和x86设备专用 |
 
 ### 🔐 签名验证
 
 验证APK签名信息：
 ```bash
 # 查看签名信息
-keytool -printcert -jarfile app/build/outputs/apk/universal/mobile/release/universal-mobile.apk
+keytool -printcert -jarfile app/build/outputs/apk/arm64_v8a/mobile/release/arm64_v8a-mobile.apk
 
 # 验证签名
-jarsigner -verify -verbose -certs app/build/outputs/apk/universal/mobile/release/universal-mobile.apk
+jarsigner -verify -verbose -certs app/build/outputs/apk/arm64_v8a/mobile/release/arm64_v8a-mobile.apk
 ```
 
 ## 🏛️ 项目架构
