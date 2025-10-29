@@ -124,7 +124,7 @@
 
         .log-container {
             padding: 10px;
-            max-height: calc(100vh - 200px);
+            max-height: calc(100vh - 250px);
             overflow-y: auto;
         }
 
@@ -239,6 +239,48 @@
             background: #6c757d;
         }
 
+        .connection-status {
+            background: white;
+            padding: 8px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.connected {
+            background: #28a745;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+        }
+
+        .status-dot.connecting {
+            background: #ffc107;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-dot.disconnected {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #d32f2f;
+        }
+
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -261,8 +303,13 @@
         <h1>📊 日志监控</h1>
     </div>
 
+    <div class="connection-status">
+        <span class="status-dot connecting" id="statusDot"></span>
+        <span id="statusText">正在连接...</span>
+    </div>
+
     <div class="controls">
-        <button class="btn btn-primary" onclick="refreshLogs()">🔄 刷新</button>
+        <button class="btn btn-primary" onclick="reconnectWebSocket()">🔄 重连</button>
         <button class="btn btn-danger" onclick="clearLogs()">🗑️ 清空</button>
         <button class="btn btn-secondary" onclick="toggleAutoRefresh()">
             <span id="autoRefreshText">⏸️ 暂停</span>
@@ -310,9 +357,12 @@
         let currentFilter = 'ALL';
         let autoRefresh = true;
         let autoScroll = true;
-        let refreshInterval;
+        let refreshInterval = null;
+        let logCount = 0;
+        let isConnected = false;
 
         function init() {
+            updateConnectionStatus('connecting', '正在连接服务器...');
             refreshLogs();
             startAutoRefresh();
         }
@@ -321,15 +371,31 @@
             if (refreshInterval) clearInterval(refreshInterval);
             refreshInterval = setInterval(() => {
                 if (autoRefresh) {
-                    refreshLogs();
+                    refreshLogsIncremental();
                 }
-            }, 2000); // 每2秒刷新一次
+            }, 500); // 每500ms刷新一次，实时性更好
+        }
+
+        function updateConnectionStatus(status, text) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+
+            statusDot.className = `status-dot ${status}`;
+            statusText.textContent = text;
+
+            isConnected = (status === 'connected');
         }
 
         function toggleAutoRefresh() {
             autoRefresh = !autoRefresh;
             const btn = document.getElementById('autoRefreshText');
             btn.textContent = autoRefresh ? '⏸️ 暂停' : '▶️ 继续';
+
+            if (autoRefresh) {
+                updateConnectionStatus('connected', '实时监控中');
+            } else {
+                updateConnectionStatus('disconnected', '已暂停');
+            }
         }
 
         async function refreshLogs() {
@@ -337,15 +403,57 @@
                 const response = await fetch('/logs/api?limit=500');
                 const data = await response.json();
                 logs = data;
+                logCount = logs.length;
                 renderLogs();
                 updateStats();
 
                 if (autoScroll) {
                     scrollToBottom();
                 }
+
+                updateConnectionStatus('connected', '实时监控中');
             } catch (error) {
                 console.error('Failed to fetch logs:', error);
+                updateConnectionStatus('disconnected', '连接失败');
+                showError('无法加载日志: ' + error.message);
             }
+        }
+
+        async function refreshLogsIncremental() {
+            try {
+                const response = await fetch('/logs/stream?since=' + logCount);
+                const data = await response.json();
+
+                if (data.logs && data.logs.length > 0) {
+                    // 有新日志，追加到现有日志
+                    logs = logs.concat(data.logs);
+                    logCount = data.count;
+
+                    // 只渲染新增的日志
+                    appendLogs(data.logs);
+                    updateStats();
+
+                    if (autoScroll) {
+                        scrollToBottom();
+                    }
+                }
+
+                // 更新连接状态
+                if (!isConnected) {
+                    updateConnectionStatus('connected', '实时监控中');
+                }
+            } catch (error) {
+                // 增量更新失败，静默处理
+                console.error('增量更新失败:', error);
+                if (isConnected) {
+                    updateConnectionStatus('disconnected', '连接中断');
+                }
+            }
+        }
+
+        function reconnectWebSocket() {
+            updateConnectionStatus('connecting', '正在重新连接...');
+            refreshLogs();
         }
 
         async function clearLogs() {
@@ -358,7 +466,49 @@
                 updateStats();
             } catch (error) {
                 console.error('Failed to clear logs:', error);
+                alert('清空失败: ' + error.message);
             }
+        }
+
+        function showError(message) {
+            const container = document.getElementById('logContainer');
+            container.innerHTML = `
+                <div class="error-state">
+                    <p>❌ ${message}</p>
+                    <p style="font-size: 12px; margin-top: 10px;">请检查服务器连接</p>
+                </div>
+            `;
+        }
+
+        function appendLogs(newLogs) {
+            const container = document.getElementById('logContainer');
+
+            // 如果容器是空状态或错误状态，先清空
+            if (container.querySelector('.empty-state') || container.querySelector('.error-state')) {
+                container.innerHTML = '';
+            }
+
+            // 追加新日志
+            const fragment = document.createDocumentFragment();
+            newLogs.forEach(log => {
+                const div = document.createElement('div');
+                div.className = 'log-entry';
+                div.dataset.level = log.level;
+                div.innerHTML = `
+                    <div class="log-header">
+                        <span class="log-timestamp">${log.timestamp}</span>
+                        <span class="log-level ${log.level}">${log.level}</span>
+                        <span class="log-tag">[${log.tag}]</span>
+                        <span class="log-thread">(${log.thread})</span>
+                    </div>
+                    <div class="log-message">${escapeHtml(log.message)}</div>
+                `;
+                fragment.appendChild(div);
+            });
+            container.appendChild(fragment);
+
+            // 应用过滤
+            filterLogs();
         }
 
         function filterLevel(level) {
