@@ -116,7 +116,8 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation project(':catvod')
-    implementation project(':chaquo') // 移除Python支持减少8-10MB体积
+//    implementation project(':chaquo') // 移除Python支持减少8-10MB体积
+    implementation project(':pyramid') // Python爬虫支持
     implementation project(':DLNA-Cast-master:dlna-dmc')
     implementation project(':DLNA-Cast-master:dlna-dmr')
     implementation project(':forcetech')

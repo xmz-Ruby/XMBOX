@@ -5,7 +5,8 @@
       "Bash(find:*)",
       "Read(//c/Users/xmz/yorkspace/github/letmeseesee/**)",
       "Read(//c/Users/xmz/yorkspace/github/TV/**)",
-      "Read(//c/Users/xmz/yorkspace/github/drpy-node/spider/py/**)"
+      "Read(//c/Users/xmz/yorkspace/github/drpy-node/spider/py/**)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

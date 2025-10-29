@@ -1,23 +1,34 @@
 package com.fongmi.android.tv.api.loader;
 
+import android.content.Context;
+
 import com.fongmi.android.tv.App;
-import com.fongmi.chaquo.Loader;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.utils.Logger;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PyLoader {
 
     private final ConcurrentHashMap<String, Spider> spiders;
-    private final Loader loader;
+    private Object loader;
     private String recent;
 
     public PyLoader() {
         this.spiders = new ConcurrentHashMap<>();
-        this.loader = new Loader();
+        init();
+    }
+
+    private void init() {
+        try {
+            loader = Class.forName("com.github.xmbox.pyramid.Loader").newInstance();
+            Logger.i("PyLoader: Pyramid loader initialized successfully");
+        } catch (Throwable e) {
+            Logger.e("PyLoader: Failed to initialize pyramid loader", e);
+        }
     }
 
     public void clear() {
@@ -31,9 +42,14 @@ public class PyLoader {
 
     public Spider getSpider(String key, String api, String ext) {
         try {
+            if (loader == null) {
+                Logger.e("PyLoader: Loader not initialized");
+                return new SpiderNull();
+            }
             if (spiders.containsKey(key)) return spiders.get(key);
             Logger.i("PyLoader: Loading Python spider - key=" + key + ", api=" + api);
-            Spider spider = loader.spider(App.get(), api);
+            Method method = loader.getClass().getMethod("spider", Context.class, String.class);
+            Spider spider = (Spider) method.invoke(loader, App.get(), api);
             spider.init(App.get(), ext);
             spiders.put(key, spider);
             Logger.i("PyLoader: Python spider loaded successfully - " + key);

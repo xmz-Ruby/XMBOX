@@ -20,7 +20,7 @@ dependencyResolutionManagement {
 }
 include ':app'
 include ':catvod'
-include ':chaquo'
+include ':pyramid'
 include ':DLNA-Cast-master:dlna-core'
 include ':DLNA-Cast-master:dlna-dmc'
 include ':DLNA-Cast-master:dlna-dmr'
