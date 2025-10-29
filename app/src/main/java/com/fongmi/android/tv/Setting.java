@@ -348,4 +348,12 @@ public class Setting {
     public static void putLiveTabVisible(boolean visible) {
         Prefers.put("live_tab_visible", visible);
     }
+
+    public static boolean isLogMonitorEnabled() {
+        return Prefers.getBoolean("log_monitor_enabled", false);
+    }
+
+    public static void putLogMonitorEnabled(boolean enabled) {
+        Prefers.put("log_monitor_enabled", enabled);
+    }
 }

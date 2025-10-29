@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
@@ -16,6 +17,7 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.server.impl.Process;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.LogMonitor;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
@@ -45,7 +47,10 @@ public class Action implements Process {
         else if ("search".equals(param)) onSearch(params);
         else if ("setting".equals(param)) onSetting(params);
         else if ("refresh".equals(param)) onRefresh(params);
-        return Nano.ok();
+        else if ("debug".equals(param)) onDebug(params);
+        NanoHTTPD.Response response = Nano.ok();
+        addCorsHeaders(response);
+        return response;
     }
 
     private void onFile(Map<String, String> params) {
@@ -184,5 +189,34 @@ public class Action implements Process {
                 Notify.show(msg);
             }
         };
+    }
+
+    private void onDebug(Map<String, String> params) {
+        String action = params.get("action");
+        if ("log_monitor".equals(action)) {
+            String enabled = params.get("enabled");
+            if ("true".equals(enabled)) {
+                Setting.putLogMonitorEnabled(true);
+                LogMonitor.get().i("LogMonitor", "日志监控已启用");
+                LogMonitor.get().d("LogMonitor", "这是一条调试日志");
+                LogMonitor.get().w("LogMonitor", "这是一条警告日志");
+                LogMonitor.get().e("LogMonitor", "这是一条错误日志");
+            } else if ("false".equals(enabled)) {
+                Setting.putLogMonitorEnabled(false);
+                LogMonitor.get().i("LogMonitor", "日志监控已禁用");
+            } else if ("test".equals(enabled)) {
+                LogMonitor.get().i("LogMonitor", "测试日志 - INFO级别");
+                LogMonitor.get().d("LogMonitor", "测试日志 - DEBUG级别");
+                LogMonitor.get().w("LogMonitor", "测试日志 - WARN级别");
+                LogMonitor.get().e("LogMonitor", "测试日志 - ERROR级别");
+                LogMonitor.get().v("LogMonitor", "测试日志 - VERBOSE级别");
+            }
+        }
+    }
+
+    private void addCorsHeaders(NanoHTTPD.Response response) {
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.addHeader("Access-Control-Allow-Headers", "Content-Type");
     }
 }
