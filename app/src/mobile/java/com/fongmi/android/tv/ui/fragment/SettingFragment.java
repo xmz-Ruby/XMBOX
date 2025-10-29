@@ -22,7 +22,6 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.api.config.WallConfig;
@@ -375,15 +374,14 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void onVersion(View view) {
-        Updater.create().force().release().start(getActivity());
+        AboutDialog.show(this);
     }
-    
+
     private void onAbout(View view) {
         AboutDialog.show(this);
     }
 
     private boolean onVersionDev(View view) {
-        Updater.create().force().dev().start(getActivity());
         return true;
     }
 

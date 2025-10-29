@@ -17,7 +17,6 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.api.config.WallConfig;
@@ -74,9 +73,8 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         
         // 确保通知渠道已创建（用户已同意协议的情况）
         com.fongmi.android.tv.utils.Notify.createChannel();
-        
+
         orientation = getResources().getConfiguration().orientation;
-        Updater.create().release().start(this);
         initFragment(savedInstanceState);
         Server.get().start();
         initConfig();

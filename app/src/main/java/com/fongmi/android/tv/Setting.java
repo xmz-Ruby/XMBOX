@@ -233,30 +233,6 @@ public class Setting {
         Prefers.put("change", change);
     }
 
-    public static boolean getUpdate() {
-        return Prefers.getBoolean("update", true);
-    }
-
-    public static void putUpdate(boolean update) {
-        Prefers.put("update", update);
-    }
-
-    public static boolean getAutoUpdateCheck() {
-        return Prefers.getBoolean("auto_update_check", false);
-    }
-
-    public static void putAutoUpdateCheck(boolean autoUpdateCheck) {
-        Prefers.put("auto_update_check", autoUpdateCheck);
-    }
-
-    public static boolean getUseCnMirror() {
-        return Prefers.getBoolean("use_cn_mirror", false);
-    }
-
-    public static void putUseCnMirror(boolean useCnMirror) {
-        Prefers.put("use_cn_mirror", useCnMirror);
-    }
-
     public static boolean isCaption() {
         return Prefers.getBoolean("caption");
     }
