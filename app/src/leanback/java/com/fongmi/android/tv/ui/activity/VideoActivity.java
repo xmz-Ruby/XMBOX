@@ -1103,6 +1103,13 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         String title = mHistory.getVodName();
         String episode = getEpisode().getName();
         String artist = title.equals(episode) ? "" : getString(R.string.play_now, episode);
+
+        // 追加集数标记到 artist 字段，用于弹幕检索自动匹配
+        // 格式：正在播放：第 1 季|涌江龙宫 -> 正在播放：第 1 季|涌江龙宫|14集
+        if (!artist.isEmpty() && getEpisode().getIndex() > 0) {
+            artist = artist + "|" + getEpisode().getIndex() + "集";
+        }
+
         mPlayers.setMetadata(title, artist, mHistory.getVodPic(), mBinding.exo.getDefaultArtwork());
     }
 

@@ -31,6 +31,10 @@ public class DanmakuAnime {
         return type;
     }
 
+    public String getTypeDescription() {
+        return typeDescription;
+    }
+
     public String getDisplayTitle() {
         return type + " - " + animeTitle;
     }

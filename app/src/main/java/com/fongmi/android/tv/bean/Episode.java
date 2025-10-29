@@ -131,6 +131,7 @@ public class Episode implements Parcelable {
         dest.writeString(this.name);
         dest.writeString(this.desc);
         dest.writeString(this.url);
+        dest.writeInt(this.index);
         dest.writeInt(this.number);
         dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
         dest.writeByte(this.selected ? (byte) 1 : (byte) 0);
@@ -140,6 +141,7 @@ public class Episode implements Parcelable {
         this.name = in.readString();
         this.desc = in.readString();
         this.url = in.readString();
+        this.index = in.readInt();
         this.number = in.readInt();
         this.activated = in.readByte() != 0;
         this.selected = in.readByte() != 0;

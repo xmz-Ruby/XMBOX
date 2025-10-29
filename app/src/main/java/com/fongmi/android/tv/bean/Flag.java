@@ -94,6 +94,8 @@ public class Flag implements Parcelable {
             String[] split = urls[i].split("\\$", 2);
             String number = String.format(Locale.getDefault(), "%02d", i + 1);
             Episode episode = split.length > 1 ? Episode.create(split[0].isEmpty() ? number : split[0].trim(), split[1]) : Episode.create(number, urls[i]);
+            // 设置剧集序号（从1开始）
+            episode.setIndex(i + 1);
             if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
         }
     }
