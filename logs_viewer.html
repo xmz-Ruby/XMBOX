@@ -330,6 +330,7 @@
         let autoScroll = true;
         let refreshInterval;
         let serverUrl = 'http://192.168.31.132:9978';
+        let logCount = 0;
 
         function init() {
             const savedUrl = localStorage.getItem('serverUrl');
@@ -379,9 +380,9 @@
             if (refreshInterval) clearInterval(refreshInterval);
             refreshInterval = setInterval(() => {
                 if (autoRefresh) {
-                    refreshLogs();
+                    refreshLogsIncremental();
                 }
-            }, 2000);
+            }, 500); // 每500ms刷新一次，实时性更好
         }
 
         function toggleAutoRefresh() {
@@ -395,6 +396,7 @@
                 const response = await fetch(serverUrl + '/logs/api?limit=500');
                 const data = await response.json();
                 logs = data;
+                logCount = logs.length;
                 renderLogs();
                 updateStats();
 
@@ -406,17 +408,73 @@
             }
         }
 
+        async function refreshLogsIncremental() {
+            try {
+                const response = await fetch(serverUrl + '/logs/stream?since=' + logCount);
+                const data = await response.json();
+
+                if (data.logs && data.logs.length > 0) {
+                    // 有新日志，追加到现有日志
+                    logs = logs.concat(data.logs);
+                    logCount = data.count;
+
+                    // 只渲染新增的日志
+                    appendLogs(data.logs);
+                    updateStats();
+
+                    if (autoScroll) {
+                        scrollToBottom();
+                    }
+                }
+            } catch (error) {
+                // 增量更新失败，回退到全量刷新
+                console.error('增量更新失败:', error);
+            }
+        }
+
         async function clearLogs() {
             if (!confirm('确定要清空所有日志吗？')) return;
 
             try {
                 await fetch(serverUrl + '/logs/clear');
                 logs = [];
+                logCount = 0;
                 renderLogs();
                 updateStats();
             } catch (error) {
                 alert('清空失败: ' + error.message);
             }
+        }
+
+        function appendLogs(newLogs) {
+            const container = document.getElementById('logContainer');
+
+            // 如果容器是空状态，先清空
+            if (container.querySelector('.empty-state') || container.querySelector('.error-state')) {
+                container.innerHTML = '';
+            }
+
+            // 追加新日志
+            const fragment = document.createDocumentFragment();
+            newLogs.forEach(log => {
+                const div = document.createElement('div');
+                div.className = 'log-entry';
+                div.dataset.level = log.level;
+                div.innerHTML = `
+                    <div class="log-header">
+                        <span class="log-timestamp">${log.timestamp}</span>
+                        <span class="log-level ${log.level}">${log.level}</span>
+                        <span class="log-tag">[${log.tag}]</span>
+                        <span class="log-thread">(${log.thread})</span>
+                    </div>
+                    <div class="log-message">${escapeHtml(log.message)}</div>
+                `;
+                fragment.appendChild(div);
+            });
+            container.appendChild(fragment);
+
+            // 应用过滤
+            filterLogs();
         }
 
         function filterLevel(level) {

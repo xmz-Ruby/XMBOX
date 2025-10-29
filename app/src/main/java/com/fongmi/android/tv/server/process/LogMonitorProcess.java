@@ -77,16 +77,40 @@ public class LogMonitorProcess implements Process {
             }
         }
 
-        // 获取最新的日志
-        String json = LogMonitor.get().getLogsAsJson(100);
+        // 获取指定索引之后的新日志
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"count\":").append(LogMonitor.get().getLogCount());
+        sb.append(",\"logs\":");
+
+        if (since > 0) {
+            // 只返回新增的日志
+            sb.append(getLogsSinceAsJson(since));
+        } else {
+            // 返回最近100条
+            sb.append(LogMonitor.get().getLogsAsJson(100));
+        }
+
+        sb.append("}");
 
         NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(
             NanoHTTPD.Response.Status.OK,
             "application/json",
-            json
+            sb.toString()
         );
         addCorsHeaders(response);
         return response;
+    }
+
+    private String getLogsSinceAsJson(int index) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        java.util.List<LogMonitor.LogEntry> logList = LogMonitor.get().getLogsSince(index);
+        for (int i = 0; i < logList.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append(logList.get(i).toJson());
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     private void addCorsHeaders(NanoHTTPD.Response response) {

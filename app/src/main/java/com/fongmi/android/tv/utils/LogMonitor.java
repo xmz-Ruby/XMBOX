@@ -120,6 +120,16 @@ public class LogMonitor {
         return new ArrayList<>(logs.subList(start, size));
     }
 
+    public List<LogEntry> getLogsSince(int index) {
+        int size = logs.size();
+        if (index >= size) return new ArrayList<>();
+        return new ArrayList<>(logs.subList(index, size));
+    }
+
+    public int getLogCount() {
+        return logs.size();
+    }
+
     public void clear() {
         logs.clear();
     }
