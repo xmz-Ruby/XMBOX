@@ -49,6 +49,7 @@ public class DanmakuSearchDialog extends BaseDialog {
     private LinearLayout emptyContainer;
     private TextView emptyText;
     private RecyclerView searchResults;
+    private LinearLayout episodeContainer;
     private RecyclerView episodeResults;
     private LinearLayout episodeActions;
     private TextView backButton;
@@ -62,6 +63,7 @@ public class DanmakuSearchDialog extends BaseDialog {
     private Handler mainHandler;
     private List<DanmakuEpisode> currentEpisodes;
     private boolean isReversed = false;
+    private int highlightedEpisodePosition = -1; // 当前高亮的剧集位置
 
     public static DanmakuSearchDialog create() {
         return new DanmakuSearchDialog();
@@ -98,6 +100,7 @@ public class DanmakuSearchDialog extends BaseDialog {
         emptyContainer = view.findViewById(R.id.empty_container);
         emptyText = view.findViewById(R.id.empty_text);
         searchResults = view.findViewById(R.id.search_results);
+        episodeContainer = view.findViewById(R.id.episode_container);
         episodeResults = view.findViewById(R.id.episode_results);
         episodeActions = view.findViewById(R.id.episode_actions);
         backButton = view.findViewById(R.id.back_button);
@@ -142,7 +145,8 @@ public class DanmakuSearchDialog extends BaseDialog {
     private void restoreSearchState() {
         Logger.t(TAG).d("恢复搜索状态 - hasKeyword: " + !searchState.getLastKeyword().isEmpty() +
                        ", hasSearchResults: " + searchState.hasSearchResults() +
-                       ", hasEpisodes: " + searchState.hasEpisodes());
+                       ", hasEpisodes: " + searchState.hasEpisodes() +
+                       ", hasAutoSearched: " + searchState.hasAutoSearched());
 
         // 检查当前播放的影视剧是否与保存的关键词匹配
         String currentTitle = player != null ? player.getTitle() : "";
@@ -179,8 +183,16 @@ public class DanmakuSearchDialog extends BaseDialog {
             Logger.t(TAG).d("显示剧集列表");
             showEpisodesView(searchState.getEpisodes());
         } else {
-            Logger.t(TAG).d("显示空白状态");
-            showEmptyView("输入剧名开始搜索");
+            // 首次打开弹幕对话框，自动触发搜索
+            if (!searchState.hasAutoSearched() && !searchInput.getText().toString().trim().isEmpty()) {
+                Logger.t(TAG).d("首次打开弹幕对话框，自动触发搜索");
+                searchState.setAutoSearched(true);
+                // 延迟执行搜索，确保UI已经初始化完成
+                mainHandler.postDelayed(this::performAutoSearch, 300);
+            } else {
+                Logger.t(TAG).d("显示空白状态");
+                showEmptyView("输入剧名开始搜索");
+            }
         }
     }
 
@@ -201,6 +213,58 @@ public class DanmakuSearchDialog extends BaseDialog {
             e.printStackTrace();
         }
         return "";
+    }
+
+    /**
+     * 自动搜索（首次打开弹幕时触发）
+     */
+    private void performAutoSearch() {
+        String keyword = searchInput.getText().toString().trim();
+        if (keyword.isEmpty()) {
+            Logger.t(TAG).d("自动搜索：关键词为空，跳过");
+            showEmptyView("输入剧名开始搜索");
+            return;
+        }
+
+        Logger.t(TAG).d("自动搜索：关键词 = " + keyword);
+
+        // 保存关键词
+        searchState.setLastKeyword(keyword);
+
+        // 显示加载动画
+        showLoadingView("正在自动搜索弹幕...");
+
+        // 执行搜索
+        DanmakuApi.searchAnime(keyword, new DanmakuApi.Callback<List<DanmakuAnime>>() {
+            @Override
+            public void onSuccess(List<DanmakuAnime> animes) {
+                mainHandler.post(() -> {
+                    if (animes.isEmpty()) {
+                        Logger.t(TAG).d("自动搜索：未找到结果");
+                        searchState.setSearchResults(null);
+                        showEmptyView("未找到相关弹幕");
+                    } else {
+                        Logger.t(TAG).d("自动搜索：找到 " + animes.size() + " 个结果");
+                        searchState.setSearchResults(animes);
+                        // 自动选择第一个番剧
+                        if (animes.size() > 0) {
+                            Logger.t(TAG).d("自动选择第一个番剧：" + animes.get(0).getDisplayTitle());
+                            autoSelectFirstAnime(animes.get(0));
+                        } else {
+                            showSearchResultsView(animes);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                mainHandler.post(() -> {
+                    Logger.t(TAG).d("自动搜索失败：" + message);
+                    showEmptyView("搜索失败: " + message);
+                });
+            }
+        });
     }
 
     private void performSearch() {
@@ -239,6 +303,41 @@ public class DanmakuSearchDialog extends BaseDialog {
                 mainHandler.post(() -> {
                     showEmptyView("搜索失败: " + message);
                     android.widget.Toast.makeText(getContext(), message, android.widget.Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    /**
+     * 自动选择第一个番剧（用于首次自动搜索）
+     */
+    private void autoSelectFirstAnime(DanmakuAnime anime) {
+        Logger.t(TAG).d("=== autoSelectFirstAnime 被调用 ===");
+        Logger.t(TAG).d("番剧：" + anime.getDisplayTitle());
+
+        searchState.setSelectedAnime(anime, 0);
+        showLoadingView("正在加载剧集...");
+
+        DanmakuApi.getBangumiEpisodes(anime.getAnimeId(), new DanmakuApi.Callback<List<DanmakuEpisode>>() {
+            @Override
+            public void onSuccess(List<DanmakuEpisode> episodes) {
+                mainHandler.post(() -> {
+                    if (episodes.isEmpty()) {
+                        Logger.t(TAG).d("该番剧暂无剧集");
+                        showEmptyView("该番剧暂无弹幕");
+                    } else {
+                        Logger.t(TAG).d("加载到 " + episodes.size() + " 集");
+                        searchState.setEpisodes(episodes);
+                        showEpisodesView(episodes);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                mainHandler.post(() -> {
+                    Logger.t(TAG).d("加载剧集失败：" + message);
+                    showEmptyView("加载失败: " + message);
                 });
             }
         });
@@ -611,8 +710,7 @@ public class DanmakuSearchDialog extends BaseDialog {
         loadingContainer.setVisibility(View.VISIBLE);
         emptyContainer.setVisibility(View.GONE);
         searchResults.setVisibility(View.GONE);
-        episodeResults.setVisibility(View.GONE);
-        backButton.setVisibility(View.GONE);
+        episodeContainer.setVisibility(View.GONE);
     }
 
     private void showEmptyView(String message) {
@@ -620,8 +718,7 @@ public class DanmakuSearchDialog extends BaseDialog {
         emptyContainer.setVisibility(View.VISIBLE);
         loadingContainer.setVisibility(View.GONE);
         searchResults.setVisibility(View.GONE);
-        episodeResults.setVisibility(View.GONE);
-        episodeActions.setVisibility(View.GONE);
+        episodeContainer.setVisibility(View.GONE);
     }
 
     private void showSearchResultsView(List<DanmakuAnime> animes) {
@@ -629,8 +726,7 @@ public class DanmakuSearchDialog extends BaseDialog {
         searchResults.setVisibility(View.VISIBLE);
         loadingContainer.setVisibility(View.GONE);
         emptyContainer.setVisibility(View.GONE);
-        episodeResults.setVisibility(View.GONE);
-        episodeActions.setVisibility(View.GONE);
+        episodeContainer.setVisibility(View.GONE);
     }
 
     private void showEpisodesView(List<DanmakuEpisode> episodes) {
@@ -640,66 +736,36 @@ public class DanmakuSearchDialog extends BaseDialog {
         currentEpisodes = new java.util.ArrayList<>(episodes);
         isReversed = false;
         episodeAdapter.setData(currentEpisodes);
-        episodeResults.setVisibility(View.VISIBLE);
-        episodeActions.setVisibility(View.VISIBLE);
+        episodeContainer.setVisibility(View.VISIBLE);
         loadingContainer.setVisibility(View.GONE);
         emptyContainer.setVisibility(View.GONE);
         searchResults.setVisibility(View.GONE);
 
         Logger.t(TAG).d( "UI状态已更新，开始查找当前集数");
 
-        // 智能滚动到当前播放的集数并自动加载弹幕
+        // 智能滚动到当前播放的集数并高亮显示（不自动加载弹幕）
         int currentPosition = findCurrentEpisodePosition(currentEpisodes);
         Logger.t(TAG).d( "findCurrentEpisodePosition 返回: " + currentPosition);
 
         if (currentPosition >= 0) {
-            Logger.t(TAG).d( "找到匹配集数，开始滚动和加载弹幕");
+            Logger.t(TAG).d( "找到匹配集数，开始滚动和高亮显示");
+            highlightedEpisodePosition = currentPosition;
             scrollToPositionWithCenter(currentPosition);
-            // 自动加载当前集数的弹幕
-            autoLoadCurrentEpisodeDanmaku(currentPosition);
+            // 刷新适配器以显示高亮
+            episodeAdapter.notifyDataSetChanged();
+
+            // 显示提示，告知用户需要手动选择
+            episodeResults.postDelayed(() -> {
+                android.widget.Toast.makeText(getContext(),
+                    "已定位到匹配集数，请点击确认加载弹幕",
+                    android.widget.Toast.LENGTH_LONG).show();
+            }, 1000);
         } else {
             Logger.t(TAG).d( "未找到匹配集数，不执行滚动");
+            highlightedEpisodePosition = -1;
         }
     }
 
-    /**
-     * 自动加载当前播放集数的弹幕
-     */
-    private void autoLoadCurrentEpisodeDanmaku(int position) {
-        Logger.t(TAG).d( "=== autoLoadCurrentEpisodeDanmaku 被调用 ===");
-        Logger.t(TAG).d( "位置: " + position);
-
-        if (currentEpisodes == null || position < 0 || position >= currentEpisodes.size()) {
-            Logger.t(TAG).d( "参数无效，取消加载");
-            return;
-        }
-
-        try {
-            DanmakuEpisode episode = currentEpisodes.get(position);
-            Logger.t(TAG).d( "剧集信息: " + episode.getDisplayTitle());
-            Logger.t(TAG).d( "剧集ID: " + episode.getEpisodeId());
-
-            String url = DanmakuApi.getDanmakuUrl(episode.getEpisodeId());
-            Logger.t(TAG).d( "弹幕URL: " + url);
-
-            Danmaku danmaku = Danmaku.from(url);
-            danmaku.setName(episode.getDisplayTitle());
-            player.setDanmaku(danmaku);
-
-            Logger.t(TAG).d( "弹幕已设置到播放器");
-
-            // 延迟显示提示，避免与滚动提示冲突
-            episodeResults.postDelayed(() -> {
-                Logger.t(TAG).d( "显示弹幕加载提示");
-                android.widget.Toast.makeText(getContext(),
-                    "已自动加载弹幕：" + episode.getDisplayTitle(),
-                    android.widget.Toast.LENGTH_SHORT).show();
-            }, 800);
-        } catch (Exception e) {
-            Logger.t(TAG).e( "自动加载弹幕失败", e);
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 优雅地滚动到指定位置，并将其居中显示
@@ -825,7 +891,7 @@ public class DanmakuSearchDialog extends BaseDialog {
     }
 
     // 剧集适配器
-    private static class DanmakuEpisodeAdapter extends RecyclerView.Adapter<DanmakuEpisodeAdapter.ViewHolder> {
+    private class DanmakuEpisodeAdapter extends RecyclerView.Adapter<DanmakuEpisodeAdapter.ViewHolder> {
 
         private List<DanmakuEpisode> data;
         private final OnItemClickListener listener;
@@ -856,6 +922,21 @@ public class DanmakuSearchDialog extends BaseDialog {
             DanmakuEpisode episode = data.get(position);
             holder.title.setText(episode.getDisplayTitle());
             holder.itemView.setOnClickListener(v -> listener.onItemClick(episode));
+
+            // 高亮显示匹配的剧集
+            if (position == highlightedEpisodePosition) {
+                // 设置醒目的边框和背景
+                holder.highlight.setVisibility(View.VISIBLE);
+                holder.highlight.setBackgroundColor(0x4000FF00); // 半透明绿色背景
+                // 添加边框效果
+                android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
+                border.setColor(0x4000FF00); // 半透明绿色背景
+                border.setStroke(4, 0xFF00FF00); // 绿色边框，4dp宽度
+                border.setCornerRadius(8); // 圆角
+                holder.highlight.setBackground(border);
+            } else {
+                holder.highlight.setVisibility(View.GONE);
+            }
         }
 
         @Override
@@ -863,12 +944,14 @@ public class DanmakuSearchDialog extends BaseDialog {
             return data == null ? 0 : data.size();
         }
 
-        static class ViewHolder extends RecyclerView.ViewHolder {
+        class ViewHolder extends RecyclerView.ViewHolder {
             TextView title;
+            View highlight;
 
             ViewHolder(View view) {
                 super(view);
                 title = view.findViewById(R.id.episode_title);
+                highlight = view.findViewById(R.id.episode_highlight);
             }
         }
     }

@@ -113,65 +113,81 @@
 
     </LinearLayout>
 
-    <!-- 搜索结果列表 -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/search_results"
+    <!-- 内容区域容器 - 使用FrameLayout让内容互相覆盖切换 -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxHeight="240dp"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:minHeight="240dp">
 
-    <!-- 剧集列表 -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/episode_results"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxHeight="240dp"
-        android:visibility="gone"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        <!-- 搜索结果列表 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="240dp"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-    <!-- 剧集操作按钮区域（显示剧集时） -->
-    <LinearLayout
-        android:id="@+id/episode_actions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        <!-- 剧集列表容器 -->
+        <LinearLayout
+            android:id="@+id/episode_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <TextView
-            android:id="@+id/back_button"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_weight="1"
-            android:text="← 返回"
-            android:gravity="center"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:background="?attr/selectableItemBackground" />
+            <!-- 剧集列表 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/episode_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="240dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-        <TextView
-            android:id="@+id/reverse_button"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_weight="1"
-            android:text="⇅ 反转"
-            android:gravity="center"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:background="?attr/selectableItemBackground" />
+            <!-- 剧集操作按钮区域 -->
+            <LinearLayout
+                android:id="@+id/episode_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/jump_button"
-            android:layout_width="0dp"
-            android:layout_height="42dp"
-            android:layout_weight="1"
-            android:text="→ 跳转"
-            android:gravity="center"
-            android:textSize="13sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:background="?attr/selectableItemBackground" />
+                <TextView
+                    android:id="@+id/back_button"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text="← 返回"
+                    android:gravity="center"
+                    android:textSize="13sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:background="?attr/selectableItemBackground" />
 
-    </LinearLayout>
+                <TextView
+                    android:id="@+id/reverse_button"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text="⇅ 反转"
+                    android:gravity="center"
+                    android:textSize="13sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:background="?attr/selectableItemBackground" />
+
+                <TextView
+                    android:id="@+id/jump_button"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:text="→ 跳转"
+                    android:gravity="center"
+                    android:textSize="13sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:background="?attr/selectableItemBackground" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>

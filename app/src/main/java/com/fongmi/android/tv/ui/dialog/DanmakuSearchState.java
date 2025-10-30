@@ -22,6 +22,7 @@ public class DanmakuSearchState {
     private DanmakuAnime selectedAnime;
     private List<DanmakuEpisode> episodes = new ArrayList<>();
     private int selectedAnimePosition = -1;
+    private boolean hasAutoSearched = false; // 标记是否已经自动搜索过
 
     private DanmakuSearchState() {}
 
@@ -95,6 +96,14 @@ public class DanmakuSearchState {
         return cleanTitle.contains(lastKeyword) || lastKeyword.contains(cleanTitle);
     }
 
+    public boolean hasAutoSearched() {
+        return hasAutoSearched;
+    }
+
+    public void setAutoSearched(boolean searched) {
+        this.hasAutoSearched = searched;
+    }
+
     public void clear() {
         Logger.t(TAG).d("清理弹幕搜索状态 - keyword: " + lastKeyword + ", searchResults: " + searchResults.size() + ", episodes: " + episodes.size());
         lastKeyword = "";
@@ -102,6 +111,7 @@ public class DanmakuSearchState {
         selectedAnime = null;
         episodes.clear();
         selectedAnimePosition = -1;
+        hasAutoSearched = false;
         Logger.t(TAG).d("状态已清理");
     }
 
