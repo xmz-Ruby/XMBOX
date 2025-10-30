@@ -118,4 +118,80 @@ public class DanmakuSearchState {
     public void clearEpisodes() {
         episodes.clear();
     }
+
+    /**
+     * 根据集数查找对应的弹幕剧集
+     * @param episodeIndex 集数索引（从1开始）
+     * @return 找到的弹幕剧集，如果没找到返回null
+     */
+    public DanmakuEpisode findEpisodeByIndex(int episodeIndex) {
+        if (!hasEpisodes() || episodeIndex <= 0) {
+            return null;
+        }
+
+        Logger.t(TAG).d("查找弹幕剧集 - 集数索引: " + episodeIndex + ", 弹幕剧集总数: " + episodes.size());
+
+        // 方法1: 使用 episodeNumber 字段直接匹配
+        for (DanmakuEpisode episode : episodes) {
+            try {
+                String episodeNumberStr = episode.getEpisodeNumber();
+                if (episodeNumberStr != null) {
+                    int episodeNum = Integer.parseInt(episodeNumberStr.trim());
+                    if (episodeNum == episodeIndex) {
+                        Logger.t(TAG).d("✓ 通过episodeNumber匹配成功: " + episode.getDisplayTitle());
+                        return episode;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                // 继续尝试其他方法
+            }
+        }
+
+        // 方法2: 从 displayTitle 提取集数进行匹配
+        for (DanmakuEpisode episode : episodes) {
+            String title = episode.getDisplayTitle();
+            if (title != null) {
+                int extractedNumber = extractEpisodeNumber(title);
+                if (extractedNumber == episodeIndex) {
+                    Logger.t(TAG).d("✓ 通过displayTitle匹配成功: " + title);
+                    return episode;
+                }
+            }
+        }
+
+        Logger.t(TAG).d("✗ 未找到匹配的弹幕剧集");
+        return null;
+    }
+
+    /**
+     * 从标题中提取集数数字
+     */
+    private int extractEpisodeNumber(String title) {
+        if (title == null || title.isEmpty()) {
+            return -1;
+        }
+
+        try {
+            // 匹配各种集数格式
+            java.util.regex.Pattern[] patterns = {
+                java.util.regex.Pattern.compile("第(\\d+)集"),
+                java.util.regex.Pattern.compile("(\\d+)集"),
+                java.util.regex.Pattern.compile("EP(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE),
+                java.util.regex.Pattern.compile("(?<!EP)E(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE),
+                java.util.regex.Pattern.compile("第(\\d+)话"),
+                java.util.regex.Pattern.compile("(\\d+)话")
+            };
+
+            for (java.util.regex.Pattern pattern : patterns) {
+                java.util.regex.Matcher matcher = pattern.matcher(title);
+                if (matcher.find()) {
+                    return Integer.parseInt(matcher.group(1));
+                }
+            }
+        } catch (Exception e) {
+            // 忽略异常
+        }
+
+        return -1;
+    }
 }

@@ -676,6 +676,47 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
         if (isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
         onRefresh();
+        // 自动加载对应集数的弹幕
+        autoLoadDanmakuForEpisode(item);
+    }
+
+    /**
+     * 自动加载对应集数的弹幕
+     */
+    private void autoLoadDanmakuForEpisode(Episode episode) {
+        try {
+            // 检查是否有弹幕剧集列表
+            DanmakuSearchState danmakuState = DanmakuSearchState.getInstance();
+            if (!danmakuState.hasEpisodes()) {
+                return;
+            }
+
+            // 获取当前剧集的索引
+            int episodeIndex = episode.getIndex();
+            if (episodeIndex <= 0) {
+                return;
+            }
+
+            com.orhanobut.logger.Logger.t("VideoActivity").d("剧集切换 - 尝试自动加载弹幕，集数: " + episodeIndex);
+
+            // 查找对应的弹幕剧集
+            com.fongmi.android.tv.bean.DanmakuEpisode danmakuEpisode = danmakuState.findEpisodeByIndex(episodeIndex);
+            if (danmakuEpisode != null) {
+                // 加载弹幕
+                String url = com.fongmi.android.tv.api.DanmakuApi.getDanmakuUrl(danmakuEpisode.getEpisodeId());
+                Danmaku danmaku = Danmaku.from(url);
+                danmaku.setName(danmakuEpisode.getDisplayTitle());
+                mPlayers.setDanmaku(danmaku);
+
+                com.orhanobut.logger.Logger.t("VideoActivity").d("✓ 自动加载弹幕成功: " + danmakuEpisode.getDisplayTitle());
+                Notify.show("已自动切换弹幕：" + danmakuEpisode.getDisplayTitle());
+            } else {
+                com.orhanobut.logger.Logger.t("VideoActivity").d("✗ 未找到对应的弹幕剧集");
+            }
+        } catch (Exception e) {
+            com.orhanobut.logger.Logger.t("VideoActivity").e("自动加载弹幕失败", e);
+            e.printStackTrace();
+        }
     }
 
     @Override
