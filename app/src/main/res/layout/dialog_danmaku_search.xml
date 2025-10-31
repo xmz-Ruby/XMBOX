@@ -27,6 +27,11 @@
             android:background="#333333"
             android:singleLine="true"
             android:imeOptions="actionSearch"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:selectAllOnFocus="true"
+            android:nextFocusDown="@id/search_results"
+            android:nextFocusRight="@id/search_results"
             android:textSize="14sp" />
 
         <ImageView
@@ -204,6 +209,10 @@
                 android:scrollbars="vertical"
                 android:fadeScrollbars="false"
                 android:overScrollMode="always"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusUp="@id/search_input"
+                android:nextFocusRight="@id/episode_results"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         </LinearLayout>
@@ -257,6 +266,10 @@
                 android:fadeScrollbars="false"
                 android:overScrollMode="always"
                 android:nestedScrollingEnabled="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusLeft="@id/search_results"
+                android:nextFocusUp="@id/search_input"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         </LinearLayout>

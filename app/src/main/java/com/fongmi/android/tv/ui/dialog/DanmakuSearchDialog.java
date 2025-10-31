@@ -147,6 +147,33 @@ public class DanmakuSearchDialog extends BaseDialog {
             }
             return false;
         });
+        searchInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                searchInput.post(() -> {
+                    showKeyboard(searchInput);
+                    searchInput.setSelection(searchInput.getText().length());
+                });
+            } else {
+                hideKeyboard();
+            }
+        });
+        searchInput.setOnClickListener(v -> {
+            showKeyboard(searchInput);
+            searchInput.setSelection(searchInput.getText().length());
+        });
+        searchInput.setOnKeyListener((v, keyCode, event) -> {
+            if (event != null && event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+                    keyCode == KeyEvent.KEYCODE_MENU ||
+                    keyCode == KeyEvent.KEYCODE_SEARCH) {
+                    showKeyboard(searchInput);
+                    return true;
+                }
+            }
+            return false;
+        });
+        searchResults.setOnKeyListener((v, keyCode, event) -> handleSearchResultsKey(keyCode, event));
+        episodeResults.setOnKeyListener((v, keyCode, event) -> handleEpisodeResultsKey(keyCode, event));
     }
 
     private void restoreSearchState() {
@@ -835,6 +862,52 @@ public class DanmakuSearchDialog extends BaseDialog {
                 episodeResults.smoothScrollToPosition(position);
             }
         });
+    }
+
+    private boolean handleSearchResultsKey(int keyCode, KeyEvent event) {
+        if (event == null || event.getAction() != KeyEvent.ACTION_DOWN) return false;
+        if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+            showEpisodeListOnly();
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+            searchInput.requestFocus();
+            searchInput.post(() -> {
+                searchInput.setSelection(searchInput.getText().length());
+                showKeyboard(searchInput);
+            });
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleEpisodeResultsKey(int keyCode, KeyEvent event) {
+        if (event == null || event.getAction() != KeyEvent.ACTION_DOWN) return false;
+        if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+            showAnimeListOnly();
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+            searchInput.requestFocus();
+            searchInput.post(() -> {
+                searchInput.setSelection(searchInput.getText().length());
+                showKeyboard(searchInput);
+            });
+            return true;
+        }
+        return false;
+    }
+
+    private void showKeyboard(View target) {
+        try {
+            if (target == null) return;
+            target.requestFocus();
+            android.view.inputmethod.InputMethodManager imm =
+                (android.view.inputmethod.InputMethodManager) getContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.showSoftInput(target, android.view.inputmethod.InputMethodManager.SHOW_FORCED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void hideKeyboard() {
