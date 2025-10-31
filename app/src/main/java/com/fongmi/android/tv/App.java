@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.os.HandlerCompat;
 
-import com.fongmi.android.tv.event.EventIndex;
 import com.fongmi.android.tv.ui.activity.CrashActivity;
 import com.fongmi.android.tv.utils.CacheCleaner;
 import com.fongmi.android.tv.utils.Notify;
@@ -27,6 +26,7 @@ import com.orhanobut.logger.Logger;
 import com.orhanobut.logger.PrettyFormatStrategy;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.meta.SubscriberInfoIndex;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +34,8 @@ import java.util.concurrent.Executors;
 import cat.ereza.customactivityoncrash.config.CaocConfig;
 
 public class App extends Application {
+
+    private static final String TAG = App.class.getSimpleName();
 
     private final ExecutorService executor;
     private final Handler handler;
@@ -133,7 +135,7 @@ public class App extends Application {
 
         OkHttp.get().setProxy(Setting.getProxy());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
-        EventBus.builder().addIndex(new EventIndex()).installDefaultEventBus();
+        initEventBus();
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
 
         // 初始化自动缓存清理
@@ -176,6 +178,22 @@ public class App extends Application {
             public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
             }
         });
+    }
+
+    private void initEventBus() {
+        EventBus.Builder builder = EventBus.builder();
+        try {
+            Class<?> indexClass = Class.forName("com.fongmi.android.tv.event.EventIndex");
+            Object instance = indexClass.getDeclaredConstructor().newInstance();
+            if (instance instanceof SubscriberInfoIndex) {
+                builder.addIndex((SubscriberInfoIndex) instance);
+            }
+        } catch (ClassNotFoundException e) {
+            Logger.t(TAG).i("EventBus index not generated; using reflection dispatch.");
+        } catch (Exception e) {
+            Logger.t(TAG).e(e, "Failed to initialize EventBus index.");
+        }
+        builder.installDefaultEventBus();
     }
 
     private void initCacheCleaner() {
