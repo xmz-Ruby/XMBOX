@@ -148,25 +148,6 @@ public final class DanmakuDialog extends BaseDialog {
         // 点击输入框显示投送二维码
         searchInput.setOnClickListener(v -> showCastQRCode());
 
-        // 遥控器按确认键也显示投送二维码，方向键不拦截以便导航
-        searchInput.setOnKeyListener((v, keyCode, event) -> {
-            // 只处理确认键，方向键返回 false 让系统处理焦点导航
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
-                    showCastQRCode();
-                    return true;
-                }
-                // 方向键不拦截，返回 false 让系统处理焦点切换
-                if (keyCode == KeyEvent.KEYCODE_DPAD_UP ||
-                    keyCode == KeyEvent.KEYCODE_DPAD_DOWN ||
-                    keyCode == KeyEvent.KEYCODE_DPAD_LEFT ||
-                    keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                    return false;
-                }
-            }
-            return false;
-        });
-
         searchButton.setOnClickListener(v -> performSearch());
         settingsButton.setOnClickListener(this::showSettings);
         closeButton.setOnClickListener(v -> dismiss());
@@ -179,18 +160,30 @@ public final class DanmakuDialog extends BaseDialog {
             animeExpandButton.setOnClickListener(v -> toggleAnimeList());
         }
 
-        searchInput.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                performSearch();
+        searchInput.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
+
+            if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+                keyCode == KeyEvent.KEYCODE_ENTER ||
+                keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+                showCastQRCode();
                 return true;
+            }
+
+            if (Util.isLeanback()) {
+                return handleSearchInputDpad(keyCode);
             }
             return false;
         });
 
-        searchInput.setOnKeyListener((v, keyCode, event) -> {
-            if (!Util.isLeanback() || event.getAction() != KeyEvent.ACTION_DOWN) return false;
-            return handleSearchInputDpad(keyCode);
+        searchInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                actionId == EditorInfo.IME_ACTION_DONE ||
+                (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                showCastQRCode();
+                return true;
+            }
+            return false;
         });
 
         // 防止剧集列表滑动事件冒泡到父容器
