@@ -110,6 +110,7 @@
     <string name="player_audio_decode">音频软解</string>
     <string name="player_aac">AAC优化</string>
     <string name="player_danmaku_load">弹幕加载</string>
+    <string name="danmaku_load_enable_hint">请先在播放器设置中开启弹幕加载</string>
     <string name="player_tunnel">隧道模式</string>
     <string name="player_buffer">缓冲时间</string>
     <string name="player_speed">长按倍速</string>

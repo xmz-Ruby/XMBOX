@@ -429,7 +429,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.right.back.setOnClickListener(view -> onFull());
         mBinding.control.right.lock.setOnClickListener(view -> onLock());
         mBinding.control.right.rotate.setOnClickListener(view -> onRotate());
-        mBinding.control.danmaku.setOnClickListener(view -> onDanmakuShow());
+        mBinding.control.danmaku.setOnClickListener(view -> onDanmakuEntry());
+        mBinding.control.danmaku.setOnLongClickListener(view -> onDanmakuToggle());
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
@@ -906,6 +907,19 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void onTrack(View view) {
         TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
+    }
+
+    private void onDanmakuEntry() {
+        if (!Setting.isDanmakuLoad()) {
+            Notify.show(R.string.danmaku_load_enable_hint);
+            return;
+        }
+        onDanmaku();
+    }
+
+    private boolean onDanmakuToggle() {
+        onDanmakuShow();
+        return true;
     }
 
     private void onDanmaku() {
