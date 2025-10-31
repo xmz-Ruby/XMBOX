@@ -27,9 +27,6 @@ import com.fongmi.android.tv.bean.DanmakuAnime;
 import com.fongmi.android.tv.bean.DanmakuEpisode;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.utils.Util;
-import com.fongmi.android.tv.server.Server;
-import com.fongmi.android.tv.utils.QRCode;
-import com.github.catvod.Proxy;
 import com.orhanobut.logger.Logger;
 
 import android.graphics.Bitmap;
@@ -140,14 +137,13 @@ public final class DanmakuDialog extends BaseDialog {
 
     @Override
     protected void initEvent() {
-        // 将搜索输入框设为只读，但保持可聚焦（遥控器可选中）
-        searchInput.setFocusable(true);
-        searchInput.setFocusableInTouchMode(true);
-        searchInput.setCursorVisible(false);
-        searchInput.setKeyListener(null); // 禁止键盘输入，保持只读
-
-        // 点击输入框显示投送二维码
-        searchInput.setOnClickListener(v -> showCastQRCode());
+        if (Util.isLeanback()) {
+            // Leanback版本：输入框只读，支持遥控器和二维码
+            initLeanbackMode();
+        } else {
+            // Mobile版本：输入框可编辑，支持触摸和滑动
+            initMobileMode();
+        }
 
         searchButton.setOnClickListener(v -> performSearch());
         settingsButton.setOnClickListener(this::showSettings);
@@ -161,32 +157,6 @@ public final class DanmakuDialog extends BaseDialog {
             animeExpandButton.setOnClickListener(v -> toggleAnimeList());
         }
 
-        searchInput.setOnKeyListener((v, keyCode, event) -> {
-            if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
-
-            if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
-                keyCode == KeyEvent.KEYCODE_ENTER ||
-                keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
-                showCastQRCode();
-                return true;
-            }
-
-            if (Util.isLeanback()) {
-                return handleSearchInputDpad(keyCode);
-            }
-            return false;
-        });
-
-        searchInput.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                actionId == EditorInfo.IME_ACTION_DONE ||
-                (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                showCastQRCode();
-                return true;
-            }
-            return false;
-        });
-
         // 防止剧集列表滑动事件冒泡到父容器
         episodeResults.setOnTouchListener((v, event) -> {
             v.getParent().requestDisallowInterceptTouchEvent(true);
@@ -198,6 +168,103 @@ public final class DanmakuDialog extends BaseDialog {
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return false;
         });
+    }
+
+    private void initLeanbackMode() {
+        // Leanback版本：输入框只读，但保持可聚焦（遥控器可选中）
+        searchInput.setFocusable(true);
+        searchInput.setFocusableInTouchMode(true);
+        searchInput.setCursorVisible(false);
+        searchInput.setKeyListener(null); // 禁止键盘输入，保持只读
+
+        // 点击输入框显示投送二维码
+        searchInput.setOnClickListener(v -> showCastQRCode());
+
+        searchInput.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
+
+            if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+                keyCode == KeyEvent.KEYCODE_ENTER ||
+                keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+                showCastQRCode();
+                return true;
+            }
+
+            return handleSearchInputDpad(keyCode);
+        });
+
+        searchInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                actionId == EditorInfo.IME_ACTION_DONE ||
+                (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                showCastQRCode();
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void initMobileMode() {
+        // Mobile版本：输入框可编辑
+        searchInput.setFocusable(true);
+        searchInput.setFocusableInTouchMode(true);
+        searchInput.setCursorVisible(true);
+
+        // 支持回车键搜索
+        searchInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                actionId == EditorInfo.IME_ACTION_DONE ||
+                (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                performSearch();
+                return true;
+            }
+            return false;
+        });
+
+        // Mobile版本：支持左右滑动切换番剧列表和剧集列表
+        setupSwipeGesture();
+    }
+
+    private void setupSwipeGesture() {
+        android.view.GestureDetector gestureDetector = new android.view.GestureDetector(getContext(),
+            new android.view.GestureDetector.SimpleOnGestureListener() {
+                private static final int SWIPE_THRESHOLD = 100;
+                private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+                @Override
+                public boolean onFling(android.view.MotionEvent e1, android.view.MotionEvent e2,
+                                       float velocityX, float velocityY) {
+                    if (e1 == null || e2 == null) return false;
+                    float diffX = e2.getX() - e1.getX();
+                    float diffY = e2.getY() - e1.getY();
+                    if (Math.abs(diffX) > Math.abs(diffY) &&
+                        Math.abs(diffX) > SWIPE_THRESHOLD &&
+                        Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffX > 0) {
+                            // 向右滑动 - 显示番剧列表
+                            if (isShowingEpisodeList) {
+                                showAnimeListOnly();
+                            }
+                        } else {
+                            // 向左滑动 - 显示剧集列表
+                            if (!isShowingEpisodeList && episodeAdapter != null && episodeAdapter.getItemCount() > 0) {
+                                showEpisodeListOnly();
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+        View.OnTouchListener touchListener = (v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return false;
+        };
+
+        if (contentContainer != null) {
+            contentContainer.setOnTouchListener(touchListener);
+        }
     }
 
     private boolean handleSearchInputDpad(int keyCode) {
@@ -467,10 +534,11 @@ public final class DanmakuDialog extends BaseDialog {
     }
 
     private void onEpisodeClick(DanmakuEpisode episode) {
+        // Mobile版本：直接加载弹幕，无需二次确认
         String url = DanmakuApi.getDanmakuUrl(episode.getEpisodeId());
         Danmaku danmaku = Danmaku.from(url);
         danmaku.setName(episode.getDisplayTitle());
-        searchState.setCurrentSelectedDanmaku(danmaku); // 保存当前选中的弹幕到单例
+        searchState.setCurrentSelectedDanmaku(danmaku);
 
         // 保存用户选择的剧集位置
         int selectedPosition = currentEpisodes.indexOf(episode);
@@ -479,6 +547,7 @@ public final class DanmakuDialog extends BaseDialog {
             Logger.t(TAG).d("保存用户选择的剧集位置: " + selectedPosition);
         }
 
+        // 直接加载弹幕并关闭对话框
         player.setDanmaku(danmaku);
         android.widget.Toast.makeText(getContext(), "弹幕加载成功", android.widget.Toast.LENGTH_SHORT).show();
         dismiss();
@@ -1299,13 +1368,13 @@ public final class DanmakuDialog extends BaseDialog {
     }
 
     /**
-     * 显示投送二维码对话框
+     * 显示投送二维码对话框（仅 Leanback 版本）
      */
     private void showCastQRCode() {
         try {
             // 获取局域网地址和端口
             String ip = com.github.catvod.utils.Util.getIp();
-            int port = Proxy.getPort();
+            int port = com.github.catvod.Proxy.getPort();
 
             if (ip.isEmpty()) {
                 android.widget.Toast.makeText(getContext(), "无法获取局域网IP地址", android.widget.Toast.LENGTH_SHORT).show();
@@ -1316,8 +1385,11 @@ public final class DanmakuDialog extends BaseDialog {
             String castUrl = "http://" + ip + ":" + port + "/danmaku";
             Logger.t(TAG).d("生成投送URL: " + castUrl);
 
-            // 生成二维码
-            Bitmap qrBitmap = QRCode.getBitmap(castUrl, 200, 1);
+            // 使用反射调用 QRCode.getBitmap (仅 leanback 版本有此类)
+            Class<?> qrCodeClass = Class.forName("com.fongmi.android.tv.utils.QRCode");
+            java.lang.reflect.Method getBitmapMethod = qrCodeClass.getMethod("getBitmap", String.class, int.class, int.class);
+            Bitmap qrBitmap = (Bitmap) getBitmapMethod.invoke(null, castUrl, 200, 1);
+
             if (qrBitmap == null) {
                 android.widget.Toast.makeText(getContext(), "生成二维码失败", android.widget.Toast.LENGTH_SHORT).show();
                 return;
