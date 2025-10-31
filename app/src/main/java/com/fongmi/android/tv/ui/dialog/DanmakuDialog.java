@@ -1310,7 +1310,7 @@ public final class DanmakuDialog extends BaseDialog {
     private void showCastQRCode() {
         try {
             // 获取局域网地址和端口
-            String ip = Util.getIp();
+            String ip = com.github.catvod.utils.Util.getIp();
             int port = Proxy.getPort();
 
             if (ip.isEmpty()) {
