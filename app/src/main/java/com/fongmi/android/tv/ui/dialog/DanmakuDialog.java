@@ -26,6 +26,7 @@ import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.bean.DanmakuAnime;
 import com.fongmi.android.tv.bean.DanmakuEpisode;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.utils.Util;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.QRCode;
 import com.github.catvod.Proxy;
@@ -188,6 +189,11 @@ public final class DanmakuDialog extends BaseDialog {
             return false;
         });
 
+        searchInput.setOnKeyListener((v, keyCode, event) -> {
+            if (!Util.isLeanback() || event.getAction() != KeyEvent.ACTION_DOWN) return false;
+            return handleSearchInputDpad(keyCode);
+        });
+
         // 防止剧集列表滑动事件冒泡到父容器
         episodeResults.setOnTouchListener((v, event) -> {
             v.getParent().requestDisallowInterceptTouchEvent(true);
@@ -199,6 +205,37 @@ public final class DanmakuDialog extends BaseDialog {
             v.getParent().requestDisallowInterceptTouchEvent(true);
             return false;
         });
+    }
+
+    private boolean handleSearchInputDpad(int keyCode) {
+        int selectionStart = Math.max(searchInput.getSelectionStart(), 0);
+        int textLength = searchInput.getText() != null ? searchInput.getText().length() : 0;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_UP:
+                return moveFocusFromSearchInput(View.FOCUS_UP);
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if (isShowingEpisodeList && requestFocusIfAvailable(episodeResults)) return true;
+                if (requestFocusIfAvailable(searchResults)) return true;
+                return moveFocusFromSearchInput(View.FOCUS_DOWN);
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (selectionStart > 0) return false;
+                return moveFocusFromSearchInput(View.FOCUS_LEFT);
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (selectionStart < textLength) return false;
+                if (moveFocusFromSearchInput(View.FOCUS_RIGHT)) return true;
+                return requestFocusIfAvailable(searchButton);
+            default:
+                return false;
+        }
+    }
+
+    private boolean moveFocusFromSearchInput(int direction) {
+        View next = searchInput.focusSearch(direction);
+        return requestFocusIfAvailable(next);
+    }
+
+    private boolean requestFocusIfAvailable(View target) {
+        return target != null && target.isShown() && target.isFocusable() && target.requestFocus();
     }
 
     private void restoreSearchState() {

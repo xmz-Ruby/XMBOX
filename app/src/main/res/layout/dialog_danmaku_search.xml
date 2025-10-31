@@ -31,7 +31,7 @@
             android:focusableInTouchMode="true"
             android:selectAllOnFocus="true"
             android:nextFocusDown="@id/search_results"
-            android:nextFocusRight="@id/search_results"
+            android:nextFocusRight="@id/search_button"
             android:textSize="14sp" />
 
         <ImageView
@@ -41,6 +41,8 @@
             android:layout_marginStart="8dp"
             android:padding="10dp"
             android:src="@android:drawable/ic_menu_search"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="搜索" />
 
@@ -55,7 +57,9 @@
             android:gravity="center"
             android:textSize="13sp"
             android:textColor="?android:attr/textColorPrimary"
-            android:background="?attr/selectableItemBackground" />
+            android:background="?attr/selectableItemBackground"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
         <TextView
             android:id="@+id/jump_button"
@@ -68,7 +72,9 @@
             android:gravity="center"
             android:textSize="13sp"
             android:textColor="?android:attr/textColorPrimary"
-            android:background="?attr/selectableItemBackground" />
+            android:background="?attr/selectableItemBackground"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
         <ImageView
             android:id="@+id/settings_button"
@@ -77,6 +83,8 @@
             android:layout_marginStart="4dp"
             android:padding="10dp"
             android:src="@android:drawable/ic_menu_preferences"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="弹幕设置" />
 
@@ -87,6 +95,8 @@
             android:layout_marginStart="4dp"
             android:padding="10dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="关闭" />
 
