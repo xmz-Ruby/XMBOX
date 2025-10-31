@@ -476,7 +476,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void setVideoView() {
         mPlayers.init(mBinding.exo);
-        PlaybackService.start(mPlayers);
+        // PlaybackService.start(mPlayers); // 禁用通知服务
         ExoUtil.setSubtitleView(mBinding.exo);
         mPlayers.setDanmakuView(mBinding.danmaku);
         mPlayers.setTag(tag = UUID.randomUUID().toString());

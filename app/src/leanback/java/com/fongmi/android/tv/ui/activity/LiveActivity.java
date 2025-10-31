@@ -191,7 +191,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setVideoView() {
         mPlayers.init(mBinding.exo);
-        PlaybackService.start(mPlayers);
+        // PlaybackService.start(mPlayers); // 禁用通知服务
         setScale(Setting.getLiveScale());
         ExoUtil.setSubtitleView(mBinding.exo);
         mPlayers.setTag(tag = UUID.randomUUID().toString());

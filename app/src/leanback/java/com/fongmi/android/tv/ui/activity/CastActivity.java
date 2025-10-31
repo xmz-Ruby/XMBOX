@@ -141,7 +141,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     private void setVideoView() {
         mPlayers.init(mBinding.exo);
-        PlaybackService.start(mPlayers);
+        // PlaybackService.start(mPlayers); // 禁用通知服务
         setScale(scale = Setting.getScale());
         ExoUtil.setSubtitleView(mBinding.exo);
         mPlayers.setTag(tag = UUID.randomUUID().toString());

@@ -112,6 +112,10 @@ public class PlaybackService extends Service {
         builder.setSmallIcon(R.drawable.ic_logo);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         builder.setDeleteIntent(ActionReceiver.getPendingIntent(this, ActionEvent.STOP));
+        // Android 12+ 前台服务通知必须设置 ForegroundServiceBehavior
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE);
+        }
         if (nonNull()) builder.setContentIntent(player.getSession().getController().getSessionActivity());
         if (nonNull()) builder.setStyle(new MediaStyle().setMediaSession(player.getSession().getSessionToken()));
         addAction(builder);
