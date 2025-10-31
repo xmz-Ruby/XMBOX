@@ -58,6 +58,7 @@ import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
+import com.github.catvod.utils.Path;
 import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
@@ -549,11 +550,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         if (resultCode != Activity.RESULT_OK) return;
         if (requestCode == FileChooser.REQUEST_PICK_CONFIG_FILE) {
             // 处理配置文件选择：添加为配置源并刷新播放源
-            String filePath = FileChooser.getPathFromUri(getContext(), data.getData());
-            if (filePath != null) {
-                String fileUrl = "file://" + filePath;
-                setConfig(Config.find(fileUrl, 0));
-            }
+            String fileUrl = Path.toFileUrl(FileChooser.getPathFromUri(getContext(), data.getData()));
+            if (fileUrl != null) setConfig(Config.find(fileUrl, 0));
         } else if (requestCode == FileChooser.REQUEST_PICK_FILE) {
             // 处理视频文件选择：直接播放
             VideoActivity.file(getActivity(), FileChooser.getPathFromUri(getContext(), data.getData()));
