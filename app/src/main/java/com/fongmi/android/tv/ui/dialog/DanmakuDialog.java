@@ -30,7 +30,6 @@ import com.fongmi.android.tv.utils.Util;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.QRCode;
 import com.github.catvod.Proxy;
-import com.github.catvod.utils.Util;
 import com.orhanobut.logger.Logger;
 
 import android.graphics.Bitmap;
