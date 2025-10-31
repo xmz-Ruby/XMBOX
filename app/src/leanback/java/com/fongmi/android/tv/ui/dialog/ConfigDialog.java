@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -142,8 +144,16 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         String text = binding.text.getText().toString().trim();
         if (edit) Config.find(url, type).url(text).update();
         if (text.isEmpty()) Config.delete(url, type);
-        if (name.isEmpty()) callback.setConfig(Config.find(text, type));
-        else callback.setConfig(Config.find(text, name, type));
+
+        Config config = name.isEmpty() ? Config.find(text, type) : Config.find(text, name, type);
+
+        // 设置播放源时申请存储权限
+        if (!PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> callback.setConfig(config));
+        } else {
+            callback.setConfig(config);
+        }
+
         dialog.dismiss();
     }
 

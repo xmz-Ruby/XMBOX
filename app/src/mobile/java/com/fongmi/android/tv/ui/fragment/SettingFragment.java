@@ -519,11 +519,25 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             // 处理配置文件选择：添加为配置源并刷新
             String filePath = FileChooser.getPathFromUri(getContext(), data.getData());
             if (filePath != null) {
-                setConfig(Config.find("file:/" + filePath.replace(Path.rootPath(), ""), type));
+                String fileUrl = "file:/" + filePath.replace(Path.rootPath(), "");
+                Config config = Config.find(fileUrl, type);
+                // 文件选择后申请存储权限
+                if (!PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> setConfig(config));
+                } else {
+                    setConfig(config);
+                }
             }
         } else if (requestCode == FileChooser.REQUEST_PICK_FILE) {
             // 处理其他文件选择
-            setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), ""), type));
+            String filePath = "file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), "");
+            Config config = Config.find(filePath, type);
+            // 文件选择后申请存储权限
+            if (!PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> setConfig(config));
+            } else {
+                setConfig(config);
+            }
         }
     }
 }

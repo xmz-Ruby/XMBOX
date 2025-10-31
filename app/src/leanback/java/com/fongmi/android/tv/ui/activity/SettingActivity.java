@@ -413,6 +413,13 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
-        setConfig(Config.find("file:/" + FileChooser.getPathFromUri(this, data.getData()).replace(Path.rootPath(), ""), type));
+        String filePath = "file:/" + FileChooser.getPathFromUri(this, data.getData()).replace(Path.rootPath(), "");
+        Config config = Config.find(filePath, type);
+        // 文件选择后申请存储权限
+        if (!PermissionX.isGranted(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> setConfig(config));
+        } else {
+            setConfig(config);
+        }
     }
 }

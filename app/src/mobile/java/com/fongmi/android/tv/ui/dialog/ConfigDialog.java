@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.Manifest;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +26,7 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.permissionx.guolindev.PermissionX;
 
 public class ConfigDialog {
 
@@ -145,22 +147,37 @@ public class ConfigDialog {
     private void onPositive(DialogInterface dialog, int which) {
         String url = binding.url.getText().toString().trim();
         String name = binding.name.getText().toString().trim();
-        
+
         // 如果是编辑模式，更新现有配置
         if (edit) Config.find(ori, type).url(url).name(name).update();
-        
+
         // 如果URL为空，删除配置
         if (url.isEmpty()) {
             Config.delete(ori, type);
             dialog.dismiss();
             return;
         }
-        
+
         // 只有URL不为空时，才设置配置
         // 保存原始URL，以便在添加失败时恢复
         String originalUrl = ori;
-        callback.setConfig(Config.find(url, type));
-        
+        Config config = Config.find(url, type);
+
+        // 设置播放源时申请存储权限
+        if (!PermissionX.isGranted(fragment.getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            PermissionX.init(fragment).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> {
+                callback.setConfig(config);
+                checkConfigLoad(url, originalUrl);
+            });
+        } else {
+            callback.setConfig(config);
+            checkConfigLoad(url, originalUrl);
+        }
+
+        dialog.dismiss();
+    }
+
+    private void checkConfigLoad(String url, String originalUrl) {
         // 添加一个延迟检查，如果配置没有成功加载，则恢复原始URL
         new android.os.Handler().postDelayed(() -> {
             // 检查配置是否成功加载
@@ -177,10 +194,10 @@ public class ConfigDialog {
                             VodConfig.get().clear().config(Config.vod()).load(new Callback() {
                                 @Override
                                 public void success() {}
-                                
+
                                 @Override
                                 public void success(String result) {}
-                                
+
                                 @Override
                                 public void error(String msg) {}
                             });
@@ -189,10 +206,10 @@ public class ConfigDialog {
                             LiveConfig.get().clear().config(Config.live()).load(new Callback() {
                                 @Override
                                 public void success() {}
-                                
+
                                 @Override
                                 public void success(String result) {}
-                                
+
                                 @Override
                                 public void error(String msg) {}
                             });
@@ -201,10 +218,10 @@ public class ConfigDialog {
                             WallConfig.get().clear().config(Config.wall()).load(new Callback() {
                                 @Override
                                 public void success() {}
-                                
+
                                 @Override
                                 public void success(String result) {}
-                                
+
                                 @Override
                                 public void error(String msg) {}
                             });
@@ -213,8 +230,6 @@ public class ConfigDialog {
                 }
             }
         }, 2000); // 2秒后检查
-        
-        dialog.dismiss();
     }
 
     private void onNegative(DialogInterface dialog, int which) {
