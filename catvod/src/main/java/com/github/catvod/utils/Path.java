@@ -139,6 +139,8 @@ public class Path {
         String path = absolutePath.trim();
         if (path.isEmpty()) return null;
         if (path.startsWith("file://")) return path;
+        File target = new File(path);
+        if (target.isDirectory()) return null;
         String root = rootPath();
         if (!root.isEmpty() && path.startsWith(root)) {
             String relative = path.substring(root.length());

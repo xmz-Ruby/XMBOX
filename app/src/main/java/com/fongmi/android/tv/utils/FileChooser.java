@@ -148,7 +148,12 @@ public class FileChooser {
             InputStream is = context.getContentResolver().openInputStream(uri);
             if (is == null) return null;
             int column = cursor.getColumnIndexOrThrow(projection[0]);
-            File file = Path.cache(cursor.getString(column));
+            String name = cursor.getString(column);
+            if (name == null || name.trim().isEmpty()) {
+                name = "tmp_" + System.currentTimeMillis();
+            }
+            File file = Path.cache(name);
+            if (file.isDirectory()) file = new File(file, "tmp_" + System.currentTimeMillis());
             Path.copy(is, file);
             return file.getAbsolutePath();
         } catch (Exception e) {

@@ -3,6 +3,8 @@ package com.fongmi.android.tv.ui.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -547,11 +549,18 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK) return;
+        if (resultCode != Activity.RESULT_OK || data == null) return;
         if (requestCode == FileChooser.REQUEST_PICK_CONFIG_FILE) {
             // 处理配置文件选择：添加为配置源并刷新播放源
-            String fileUrl = Path.toFileUrl(FileChooser.getPathFromUri(getContext(), data.getData()));
-            if (fileUrl != null) setConfig(Config.find(fileUrl, 0));
+            String rawPath = FileChooser.getPathFromUri(getContext(), data.getData());
+            Log.d("VodFragment", "REQUEST_PICK_CONFIG_FILE path=" + rawPath);
+            String fileUrl = Path.toFileUrl(rawPath);
+            Log.d("VodFragment", "REQUEST_PICK_CONFIG_FILE url=" + fileUrl);
+            if (!TextUtils.isEmpty(fileUrl)) {
+                setConfig(Config.find(fileUrl, 0));
+            } else {
+                Notify.show(R.string.error_config_url);
+            }
         } else if (requestCode == FileChooser.REQUEST_PICK_FILE) {
             // 处理视频文件选择：直接播放
             VideoActivity.file(getActivity(), FileChooser.getPathFromUri(getContext(), data.getData()));

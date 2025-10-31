@@ -8,6 +8,7 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -472,15 +473,27 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK) return;
+        if (resultCode != Activity.RESULT_OK || data == null) return;
+        String path = FileChooser.getPathFromUri(getContext(), data.getData());
+        Log.d("SettingFragment", "onActivityResult path=" + path + " requestCode=" + requestCode);
         if (requestCode == FileChooser.REQUEST_PICK_CONFIG_FILE) {
             // 处理配置文件选择：添加为配置源并刷新
-            String fileUrl = Path.toFileUrl(FileChooser.getPathFromUri(getContext(), data.getData()));
-            if (!TextUtils.isEmpty(fileUrl)) setConfig(Config.find(fileUrl, type));
+            String fileUrl = Path.toFileUrl(path);
+            Log.d("SettingFragment", "REQUEST_PICK_CONFIG_FILE url=" + fileUrl + " type=" + type);
+            if (!TextUtils.isEmpty(fileUrl)) {
+                setConfig(Config.find(fileUrl, type));
+            } else {
+                Notify.show(R.string.error_config_url);
+            }
         } else if (requestCode == FileChooser.REQUEST_PICK_FILE) {
             // 处理其他文件选择
-            String fileUrl = Path.toFileUrl(FileChooser.getPathFromUri(getContext(), data.getData()));
-            if (!TextUtils.isEmpty(fileUrl)) setConfig(Config.find(fileUrl, type));
+            String fileUrl = Path.toFileUrl(path);
+            Log.d("SettingFragment", "REQUEST_PICK_FILE url=" + fileUrl + " type=" + type);
+            if (!TextUtils.isEmpty(fileUrl)) {
+                setConfig(Config.find(fileUrl, type));
+            } else {
+                Notify.show(R.string.error_config_url);
+            }
         }
     }
 }
