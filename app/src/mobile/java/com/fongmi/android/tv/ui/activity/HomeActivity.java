@@ -38,6 +38,7 @@ import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 import com.google.android.material.navigation.NavigationBarView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -92,7 +93,8 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
             VideoActivity.push(this, intent.getStringExtra(Intent.EXTRA_TEXT));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             if ("text/plain".equals(intent.getType()) || UrlUtil.path(intent.getData()).endsWith(".m3u")) {
-                loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
+                String fileUrl = Path.toFileUrl(FileChooser.getPathFromUri(this, intent.getData()));
+                if (fileUrl != null) loadLive(fileUrl);
             } else {
                 VideoActivity.push(this, intent.getData().toString());
             }

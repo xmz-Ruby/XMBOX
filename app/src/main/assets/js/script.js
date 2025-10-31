@@ -73,14 +73,14 @@ function selectFile(path, canDel) {
     current_file = path;
     if (canDel) $("#delFileBtn").show();
     else $("#delFileBtn").hide();
-    $("#fileUrl").html("file:/" + current_file);
+    $("#fileUrl").html("file://" + current_file);
     $("#fileInfoDialog").show();
 }
 
 function pushFile(yes) {
     hideFileInfo();
     if (yes == 1) {
-        file("file:/" + current_file);
+        file("file://" + current_file);
     }
 }
 

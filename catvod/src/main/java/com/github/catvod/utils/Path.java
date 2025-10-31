@@ -116,9 +116,37 @@ public class Path {
     }
 
     public static File local(String path) {
-        path = path.replace("file:/", "");
-        File file = new File(root(), path);
-        return file.exists() ? file : new File(path);
+        if (path == null) return new File("");
+        String value;
+        if (path.startsWith("file://")) {
+            value = path.substring(7);
+        } else if (path.startsWith("file:/")) {
+            value = path.substring(6);
+        } else {
+            value = path;
+        }
+        if (value.startsWith("/")) {
+            File absolute = new File(value);
+            if (absolute.exists()) return absolute;
+            value = value.length() > 1 ? value.substring(1) : value;
+        }
+        File file = new File(root(), value);
+        return file.exists() ? file : new File(value);
+    }
+
+    public static String toFileUrl(String absolutePath) {
+        if (absolutePath == null) return null;
+        String path = absolutePath.trim();
+        if (path.isEmpty()) return null;
+        if (path.startsWith("file://")) return path;
+        String root = rootPath();
+        if (!root.isEmpty() && path.startsWith(root)) {
+            String relative = path.substring(root.length());
+            while (relative.startsWith("/")) relative = relative.substring(1);
+            if (!relative.isEmpty()) return "file://" + relative;
+        }
+        if (!path.startsWith("/")) path = "/" + path;
+        return "file://" + path;
     }
 
     public static String read(File file) {

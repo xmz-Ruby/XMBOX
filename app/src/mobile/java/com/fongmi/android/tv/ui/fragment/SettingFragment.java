@@ -475,13 +475,12 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         if (resultCode != Activity.RESULT_OK) return;
         if (requestCode == FileChooser.REQUEST_PICK_CONFIG_FILE) {
             // 处理配置文件选择：添加为配置源并刷新
-            String filePath = FileChooser.getPathFromUri(getContext(), data.getData());
-            if (filePath != null) {
-                setConfig(Config.find("file:/" + filePath.replace(Path.rootPath(), ""), type));
-            }
+            String fileUrl = Path.toFileUrl(FileChooser.getPathFromUri(getContext(), data.getData()));
+            if (!TextUtils.isEmpty(fileUrl)) setConfig(Config.find(fileUrl, type));
         } else if (requestCode == FileChooser.REQUEST_PICK_FILE) {
             // 处理其他文件选择
-            setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), ""), type));
+            String fileUrl = Path.toFileUrl(FileChooser.getPathFromUri(getContext(), data.getData()));
+            if (!TextUtils.isEmpty(fileUrl)) setConfig(Config.find(fileUrl, type));
         }
     }
 }

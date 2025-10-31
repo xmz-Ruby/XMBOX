@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
@@ -375,6 +376,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
-        setConfig(Config.find("file:/" + FileChooser.getPathFromUri(this, data.getData()).replace(Path.rootPath(), ""), type));
+        String fileUrl = Path.toFileUrl(FileChooser.getPathFromUri(this, data.getData()));
+        if (!TextUtils.isEmpty(fileUrl)) setConfig(Config.find(fileUrl, type));
     }
 }
