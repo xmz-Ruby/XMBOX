@@ -65,5 +65,6 @@ public abstract class BaseDialog extends BottomSheetDialogFragment {
         BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         behavior.setSkipCollapsed(true);
+        behavior.setDraggable(false); // 禁用拖拽，防止与内部滑动冲突
     }
 }

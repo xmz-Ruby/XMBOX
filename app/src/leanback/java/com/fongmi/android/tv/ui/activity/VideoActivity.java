@@ -591,6 +591,14 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 return;
             }
 
+            // 检查当前播放的影视剧是否与弹幕搜索的影视剧匹配
+            String currentVideoName = mBinding.name.getText().toString();
+            if (danmakuState.isVideoChanged(currentVideoName)) {
+                com.orhanobut.logger.Logger.t("VideoActivity").d("影视剧已切换，清理旧的弹幕状态");
+                danmakuState.clear();
+                return;
+            }
+
             // 获取当前剧集的索引
             int episodeIndex = episode.getIndex();
             if (episodeIndex <= 0) {
@@ -609,9 +617,26 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 mPlayers.setDanmaku(danmaku);
 
                 com.orhanobut.logger.Logger.t("VideoActivity").d("✓ 自动加载弹幕成功: " + danmakuEpisode.getDisplayTitle());
-                Notify.show("已自动切换弹幕：" + danmakuEpisode.getDisplayTitle());
+
+                // 获取番剧名称用于更完整的提示
+                String animeName = "";
+                if (danmakuState.getSelectedAnime() != null) {
+                    animeName = danmakuState.getSelectedAnime().getDisplayTitle();
+                }
+
+                // 显示更详细的弹幕提示信息
+                String message;
+                if (!animeName.isEmpty()) {
+                    message = String.format("当前弹幕：%s - %s", animeName, danmakuEpisode.getDisplayTitle());
+                } else {
+                    message = "当前弹幕：" + danmakuEpisode.getDisplayTitle();
+                }
+                // 使用Toast.LENGTH_LONG显示更长时间，让用户看清楚
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             } else {
                 com.orhanobut.logger.Logger.t("VideoActivity").d("✗ 未找到对应的弹幕剧集");
+                // 提示用户未找到对应弹幕
+                Notify.show("未找到第" + episodeIndex + "集的弹幕");
             }
         } catch (Exception e) {
             com.orhanobut.logger.Logger.t("VideoActivity").e("自动加载弹幕失败", e);

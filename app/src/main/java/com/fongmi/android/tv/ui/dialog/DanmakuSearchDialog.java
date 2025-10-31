@@ -48,13 +48,15 @@ public class DanmakuSearchDialog extends BaseDialog {
     private TextView loadingText;
     private LinearLayout emptyContainer;
     private TextView emptyText;
-    private LinearLayout contentContainer;
+    private FrameLayout contentContainer;
     private RecyclerView searchResults;
     private LinearLayout episodeContainer;
     private RecyclerView episodeResults;
-    private LinearLayout episodeActions;
     private TextView reverseButton;
     private TextView jumpButton;
+    private LinearLayout animeListContainer;
+    private ImageView animeToggleButton;
+    private ImageView animeExpandButton;
 
     private DanmakuAnimeAdapter animeAdapter;
     private DanmakuEpisodeAdapter episodeAdapter;
@@ -64,6 +66,7 @@ public class DanmakuSearchDialog extends BaseDialog {
     private List<DanmakuEpisode> currentEpisodes;
     private boolean isReversed = false;
     private int highlightedEpisodePosition = -1; // 当前高亮的剧集位置
+    private boolean isShowingEpisodeList = false; // 当前是否展示剧集列表
 
     public static DanmakuSearchDialog create() {
         return new DanmakuSearchDialog();
@@ -103,9 +106,11 @@ public class DanmakuSearchDialog extends BaseDialog {
         searchResults = view.findViewById(R.id.search_results);
         episodeContainer = view.findViewById(R.id.episode_container);
         episodeResults = view.findViewById(R.id.episode_results);
-        episodeActions = view.findViewById(R.id.episode_actions);
         reverseButton = view.findViewById(R.id.reverse_button);
         jumpButton = view.findViewById(R.id.jump_button);
+        animeListContainer = view.findViewById(R.id.anime_list_container);
+        animeToggleButton = view.findViewById(R.id.anime_toggle_button);
+        animeExpandButton = view.findViewById(R.id.anime_expand_button);
     }
 
     @Override
@@ -119,6 +124,7 @@ public class DanmakuSearchDialog extends BaseDialog {
 
         episodeAdapter = new DanmakuEpisodeAdapter(this::onEpisodeClick);
         episodeResults.setAdapter(episodeAdapter);
+        showAnimeListOnly();
 
         // 恢复搜索状态
         restoreSearchState();
@@ -130,6 +136,8 @@ public class DanmakuSearchDialog extends BaseDialog {
         closeButton.setOnClickListener(v -> dismiss());
         reverseButton.setOnClickListener(v -> reverseEpisodes());
         jumpButton.setOnClickListener(v -> showJumpDialog());
+        animeToggleButton.setOnClickListener(v -> toggleAnimeList());
+        animeExpandButton.setOnClickListener(v -> toggleAnimeList());
 
         searchInput.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH ||
@@ -147,16 +155,11 @@ public class DanmakuSearchDialog extends BaseDialog {
                        ", hasEpisodes: " + searchState.hasEpisodes() +
                        ", hasAutoSearched: " + searchState.hasAutoSearched());
 
-        // 检查当前播放的影视剧是否与保存的关键词匹配
+        // 首先检查是否切换了影视剧（最重要的检查）
         String currentTitle = player != null ? player.getTitle() : "";
-        if (!searchState.getLastKeyword().isEmpty() && !currentTitle.isEmpty()) {
-            boolean isMatch = searchState.isKeywordMatchTitle(currentTitle);
-            Logger.t(TAG).d("关键词匹配检查 - 当前标题: " + currentTitle + ", 保存关键词: " + searchState.getLastKeyword() + ", 匹配: " + isMatch);
-
-            if (!isMatch) {
-                Logger.t(TAG).d("检测到影视剧切换，清理旧状态");
-                searchState.clear();
-            }
+        if (searchState.isVideoChanged(currentTitle)) {
+            Logger.t(TAG).d("检测到影视剧切换，清理所有旧状态");
+            searchState.clear();
         }
 
         // 恢复搜索关键词
@@ -724,6 +727,7 @@ public class DanmakuSearchDialog extends BaseDialog {
         emptyContainer.setVisibility(View.GONE);
         // 只显示番剧列表，剧集列表为空
         episodeAdapter.setData(new java.util.ArrayList<>());
+        showAnimeListOnly();
     }
 
     /**
@@ -746,6 +750,7 @@ public class DanmakuSearchDialog extends BaseDialog {
         contentContainer.setVisibility(View.VISIBLE);
         loadingContainer.setVisibility(View.GONE);
         emptyContainer.setVisibility(View.GONE);
+        showEpisodeListOnly();
 
         Logger.t(TAG).d("UI状态已更新，开始查找当前集数");
 
@@ -842,6 +847,51 @@ public class DanmakuSearchDialog extends BaseDialog {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 切换番剧列表的展开/收起状态
+     */
+    private void toggleAnimeList() {
+        if (isShowingEpisodeList) {
+            showAnimeListOnly();
+        } else if (episodeAdapter != null && episodeAdapter.getItemCount() > 0) {
+            showEpisodeListOnly();
+        } else {
+            android.widget.Toast.makeText(getContext(), "请先选择番剧加载剧集", android.widget.Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 只显示番剧列表
+     */
+    private void showAnimeListOnly() {
+        isShowingEpisodeList = false;
+        animeListContainer.setVisibility(View.VISIBLE);
+        episodeContainer.setVisibility(View.GONE);
+        animeExpandButton.setVisibility(View.GONE);
+        if (episodeAdapter == null || episodeAdapter.getItemCount() == 0) {
+            animeToggleButton.setVisibility(View.GONE);
+        } else {
+            animeToggleButton.setVisibility(View.VISIBLE);
+        }
+        searchResults.post(() -> searchResults.requestFocus());
+    }
+
+    /**
+     * 只显示剧集列表
+     */
+    private void showEpisodeListOnly() {
+        if (episodeAdapter == null || episodeAdapter.getItemCount() == 0) {
+            android.widget.Toast.makeText(getContext(), "请先选择番剧加载剧集", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+        isShowingEpisodeList = true;
+        animeListContainer.setVisibility(View.GONE);
+        episodeContainer.setVisibility(View.VISIBLE);
+        animeExpandButton.setVisibility(View.VISIBLE);
+        animeToggleButton.setVisibility(View.VISIBLE);
+        episodeResults.post(() -> episodeResults.requestFocus());
     }
 
     // 番剧适配器

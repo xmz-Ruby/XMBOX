@@ -23,6 +23,12 @@ public class DanmakuSearchState {
     private List<DanmakuEpisode> episodes = new ArrayList<>();
     private int selectedAnimePosition = -1;
     private boolean hasAutoSearched = false; // 标记是否已经自动搜索过
+    private boolean isFirstTimeShowingEpisodes = true; // 标记是否首次显示剧集列表
+    private String lastEpisodeTitle = ""; // 记录上次打开对话框时的剧集标题
+    private int highlightedEpisodePosition = -1; // 高亮的剧集位置
+    private com.fongmi.android.tv.bean.Danmaku currentSelectedDanmaku = null; // 保存当前选中的弹幕引用
+    private int userSelectedEpisodePosition = -1; // 用户选择的弹幕剧集位置
+    private String lastVideoTitle = ""; // 记录上次的影视剧标题（用于检测影视剧切换）
 
     private DanmakuSearchState() {}
 
@@ -96,12 +102,103 @@ public class DanmakuSearchState {
         return cleanTitle.contains(lastKeyword) || lastKeyword.contains(cleanTitle);
     }
 
+    /**
+     * 检查是否切换了影视剧
+     * @param currentTitle 当前播放的影视剧标题
+     * @return true表示切换了影视剧，需要清理状态
+     */
+    public boolean isVideoChanged(String currentTitle) {
+        if (currentTitle == null || currentTitle.isEmpty()) {
+            return false;
+        }
+
+        // 清理标题中的集数信息，只保留剧名
+        String cleanCurrentTitle = cleanTitle(currentTitle);
+        String cleanLastTitle = cleanTitle(lastVideoTitle);
+
+        // 如果是第一次记录，不算切换
+        if (lastVideoTitle.isEmpty()) {
+            Logger.t(TAG).d("首次记录影视剧标题: " + cleanCurrentTitle);
+            lastVideoTitle = currentTitle;
+            return false;
+        }
+
+        // 比较清理后的标题
+        boolean changed = !cleanCurrentTitle.equals(cleanLastTitle);
+        if (changed) {
+            Logger.t(TAG).d("检测到影视剧切换: " + cleanLastTitle + " -> " + cleanCurrentTitle);
+            lastVideoTitle = currentTitle;
+        }
+
+        return changed;
+    }
+
+    /**
+     * 清理标题，去除集数信息
+     */
+    private String cleanTitle(String title) {
+        if (title == null || title.isEmpty()) {
+            return "";
+        }
+        return title.replaceAll("第\\d+集", "")
+                    .replaceAll("\\d+集", "")
+                    .replaceAll("EP\\d+", "")
+                    .replaceAll("E\\d+", "")
+                    .replaceAll("第\\d+话", "")
+                    .replaceAll("\\d+话", "")
+                    .replaceAll("\\[.*?\\]", "")
+                    .replaceAll("\\(.*?\\)", "")
+                    .replaceAll("【.*?】", "")
+                    .replaceAll("（.*?）", "")
+                    .trim();
+    }
+
     public boolean hasAutoSearched() {
         return hasAutoSearched;
     }
 
     public void setAutoSearched(boolean searched) {
         this.hasAutoSearched = searched;
+    }
+
+    public boolean isFirstTimeShowingEpisodes() {
+        return isFirstTimeShowingEpisodes;
+    }
+
+    public void setFirstTimeShowingEpisodes(boolean firstTime) {
+        this.isFirstTimeShowingEpisodes = firstTime;
+    }
+
+    public String getLastEpisodeTitle() {
+        return lastEpisodeTitle;
+    }
+
+    public void setLastEpisodeTitle(String title) {
+        this.lastEpisodeTitle = title;
+    }
+
+    public int getHighlightedEpisodePosition() {
+        return highlightedEpisodePosition;
+    }
+
+    public void setHighlightedEpisodePosition(int position) {
+        this.highlightedEpisodePosition = position;
+    }
+
+    public com.fongmi.android.tv.bean.Danmaku getCurrentSelectedDanmaku() {
+        return currentSelectedDanmaku;
+    }
+
+    public void setCurrentSelectedDanmaku(com.fongmi.android.tv.bean.Danmaku danmaku) {
+        this.currentSelectedDanmaku = danmaku;
+    }
+
+    public int getUserSelectedEpisodePosition() {
+        return userSelectedEpisodePosition;
+    }
+
+    public void setUserSelectedEpisodePosition(int position) {
+        this.userSelectedEpisodePosition = position;
     }
 
     public void clear() {
@@ -112,6 +209,12 @@ public class DanmakuSearchState {
         episodes.clear();
         selectedAnimePosition = -1;
         hasAutoSearched = false;
+        isFirstTimeShowingEpisodes = true;
+        lastEpisodeTitle = "";
+        highlightedEpisodePosition = -1;
+        currentSelectedDanmaku = null;
+        userSelectedEpisodePosition = -1;
+        lastVideoTitle = "";
         Logger.t(TAG).d("状态已清理");
     }
 
