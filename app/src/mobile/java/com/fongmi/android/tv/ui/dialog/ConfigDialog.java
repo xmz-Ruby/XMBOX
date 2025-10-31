@@ -23,7 +23,6 @@ import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
-import com.fongmi.android.tv.utils.FileChooser;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class ConfigDialog {
@@ -106,7 +105,10 @@ public class ConfigDialog {
     }
 
     private void onChoose(View view) {
-        FileChooser.from(fragment).show("*/*", new String[]{"*/*"}, FileChooser.REQUEST_PICK_CONFIG_FILE);
+        ConfigFileDialog.create().show(fragment.getActivity(), file -> {
+            binding.url.setText("file://" + file.getAbsolutePath());
+            binding.url.setSelection(binding.url.getText().length());
+        });
         dialog.dismiss();
     }
 

@@ -20,7 +20,6 @@ import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
-import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -116,7 +115,10 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void onChoose(View view) {
-        FileChooser.from(activity).show();
+        ConfigFileDialog.create(activity).show(file -> {
+            binding.text.setText("file://" + file.getAbsolutePath());
+            binding.text.setSelection(binding.text.getText().length());
+        });
         dialog.dismiss();
     }
 

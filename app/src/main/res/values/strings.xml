@@ -88,6 +88,8 @@
     <string name="setting_cache_threshold">Cache Threshold</string>
     <string name="setting_backup">备份</string>
     <string name="setting_restore">恢复</string>
+    <string name="setting_config_file">选择配置文件</string>
+    <string name="setting_config_file_empty">没有找到配置文件</string>
     <string name="setting_version">版本</string>
     <string name="setting_choose">Choose</string>
     <string name="setting_off">Off</string>
