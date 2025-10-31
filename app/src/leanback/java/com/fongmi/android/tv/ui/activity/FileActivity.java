@@ -11,6 +11,7 @@ import com.fongmi.android.tv.databinding.ActivityFileBinding;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.presenter.FilePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.Init;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
@@ -22,7 +23,7 @@ public class FileActivity extends BaseActivity implements FilePresenter.OnClickL
     private File dir;
 
     private boolean isRoot() {
-        return Path.root().equals(dir);
+        return Init.context().getFilesDir().equals(dir);
     }
 
     @Override
@@ -33,7 +34,7 @@ public class FileActivity extends BaseActivity implements FilePresenter.OnClickL
     @Override
     protected void initView() {
         setRecyclerView();
-        update(Path.root());
+        update(Init.context().getFilesDir());
     }
 
     private void setRecyclerView() {

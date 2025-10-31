@@ -9,6 +9,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.databinding.ActivityFileBinding;
 import com.fongmi.android.tv.ui.adapter.FileAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.github.catvod.Init;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
@@ -20,7 +21,7 @@ public class FileActivity extends BaseActivity implements FileAdapter.OnClickLis
     private File dir;
 
     private boolean isRoot() {
-        return Path.root().equals(dir);
+        return Init.context().getFilesDir().equals(dir);
     }
 
     @Override
@@ -31,7 +32,7 @@ public class FileActivity extends BaseActivity implements FileAdapter.OnClickLis
     @Override
     protected void initView(Bundle savedInstanceState) {
         setRecyclerView();
-        update(Path.root());
+        update(Init.context().getFilesDir());
     }
 
     private void setRecyclerView() {

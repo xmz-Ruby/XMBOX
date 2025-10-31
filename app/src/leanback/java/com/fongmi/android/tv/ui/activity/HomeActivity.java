@@ -497,7 +497,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         LiveConfig.get().clear();
         VodConfig.get().clear();
         OkHttp.get().clear();
-        AppDatabase.backup();
         Server.get().stop();
         Source.get().exit();
         super.onDestroy();

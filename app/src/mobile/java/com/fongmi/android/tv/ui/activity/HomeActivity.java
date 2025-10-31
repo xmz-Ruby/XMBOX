@@ -232,7 +232,6 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         LiveConfig.get().clear();
         VodConfig.get().clear();
         OkHttp.get().clear();
-        AppDatabase.backup();
         Source.get().exit();
         Server.get().stop();
         super.onDestroy();
