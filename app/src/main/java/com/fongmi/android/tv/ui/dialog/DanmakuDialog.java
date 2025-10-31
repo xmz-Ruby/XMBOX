@@ -26,7 +26,13 @@ import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.bean.DanmakuAnime;
 import com.fongmi.android.tv.bean.DanmakuEpisode;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.utils.QRCode;
+import com.github.catvod.Proxy;
+import com.github.catvod.utils.Util;
 import com.orhanobut.logger.Logger;
+
+import android.graphics.Bitmap;
 
 import java.util.List;
 
@@ -133,6 +139,34 @@ public final class DanmakuDialog extends BaseDialog {
 
     @Override
     protected void initEvent() {
+        // 将搜索输入框设为只读，但保持可聚焦（遥控器可选中）
+        searchInput.setFocusable(true);
+        searchInput.setFocusableInTouchMode(true);
+        searchInput.setCursorVisible(false);
+        searchInput.setKeyListener(null); // 禁止键盘输入，保持只读
+
+        // 点击输入框显示投送二维码
+        searchInput.setOnClickListener(v -> showCastQRCode());
+
+        // 遥控器按确认键也显示投送二维码，方向键不拦截以便导航
+        searchInput.setOnKeyListener((v, keyCode, event) -> {
+            // 只处理确认键，方向键返回 false 让系统处理焦点导航
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
+                    showCastQRCode();
+                    return true;
+                }
+                // 方向键不拦截，返回 false 让系统处理焦点切换
+                if (keyCode == KeyEvent.KEYCODE_DPAD_UP ||
+                    keyCode == KeyEvent.KEYCODE_DPAD_DOWN ||
+                    keyCode == KeyEvent.KEYCODE_DPAD_LEFT ||
+                    keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                    return false;
+                }
+            }
+            return false;
+        });
+
         searchButton.setOnClickListener(v -> performSearch());
         settingsButton.setOnClickListener(this::showSettings);
         closeButton.setOnClickListener(v -> dismiss());
@@ -1231,6 +1265,87 @@ public final class DanmakuDialog extends BaseDialog {
                 title = view.findViewById(R.id.episode_title);
                 highlight = view.findViewById(R.id.episode_highlight);
             }
+        }
+    }
+
+    /**
+     * 显示投送二维码对话框
+     */
+    private void showCastQRCode() {
+        try {
+            // 获取局域网地址和端口
+            String ip = Util.getIp();
+            int port = Proxy.getPort();
+
+            if (ip.isEmpty()) {
+                android.widget.Toast.makeText(getContext(), "无法获取局域网IP地址", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 生成投送URL - 指向弹幕搜索页面
+            String castUrl = "http://" + ip + ":" + port + "/danmaku";
+            Logger.t(TAG).d("生成投送URL: " + castUrl);
+
+            // 生成二维码
+            Bitmap qrBitmap = QRCode.getBitmap(castUrl, 200, 1);
+            if (qrBitmap == null) {
+                android.widget.Toast.makeText(getContext(), "生成二维码失败", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 创建对话框显示二维码
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+
+            // 创建自定义布局
+            LinearLayout layout = new LinearLayout(getContext());
+            layout.setOrientation(LinearLayout.VERTICAL);
+            layout.setPadding(40, 40, 40, 40);
+            layout.setGravity(android.view.Gravity.CENTER);
+
+            // 添加标题文本
+            TextView titleText = new TextView(getContext());
+            titleText.setText("扫描二维码进行弹幕投送");
+            titleText.setTextSize(16);
+            titleText.setGravity(android.view.Gravity.CENTER);
+            titleText.setPadding(0, 0, 0, 20);
+            layout.addView(titleText);
+
+            // 添加二维码图片
+            ImageView qrImageView = new ImageView(getContext());
+            qrImageView.setImageBitmap(qrBitmap);
+            LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            imageParams.gravity = android.view.Gravity.CENTER;
+            qrImageView.setLayoutParams(imageParams);
+            layout.addView(qrImageView);
+
+            // 添加URL文本
+            TextView urlText = new TextView(getContext());
+            urlText.setText(castUrl);
+            urlText.setTextSize(12);
+            urlText.setGravity(android.view.Gravity.CENTER);
+            urlText.setPadding(0, 20, 0, 0);
+            urlText.setTextColor(0xFF999999);
+            layout.addView(urlText);
+
+            // 添加说明文本
+            TextView hintText = new TextView(getContext());
+            hintText.setText("使用手机扫描二维码\n在手机上搜索并投送弹幕到电视");
+            hintText.setTextSize(12);
+            hintText.setGravity(android.view.Gravity.CENTER);
+            hintText.setPadding(0, 10, 0, 0);
+            hintText.setTextColor(0xFF666666);
+            layout.addView(hintText);
+
+            builder.setView(layout);
+            builder.setPositiveButton("关闭", null);
+            builder.show();
+
+        } catch (Exception e) {
+            Logger.t(TAG).e("显示投送二维码失败", e);
+            android.widget.Toast.makeText(getContext(), "显示二维码失败: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 }
