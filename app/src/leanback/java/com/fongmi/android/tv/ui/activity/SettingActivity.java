@@ -150,11 +150,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     public void setConfig(Config config) {
-        if (config.getUrl().startsWith("file") && !PermissionX.isGranted(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
-        } else {
-            load(config);
-        }
+        load(config);
     }
 
     private void load(Config config) {
@@ -373,7 +369,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void onBackup(View view) {
-        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.backup(new Callback() {
+        AppDatabase.backup(new Callback() {
             @Override
             public void success() {
                 Notify.show(R.string.backup_success);
@@ -383,11 +379,11 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
             public void error() {
                 Notify.show(R.string.backup_fail);
             }
-        }));
+        });
     }
 
     private void onRestore(View view) {
-        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> RestoreDialog.create(this).show(new Callback() {
+        RestoreDialog.create(this).show(new Callback() {
             @Override
             public void success() {
                 Notify.show(R.string.restore_success);
@@ -400,7 +396,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
             public void error() {
                 Notify.show(R.string.restore_fail);
             }
-        }));
+        });
     }
 
     private void initConfig() {

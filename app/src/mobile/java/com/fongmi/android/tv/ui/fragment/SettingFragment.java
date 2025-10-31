@@ -183,20 +183,12 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     public void setConfig(Config config) {
         // 添加Fragment状态检查，防止在无效状态下执行
         if (getActivity() == null || !isAdded() || isDetached()) return;
-        
+
         // 如果URL为空，不进行任何操作
         if (config == null || config.isEmpty()) return;
-        
+
         try {
-            if (config.getUrl().startsWith("file") && !PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> {
-                    if (getActivity() != null && isAdded()) {
-                        load(config);
-                    }
-                });
-            } else {
-                load(config);
-            }
+            load(config);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -466,7 +458,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void onBackup(View view) {
-        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.backup(new Callback() {
+        AppDatabase.backup(new Callback() {
             @Override
             public void success() {
                 Notify.show(R.string.backup_success);
@@ -476,11 +468,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             public void error() {
                 Notify.show(R.string.backup_fail);
             }
-        }));
+        });
     }
 
     private void onRestore(View view) {
-        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> RestoreDialog.create().show(getActivity(), new Callback() {
+        RestoreDialog.create().show(getActivity(), new Callback() {
             @Override
             public void success() {
                 Notify.show(R.string.restore_success);
@@ -493,7 +485,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             public void error() {
                 Notify.show(R.string.restore_fail);
             }
-        }));
+        });
     }
 
     private void initConfig() {

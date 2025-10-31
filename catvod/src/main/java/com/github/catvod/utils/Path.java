@@ -1,6 +1,5 @@
 package com.github.catvod.utils;
 
-import android.os.Environment;
 import android.util.Log;
 
 import com.github.catvod.Init;
@@ -29,7 +28,7 @@ public class Path {
     }
 
     public static File root() {
-        return Environment.getExternalStorageDirectory();
+        return Init.context().getFilesDir();
     }
 
     public static File cache() {
