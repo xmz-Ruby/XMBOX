@@ -119,7 +119,7 @@ public final class DanmakuDialog extends BaseDialog {
 
     @Override
     protected void initView() {
-        if (Util.isLeanback()) setDimAmount(0f);
+        // 遮罩已在 BaseDialog 中统一处理
         mainHandler = new Handler(Looper.getMainLooper());
         searchState = DanmakuSearchState.getInstance();
 

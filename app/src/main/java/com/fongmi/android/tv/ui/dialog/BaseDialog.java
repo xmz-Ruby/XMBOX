@@ -67,4 +67,13 @@ public abstract class BaseDialog extends BottomSheetDialogFragment {
         behavior.setSkipCollapsed(true);
         behavior.setDraggable(false); // 禁用拖拽，防止与内部滑动冲突
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Leanback 模式下禁用背景遮罩，避免黄色半透明遮罩
+        if (com.fongmi.android.tv.utils.Util.isLeanback()) {
+            getDialog().getWindow().setDimAmount(0f);
+        }
+    }
 }
