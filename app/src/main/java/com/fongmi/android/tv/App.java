@@ -26,6 +26,7 @@ import com.orhanobut.logger.Logger;
 import com.orhanobut.logger.PrettyFormatStrategy;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.EventBusBuilder;
 import org.greenrobot.eventbus.meta.SubscriberInfoIndex;
 
 import java.util.concurrent.ExecutorService;
@@ -181,7 +182,7 @@ public class App extends Application {
     }
 
     private void initEventBus() {
-        EventBus.Builder builder = EventBus.builder();
+        EventBusBuilder builder = EventBus.builder();
         try {
             Class<?> indexClass = Class.forName("com.fongmi.android.tv.event.EventIndex");
             Object instance = indexClass.getDeclaredConstructor().newInstance();
