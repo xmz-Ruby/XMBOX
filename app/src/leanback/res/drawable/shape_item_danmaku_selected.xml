@@ -1,30 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Shadow/Glow effect -->
+    <!-- Highlight background -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@color/primary" />
-            <corners android:radius="6dp" />
+            <corners android:radius="8dp" />
         </shape>
     </item>
 
-    <!-- Main shape -->
+    <!-- Inner content -->
     <item
         android:bottom="2dp"
         android:left="2dp"
         android:right="2dp"
         android:top="2dp">
         <shape android:shape="rectangle">
-            <solid android:color="@color/grey_700" />
+            <solid android:color="@color/grey_600" />
             <stroke
-                android:width="3dp"
+                android:width="2dp"
                 android:color="@color/primary" />
-            <corners android:radius="4dp" />
-            <padding
-                android:bottom="8dp"
-                android:left="12dp"
-                android:right="12dp"
-                android:top="8dp" />
+            <corners android:radius="6dp" />
         </shape>
     </item>
 </layer-list>

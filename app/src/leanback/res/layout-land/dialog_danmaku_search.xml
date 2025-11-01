@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/grey_900">
+
+    <!-- 搜索输入区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/search_input"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:hint="请输入剧名搜索弹幕"
+            android:textColorHint="@color/white_50"
+            android:textColor="@color/white"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@drawable/shape_search_input"
+            android:singleLine="true"
+            android:imeOptions="actionSearch"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/search_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="12dp"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_search"
+            android:background="@drawable/selector_button"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:contentDescription="搜索" />
+
+        <TextView
+            android:id="@+id/reverse_button"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minWidth="80dp"
+            android:layout_marginStart="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="⇅ 反转"
+            android:gravity="center"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:background="@drawable/selector_button"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <TextView
+            android:id="@+id/jump_button"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minWidth="80dp"
+            android:layout_marginStart="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="→ 跳转"
+            android:gravity="center"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:background="@drawable/selector_button"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <ImageView
+            android:id="@+id/settings_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_preferences"
+            android:background="@drawable/selector_button"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:contentDescription="弹幕设置" />
+
+        <ImageView
+            android:id="@+id/close_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="@drawable/selector_button"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:contentDescription="关闭" />
+
+    </LinearLayout>
+
+    <!-- 加载动画区域 -->
+    <FrameLayout
+        android:id="@+id/loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/loading_progress"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:indeterminate="true" />
+
+            <TextView
+                android:id="@+id/loading_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="正在搜索..."
+                android:textSize="13sp"
+                android:textColor="@color/white_70" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- 空状态提示 -->
+    <LinearLayout
+        android:id="@+id/empty_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_menu_search"
+            android:alpha="0.3"
+            android:contentDescription="搜索图标" />
+
+        <TextView
+            android:id="@+id/empty_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="未找到相关弹幕"
+            android:textSize="13sp"
+            android:textColor="@color/white_70" />
+
+    </LinearLayout>
+
+    <!-- 内容区域 - 单列展示番剧或剧集列表 (横屏模式) -->
+    <FrameLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="450dp"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- 左侧：番剧列表 -->
+        <LinearLayout
+            android:id="@+id/anime_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/grey_700"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="番剧列表"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:padding="12dp"
+                    android:gravity="center" />
+
+                <ImageView
+                    android:id="@+id/anime_toggle_button"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_media_next"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:background="@drawable/selector_button"
+                    android:contentDescription="查看剧集列表" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/search_results"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="200dp"
+                android:scrollbars="vertical"
+                android:fadeScrollbars="false"
+                android:overScrollMode="always"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </LinearLayout>
+
+        <!-- 右侧：剧集列表 -->
+        <LinearLayout
+            android:id="@+id/episode_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/grey_700"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/anime_expand_button"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:background="@drawable/selector_button"
+                    android:contentDescription="返回番剧列表"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="剧集列表"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:padding="12dp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/episode_results"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="200dp"
+                android:scrollbars="vertical"
+                android:fadeScrollbars="false"
+                android:overScrollMode="always"
+                android:nestedScrollingEnabled="true"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

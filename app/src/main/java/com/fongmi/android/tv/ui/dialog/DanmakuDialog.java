@@ -1160,6 +1160,9 @@ public final class DanmakuDialog extends BaseDialog {
     private void scrollToPositionWithCenter(int position, boolean showToast) {
         Logger.t(TAG).d("=== 开始滚动到位置: " + position + ", 显示提示: " + showToast + " ===");
 
+        // 保存Context引用，避免在延迟执行时Context为null
+        final android.content.Context context = getContext();
+
         episodeResults.post(() -> {
             try {
                 androidx.recyclerview.widget.LinearLayoutManager layoutManager =
@@ -1178,17 +1181,17 @@ public final class DanmakuDialog extends BaseDialog {
                         Logger.t(TAG).d("策略2: smoothScrollToPosition");
                         episodeResults.smoothScrollToPosition(position);
 
-                        if (showToast) {
+                        if (showToast && context != null) {
                             episodeResults.postDelayed(() -> {
                                 try {
                                     String episodeNum = currentEpisodes.get(position).getEpisodeNumber();
                                     Logger.t(TAG).d("显示提示: 第 " + episodeNum + " 集");
-                                    android.widget.Toast.makeText(getContext(),
+                                    android.widget.Toast.makeText(context,
                                         "已定位到第 " + episodeNum + " 集",
                                         android.widget.Toast.LENGTH_SHORT).show();
                                 } catch (Exception e) {
                                     Logger.t(TAG).d("显示提示: 第 " + (position + 1) + " 个剧集");
-                                    android.widget.Toast.makeText(getContext(),
+                                    android.widget.Toast.makeText(context,
                                         "已定位到第 " + (position + 1) + " 个剧集",
                                         android.widget.Toast.LENGTH_SHORT).show();
                                 }
