@@ -20,10 +20,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:textColor="@color/white"
+        android:textColor="@color/text_danmaku_item"
         android:textStyle="bold"
         android:maxLines="2"
-        android:ellipsize="end" />
+        android:ellipsize="end"
+        android:duplicateParentState="true" />
 
     <TextView
         android:id="@+id/anime_type"
@@ -31,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:textSize="13sp"
-        android:textColor="@color/white_70" />
+        android:textColor="@color/white_70"
+        android:duplicateParentState="true" />
 
 </LinearLayout>

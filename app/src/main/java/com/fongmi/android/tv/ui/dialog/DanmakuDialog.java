@@ -1272,13 +1272,15 @@ public final class DanmakuDialog extends BaseDialog {
                 listener.onItemClick(anime, position);
             });
 
-            // 显示选中状态
-            if (position == selectedPosition) {
-                holder.itemView.setBackgroundColor(0x3300FF00);
-            } else {
-                // 恢复默认背景 - 使用透明色
-                holder.itemView.setBackgroundColor(0x00000000);
-            }
+            // 显示选中状态 - 使用activated状态触发selector
+            holder.itemView.setActivated(position == selectedPosition);
+
+            // 添加焦点监听器，确保焦点变化时重绘
+            holder.itemView.setOnFocusChangeListener((v, hasFocus) -> {
+                // 焦点变化时会自动触发selector的state_focused
+                // 这里只需要确保view刷新
+                v.invalidate();
+            });
         }
 
         @Override
@@ -1340,13 +1342,22 @@ public final class DanmakuDialog extends BaseDialog {
                 listener.onItemClick(episode);
             });
 
-            // 显示高亮状态 - 使用更醒目的样式
-            if (position == searchState.getHighlightedEpisodePosition()) {
+            // 使用activated状态触发selector，同时保留highlight视觉效果
+            boolean isHighlighted = position == searchState.getHighlightedEpisodePosition();
+            holder.itemView.setActivated(isHighlighted);
+
+            // 添加焦点监听器
+            holder.itemView.setOnFocusChangeListener((v, hasFocus) -> {
+                // 焦点变化时自动触发selector的state_focused
+                v.invalidate();
+            });
+
+            if (isHighlighted) {
                 holder.highlight.setVisibility(View.VISIBLE);
                 android.graphics.drawable.GradientDrawable border = new android.graphics.drawable.GradientDrawable();
-                border.setColor(0x4000FF00);
-                border.setStroke(6, 0xFF00FF00);
-                border.setCornerRadius(8);
+                border.setColor(0x00000000); // 透明背景，不影响selector
+                border.setStroke(4, 0xFFFFEB3B); // 使用primary颜色作为边框
+                border.setCornerRadius(6);
                 holder.highlight.setBackground(border);
             } else {
                 holder.highlight.setVisibility(View.GONE);

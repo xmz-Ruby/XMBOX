@@ -221,6 +221,7 @@
                 android:scrollbars="vertical"
                 android:fadeScrollbars="false"
                 android:overScrollMode="always"
+                android:descendantFocusability="afterDescendants"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         </LinearLayout>
@@ -279,6 +280,7 @@
                 android:fadeScrollbars="false"
                 android:overScrollMode="always"
                 android:nestedScrollingEnabled="true"
+                android:descendantFocusability="afterDescendants"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         </LinearLayout>
