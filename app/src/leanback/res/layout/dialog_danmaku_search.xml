@@ -24,7 +24,7 @@
             android:textColor="@color/white"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@drawable/shape_search_input"
+            android:background="@drawable/selector_search_input"
             android:singleLine="true"
             android:imeOptions="actionSearch"
             android:textSize="16sp" />
