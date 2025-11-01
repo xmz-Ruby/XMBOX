@@ -177,8 +177,10 @@ public final class DanmakuDialog extends BaseDialog {
         searchInput.setCursorVisible(false);
         searchInput.setKeyListener(null); // 禁止键盘输入，保持只读
 
-        // 点击输入框显示投送二维码
-        searchInput.setOnClickListener(v -> showCastQRCode());
+        // 点击输入框显示投送二维码（仅Leanback有QRCode类）
+        searchInput.setOnClickListener(v -> {
+            if (Util.isLeanback()) showCastQRCode();
+        });
 
         searchInput.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
@@ -186,7 +188,7 @@ public final class DanmakuDialog extends BaseDialog {
             if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
                 keyCode == KeyEvent.KEYCODE_ENTER ||
                 keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER) {
-                showCastQRCode();
+                if (Util.isLeanback()) showCastQRCode();
                 return true;
             }
 
@@ -197,7 +199,7 @@ public final class DanmakuDialog extends BaseDialog {
             if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                 actionId == EditorInfo.IME_ACTION_DONE ||
                 (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                showCastQRCode();
+                if (Util.isLeanback()) showCastQRCode();
                 return true;
             }
             return false;
@@ -1399,16 +1401,10 @@ public final class DanmakuDialog extends BaseDialog {
             String castUrl = "http://" + ip + ":" + port + "/danmaku";
             Logger.t(TAG).d("生成投送URL: " + castUrl);
 
-            // 直接调用 QRCode.getBitmap (leanback版本)
-            Bitmap qrBitmap = null;
-            try {
-                qrBitmap = com.fongmi.android.tv.utils.QRCode.getBitmap(castUrl, 200, 1);
-            } catch (NoClassDefFoundError e) {
-                // Mobile版本没有QRCode类，使用反射
-                Class<?> qrCodeClass = Class.forName("com.fongmi.android.tv.utils.QRCode");
-                java.lang.reflect.Method getBitmapMethod = qrCodeClass.getMethod("getBitmap", String.class, int.class, int.class);
-                qrBitmap = (Bitmap) getBitmapMethod.invoke(null, castUrl, 200, 1);
-            }
+            // 使用反射调用 QRCode.getBitmap (仅 leanback 版本有此类)
+            Class<?> qrCodeClass = Class.forName("com.fongmi.android.tv.utils.QRCode");
+            java.lang.reflect.Method getBitmapMethod = qrCodeClass.getMethod("getBitmap", String.class, int.class, int.class);
+            Bitmap qrBitmap = (Bitmap) getBitmapMethod.invoke(null, castUrl, 200, 1);
 
             if (qrBitmap == null) {
                 android.widget.Toast.makeText(getContext(), "生成二维码失败", android.widget.Toast.LENGTH_SHORT).show();

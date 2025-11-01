@@ -402,7 +402,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mPlayers.setDanmakuView(mBinding.danmaku);
         mPlayers.setTag(tag = UUID.randomUUID().toString());
         mBinding.control.decode.setText(mPlayers.getDecodeText());
-        mBinding.control.danmaku.setVisibility(Setting.isDanmakuLoad() ? View.VISIBLE : View.GONE);
+        mBinding.control.danmaku.setVisibility(View.VISIBLE);
         mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
     }
 
@@ -942,8 +942,73 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void onDanmaku() {
+        if (!Setting.isDanmakuLoad()) {
+            // 弹幕开关未打开，显示投送二维码
+            showDanmakuCastQRCode();
+            return;
+        }
         DanmakuDialog.create().player(mPlayers).show(this);
         hideControl();
+    }
+
+    private void showDanmakuCastQRCode() {
+        try {
+            String ip = com.github.catvod.utils.Util.getIp();
+            int port = com.github.catvod.Proxy.getPort();
+
+            if (ip.isEmpty()) {
+                Notify.show("无法获取局域网IP地址");
+                return;
+            }
+
+            String castUrl = "http://" + ip + ":" + port + "/danmaku";
+            android.graphics.Bitmap qrBitmap = com.fongmi.android.tv.utils.QRCode.getBitmap(castUrl, 200, 1);
+
+            if (qrBitmap == null) {
+                Notify.show("生成二维码失败");
+                return;
+            }
+
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+            android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+            layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+            layout.setPadding(40, 40, 40, 40);
+            layout.setGravity(android.view.Gravity.CENTER);
+
+            android.widget.TextView titleText = new android.widget.TextView(this);
+            titleText.setText("扫描二维码进行弹幕投送");
+            titleText.setTextSize(16);
+            titleText.setGravity(android.view.Gravity.CENTER);
+            titleText.setPadding(0, 0, 0, 20);
+            layout.addView(titleText);
+
+            android.widget.ImageView qrImageView = new android.widget.ImageView(this);
+            qrImageView.setImageBitmap(qrBitmap);
+            layout.addView(qrImageView);
+
+            android.widget.TextView urlText = new android.widget.TextView(this);
+            urlText.setText(castUrl);
+            urlText.setTextSize(12);
+            urlText.setGravity(android.view.Gravity.CENTER);
+            urlText.setPadding(0, 20, 0, 0);
+            urlText.setTextColor(0xFF999999);
+            layout.addView(urlText);
+
+            android.widget.TextView hintText = new android.widget.TextView(this);
+            hintText.setText("使用手机扫描二维码\n在手机上搜索并投送弹幕到电视\n\n提示：在设置中打开弹幕开关可直接搜索弹幕");
+            hintText.setTextSize(12);
+            hintText.setGravity(android.view.Gravity.CENTER);
+            hintText.setPadding(0, 10, 0, 0);
+            hintText.setTextColor(0xFF666666);
+            layout.addView(hintText);
+
+            builder.setView(layout);
+            builder.setPositiveButton("关闭", null);
+            builder.show();
+
+        } catch (Exception e) {
+            Notify.show("显示二维码失败: " + e.getMessage());
+        }
     }
 
     private void onToggle() {

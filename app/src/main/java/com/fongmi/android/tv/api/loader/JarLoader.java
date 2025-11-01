@@ -47,12 +47,23 @@ public class JarLoader {
     }
 
     private void load(String key, File file) {
+        if (!file.exists() || file.length() < 100) {
+            Logger.e("JarLoader: Invalid JAR file - key=" + key + ", exists=" + file.exists() + ", size=" + file.length());
+            if (file.exists()) file.delete();
+            return;
+        }
         if (!file.setReadOnly()) return;
         Logger.i("JarLoader: Loading JAR - key=" + key + ", file=" + file.getName());
-        loaders.put(key, dex(file));
-        invokeInit(key);
-        putProxy(key);
-        Logger.i("JarLoader: JAR loaded successfully - " + key);
+        try {
+            loaders.put(key, dex(file));
+            invokeInit(key);
+            putProxy(key);
+            Logger.i("JarLoader: JAR loaded successfully - " + key);
+        } catch (Throwable e) {
+            Logger.e("JarLoader: Failed to load JAR - key=" + key + ", deleting corrupted file", e);
+            file.delete();
+            loaders.remove(key);
+        }
     }
 
     private DexClassLoader dex(File file) {
