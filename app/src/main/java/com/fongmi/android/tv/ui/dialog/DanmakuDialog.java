@@ -1399,10 +1399,16 @@ public final class DanmakuDialog extends BaseDialog {
             String castUrl = "http://" + ip + ":" + port + "/danmaku";
             Logger.t(TAG).d("生成投送URL: " + castUrl);
 
-            // 使用反射调用 QRCode.getBitmap (仅 leanback 版本有此类)
-            Class<?> qrCodeClass = Class.forName("com.fongmi.android.tv.utils.QRCode");
-            java.lang.reflect.Method getBitmapMethod = qrCodeClass.getMethod("getBitmap", String.class, int.class, int.class);
-            Bitmap qrBitmap = (Bitmap) getBitmapMethod.invoke(null, castUrl, 200, 1);
+            // 直接调用 QRCode.getBitmap (leanback版本)
+            Bitmap qrBitmap = null;
+            try {
+                qrBitmap = com.fongmi.android.tv.utils.QRCode.getBitmap(castUrl, 200, 1);
+            } catch (NoClassDefFoundError e) {
+                // Mobile版本没有QRCode类，使用反射
+                Class<?> qrCodeClass = Class.forName("com.fongmi.android.tv.utils.QRCode");
+                java.lang.reflect.Method getBitmapMethod = qrCodeClass.getMethod("getBitmap", String.class, int.class, int.class);
+                qrBitmap = (Bitmap) getBitmapMethod.invoke(null, castUrl, 200, 1);
+            }
 
             if (qrBitmap == null) {
                 android.widget.Toast.makeText(getContext(), "生成二维码失败", android.widget.Toast.LENGTH_SHORT).show();
