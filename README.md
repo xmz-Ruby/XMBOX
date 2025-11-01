@@ -21,7 +21,7 @@
 ### 📺 多平台支持
 - **Android TV版本** - 针对电视、盒子优化的遥控器界面
 - **手机版本** - 触屏友好的移动端界面
-- **多架构支持** - ARM64-V8A、ARM V7A 和 x86_64 三架构
+- **多架构支持** - ARM64-V8A、ARM V7A、ARM Universal（32/64位通用）和 x86_64 四种架构
 
 ### 🎬 强大的播放功能
 - 🎵 **多格式支持** - 支持主流视频格式播放
@@ -47,6 +47,7 @@
 - Android 5.0 (API 21) 及以上
 - ARM64-V8A: 推荐新设备使用，性能更优
 - ARM V7A: 兼容老设备，适配性更强
+- ARM Universal: 通用版本，同时支持32位和64位ARM设备（推荐）
 - x86_64: 支持x86架构设备和模拟器
 
 ## 🏗️ 构建指南
@@ -107,14 +108,16 @@ signingConfigs {
 **构建单架构版本：**
 ```bash
 # 手机版
-./gradlew assembleArm64_v8aMobileRelease    # ARM64 手机版
-./gradlew assembleArmeabi_v7aMobileRelease  # ARM V7A 手机版
-./gradlew assembleX86_64MobileRelease       # x86_64 手机版
+./gradlew assembleArm64_v8aMobileRelease      # ARM64 手机版
+./gradlew assembleArmeabi_v7aMobileRelease    # ARM V7A 手机版
+./gradlew assembleArm_universalMobileRelease  # ARM Universal 手机版（推荐）
+./gradlew assembleX86_64MobileRelease         # x86_64 手机版
 
 # TV版
-./gradlew assembleArm64_v8aLeanbackRelease    # ARM64 TV版
-./gradlew assembleArmeabi_v7aLeanbackRelease  # ARM V7A TV版
-./gradlew assembleX86_64LeanbackRelease       # x86_64 TV版
+./gradlew assembleArm64_v8aLeanbackRelease      # ARM64 TV版
+./gradlew assembleArmeabi_v7aLeanbackRelease    # ARM V7A TV版
+./gradlew assembleArm_universalLeanbackRelease  # ARM Universal TV版（推荐）
+./gradlew assembleX86_64LeanbackRelease         # x86_64 TV版
 ```
 
 **构建所有版本：**
@@ -126,21 +129,26 @@ signingConfigs {
 
 ```
 app/build/outputs/apk/
-├── arm64_v8a/mobile/release/arm64_v8a-mobile.apk
-├── arm64_v8a/leanback/release/arm64_v8a-leanback.apk
-├── armeabi_v7a/mobile/release/armeabi_v7a-mobile.apk
-├── armeabi_v7a/leanback/release/armeabi_v7a-leanback.apk
-├── x86_64/mobile/release/x86_64-mobile.apk
-└── x86_64/leanback/release/x86_64-leanback.apk
+├── arm64_v8aMobile/release/arm64_v8a-mobile.apk
+├── arm64_v8aLeanback/release/arm64_v8a-leanback.apk
+├── armeabi_v7aMobile/release/armeabi_v7a-mobile.apk
+├── armeabi_v7aLeanback/release/armeabi_v7a-leanback.apk
+├── arm_universalMobile/release/arm_universal-mobile.apk         # 推荐
+├── arm_universalLeanback/release/arm_universal-leanback.apk     # 推荐
+├── x86_64Mobile/release/x86_64-mobile.apk
+└── x86_64Leanback/release/x86_64-leanback.apk
 ```
 
 ### 📦 版本选择建议
 
 | 架构类型 | 体积 | 兼容性 | 适用场景 |
 |---------|------|--------|---------|
-| **ARM64-V8A** | 小（约30MB） | 64位ARM设备 | 推荐新设备使用，性能最优 |
-| **ARM V7A** | 小（约30MB） | 32位ARM设备 | 兼容老设备，适配性强 |
-| **x86_64** | 小（约30MB） | x86架构设备 | 模拟器和x86设备专用 |
+| **ARM Universal** | 大（约80MB） | 32/64位ARM设备通用 | **强烈推荐**，一个APK兼容所有ARM设备 |
+| **ARM64-V8A** | 小（约40MB） | 64位ARM设备 | 新设备专用，体积小性能优 |
+| **ARM V7A** | 小（约40MB） | 32位ARM设备 | 老设备专用，兼容性强 |
+| **x86_64** | 小（约40MB） | x86架构设备 | 模拟器和x86设备专用 |
+
+> **注意**: ARM Universal 版本体积较大，但一个APK可同时在32位和64位ARM设备上运行，无需区分架构。如果追求最小安装包，可选择对应架构的单独版本。
 
 ### 🔐 签名验证
 
@@ -188,11 +196,16 @@ LetMeSeeSee/
 #### ✨ 新功能
 * **项目重命名** - 项目更名为"让我看看 (LetMeSeeSee)"
 * **移除自动更新** - 完全移除自动更新检查机制
+* **ARM Universal 构建** - 新增通用ARM版本，同时支持32位和64位设备
 * **界面优化** - 优化设置页面显示
 
 #### 🎨 UI优化
 * 统一应用名称显示
 * 优化版本信息展示
+
+#### 🔧 构建优化
+* 新增 arm_universal flavor，一个APK兼容所有ARM设备
+* 优化构建配置，支持 armeabi-v7a 和 arm64-v8a 双架构打包
 
 ## 🔌 API 文档
 
